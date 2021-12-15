@@ -1,8 +1,3 @@
----
-title: cw3-fixed-multisig Spec
-order: 2
----
-
 # CW3 Fixed Multisig
 
 cw3-fixed-multisig source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw3-fixed-multisig](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw3-fixed-multisig)

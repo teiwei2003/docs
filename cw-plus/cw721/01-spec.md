@@ -1,8 +1,3 @@
----
-title: cw721 Spec
-order: 1
----
-
 # CW721 Spec: Non Fungible Tokens
 
 cw721 package source code: [https://github.com/CosmWasm/cosmwasm-plus/blob/master/packages/cw721/README.md](https://github.com/CosmWasm/cosmwasm-plus/blob/master/packages/cw721/README.md)

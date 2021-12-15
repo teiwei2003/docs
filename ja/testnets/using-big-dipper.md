@@ -1,8 +1,3 @@
----
-title: Using Big Dipper
-order: 3
----
-
 # Using Big Dipper
 
 For exploring the testnets, you can use big-dipper instances:

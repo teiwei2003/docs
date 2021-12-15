@@ -1,71 +1,66 @@
----
-title: cw3-flex-multisig Spec
-order: 3
----
+# CW3 灵活多重签名
 
-# CW3 Flexible Multisig
+cw3-flex-multisig 源代码:[https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw3-flex-multisig](https://github.com/CosmWasm/cosmwasm-plus/树/主/合同/cw3-flex-multisig)
 
-cw3-flex-multisig source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw3-flex-multisig](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw3-flex-multisig)
+这建立在 [cw3-fixed-multisig](02-cw3-fixed-spec.md) 之上
+[cw3 规范](01-spec.md) 的强大实现。
+这是一个多重签名合约，由
+[cw4 (group)](../cw4/01-spec.md) 合约，独立
+维护选民集。
 
-This builds on [cw3-fixed-multisig](02-cw3-fixed-spec.md) with a more
-powerful implementation of the [cw3 spec](01-spec.md).
-It is a multisig contract that is backed by a
-[cw4 (group)](../cw4/01-spec.md) contract, which independently
-maintains the voter set.
+这提供了两个主要优点:
 
-This provides 2 main advantages:
+* 您可以创建两个具有不同投票阈值的不同多重签名
+  得到同一个团体的支持。因此，您可以拥有 50% 的选票和 67% 的选票
+  总是使用相同的选民集，但可以采取其他行动。
+* TODO:它允许动态多重签名组。由于组可以改变，
+  我们可以将 multisigs 之一设置为组合约的管理员，
+  和
 
-* You can create two different multisigs with different voting thresholds
-  backed by the same group. Thus, you can have a 50% vote, and a 67% vote
-  that always use the same voter set, but can take other actions.
-* TODO: It allows dynamic multisig groups. Since the group can change,
-  we can set one of the multisigs as the admin of the group contract,
-  and the
+除了动态投票集，与原生的主要区别
+Cosmos SDK multisig，就是聚合链上的签名，用
+可见的提案(如 Cosmos SDK 中的“x/gov”)，而不是要求
+签名者在链下共享签名。
 
-In addition to the dynamic voting set, the main difference with the native
-Cosmos SDK multisig, is that it aggregates the signatures on chain, with
-visible proposals (like `x/gov` in the Cosmos SDK), rather than requiring
-signers to share signatures off chain.
+## 在里面
 
-## Init
+创建这种多重签名的第一步是实例化一个 cw4 合约
+具有所需的成员集。目前，这仅受支持
+[cw4-group](../cw4/02-cw4-group-spec.md)，但是我们会添加一个token-weighted group contract
+(去做)。
 
-The first step to create such a multisig is to instantiate a cw4 contract
-with the desired member set. For now, this only is supported by
-[cw4-group](../cw4/02-cw4-group-spec.md), but we will add a token-weighted group contract
-(TODO).
+如果您创建了一个“cw4-group”合约并希望多重签名能够
+要修改自己的组，请在多个事务中执行以下操作:
 
-If you create a `cw4-group` contract and want a multisig to be able
-to modify its own group, do the following in multiple transactions:
+* init cw4-group，用你的个人密钥作为管理员
+* 初始化一个指向组的多重签名
+* `AddHook{multisig}` 在组合约上
+* 组合约上的`UpdateAdmin{multisig}`
 
-* init cw4-group, with your personal key as admin
-* init a multisig pointing to the group
-* `AddHook{multisig}` on the group contract
-* `UpdateAdmin{multisig}` on the group contract
+这是创建此类循环依赖项的当前做法，
+并且依赖于外部驱动程序(很难甚至不可能编写这样的脚本
+链上自部署合约)。 (待办事项:记录更好)。
 
-This is the current practice to create such circular dependencies,
-and depends on an external driver (hard to impossible to script such a
-self-deploying contract on-chain). (TODO: document better).
+创建多重签名时，您必须设置所需的权重才能通过投票
+以及最大/默认投票期。 (TODO:允许更多阈值类型)
 
-When creating the multisig, you must set the required weight to pass a vote
-as well as the max/default voting period. (TODO: allow more threshold types)
+## 处理过程
 
-## Handle Process
+首先，登记选民必须提交提案。这也包括
+提案人首先对提案投“赞成”票。提议者可以设置
+投票过程的到期时间，或者默认为限制
+创建合同时提供(因此可以在几次之后关闭提案
+天)。
 
-First, a registered voter must submit a proposal. This also includes the
-first "Yes" vote on the proposal by the proposer. The proposer can set
-an expiration time for the voting process, or it defaults to the limit
-provided when creating the contract (so proposals can be closed after several
-days).
+在提案过期之前，任何权重非零的选民都可以添加他们的
+投票。只计算“是”票。如果之前提交了足够多的“是”选票
+提案到期日期，状态设置为“已通过”。
 
-Before the proposal has expired, any voter with non-zero weight can add their
-vote. Only "Yes" votes are tallied. If enough "Yes" votes were submitted before
-the proposal expiration date, the status is set to "Passed".
+一旦提案“通过”，任何人都可以提交“执行”消息。这会
+触发提案发送提案中所有存储的消息并更新
+它的状态为“已执行”，因此无法再次运行。 (注意如果执行失败
+出于任何原因 - 燃料不足，资金不足等 - 状态更新将
+被恢复，它将保持“通过”，所以你可以再试一次)。
 
-Once a proposal is "Passed", anyone may submit an "Execute" message. This will
-trigger the proposal to send all stored messages from the proposal and update
-it's state to "Executed", so it cannot run again. (Note if the execution fails
-for any reason - out of gas, insufficient funds, etc - the state update will
-be reverted, and it will remain "Passed", so you can try again).
-
-Once a proposal has expired without passing, anyone can submit a "Close"
-message to mark it closed. This has no effect beyond cleaning up the UI/database.
+一旦提案过期未通过，任​​何人都可以提交“关闭”
+将其标记为关闭的消息。除了清理 UI/数据库之外，这没有任何影响。

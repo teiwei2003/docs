@@ -1,30 +1,25 @@
----
-title: cw20-base Spec
-order: 2
----
+# CW20 基本
 
-# CW20 Basic
+这是 cw20 合约的基本实现。 它实现
+[CW20 规范](01-spec.md) 旨在
+按原样部署，或导入其他合约以轻松构建
+具有自定义逻辑的 cw20 兼容令牌。
 
-This is a basic implementation of a cw20 contract. It implements
-the [CW20 spec](01-spec.md) and is designed to
-be deployed as is, or imported into other contracts to easily build
-cw20-compatible tokens with custom logic.
+实现:
 
-Implements:
+- [x] CW20 基地
+- [x] Mintable 扩展
+- [x] 津贴延期
 
-- [x] CW20 Base
-- [x] Mintable extension
-- [x] Allowances extension
+## 导入这个合约
 
-## Importing this contract
+你也可以导入这个合约的大部分逻辑来构建另一个
+ERC20-合同，例如结合曲线，覆盖或扩展您的
+需要。
 
-You can also import much of the logic of this contract to build another
-ERC20-contract, such as a bonding curve, overriding or extending what you
-need.
-
-Basically, you just need to write your handle function and import
-`cw20_base::contract::handle_transfer`, etc and dispatch to them.
-This allows you to use custom `HandleMsg` and `QueryMsg` with your additional
-calls, but then use the underlying implementation for the standard cw20
-messages you want to support. The same with `QueryMsg`. You *could* reuse `init`
-as it, but it is likely you will want to change it. And it is rather simple.
+基本上，您只需要编写句柄函数并导入
+`cw20_base::contract::handle_transfer` 等并分派给他们。
+这允许您使用自定义的 `HandleMsg` 和 `QueryMsg` 与您的附加
+调用，然后使用标准 cw20 的底层实现
+您想要支持的消息。 与`QueryMsg` 相同。 你*可以*重用`init`
+一样，但您很可能想要更改它。 而且相当简单。

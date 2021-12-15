@@ -1,35 +1,30 @@
----
-title: cw20-atomic-swap Spec
-order: 7
----
+# 原子交换
 
-# Atomic Swaps
+cw20-atomic-swap 源代码:[https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-atomic-swap](https://github.com/CosmWasm/cosmwasm-plus/树/主/合同/cw20-原子交换)
 
-cw20-atomic-swap source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-atomic-swap](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-atomic-swap)
+这是一个允许用户执行原子交换的合约。
+它实现了原子交换的一侧。另一面可以实现
+通过同一区块链中或通常在不同区块链上的等效合约。
 
-This is a contract that allows users to execute atomic swaps.
-It implements one side of an atomic swap. The other side can be realized
-by an equivalent contract in the same blockchain or, typically, on a different blockchain.
+原子交换的每一方都有一个发送者、一个接收者、一个散列、
+和超时。它还有一个唯一的 id(供将来调用以引用它)。
+散列是 sha256 编码的 32 字节长短语。
+超时可以是基于时间的(自 1970 年 1 月 1 日午夜以来的秒数)，
+或基于块高度。
 
-Each side of an atomic swap has a sender, a recipient, a hash,
-and a timeout. It also has a unique id (for future calls to reference it).
-The hash is a sha256-encoded 32-bytes long phrase.
-The timeout can be either time-based (seconds since midnight, January 1, 1970),
-or block height based.
+基本功能是，发送方选择一个 32 字节长的短语作为原像，对其进行哈希处理，
+然后使用散列创建资金互换。
+在超时之前，任何知道原像的人都可以决定释放资金
+给原收件人。
+超时后(如果没有执行发布)，任何人都可以退款
+锁定的令牌给原始发件人。
+在交换的另一端，过程类似，发送者和接收者交换。
+哈希值必须相同，因此第一个发件人可以领取资金，从而显示原像
+并触发交换。
 
-The basic function is, the sender chooses a 32-bytes long phrase as preimage, hashes it,
-and then uses the hash to create a swap with funds.
-Before the timeout, anybody that knows the preimage may decide to release the funds
-to the original recipient.
-After the timeout (and if no release has been executed), anyone can refund
-the locked tokens to the original sender.
-On the other side of the swap the process is similar, with sender and recipient exchanged.
-The hash must be the same, so the first sender can claim the funds, revealing the preimage
-and triggering the swap.
+请参阅 [IOV 原子交换规范](https://github.com/iov-one/iov-core/blob/master/docs/atomic-swap-protocol-v1.md)
+详情。
 
-See the [IOV atomic swap spec](https://github.com/iov-one/iov-core/blob/master/docs/atomic-swap-protocol-v1.md)
-for details.
+## 代币类型
 
-## Token types
-
-Currently native tokens are supported; an upcoming version will support CW20 tokens.
+目前支持原生代币；即将推出的版本将支持 CW20 代币。

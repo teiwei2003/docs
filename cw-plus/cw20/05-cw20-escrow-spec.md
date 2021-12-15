@@ -1,8 +1,3 @@
----
-title: cw20-escrow Spec
-order: 5
----
-
 # CW20 Escrow
 
 cw20-escrow source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-escrow](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-escrow)

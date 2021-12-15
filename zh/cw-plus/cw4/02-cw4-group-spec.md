@@ -1,27 +1,22 @@
----
-title: cw4-group Spec
-order: 2
----
+# CW4 组
 
-# CW4 Group
+cw4-group 源代码:[https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw4-group](https://github.com/CosmWasm/cosmwasm-plus/tree/master/ 合同/cw4-group)
 
-cw4-group source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw4-group](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw4-group)
+这是 [cw4 规范](01-spec.md) 的基本实现。
+它满足规范的所有元素，包括原始查询查找，
+它旨在用作后备存储
+[符合 cw3 的合同](../cw3/01-spec.md)。
 
-This is a basic implementation of the [cw4 spec](01-spec.md).
-It fulfills all elements of the spec, including the raw query lookups,
-and it designed to be used as a backing storage for
-[cw3 compliant contracts](../cw3/01-spec.md).
+它与管理员一起存储一组成员，并允许管理员
+更新状态。 原始查询(用于跨合约查询)
+可以查询给定的会员地址和总重量。 智能查询(设计
+对于客户端 API) 可以做同样的事情，也可以查询管理地址以及
+对所有成员进行分页。
 
-It stores a set of members along with an admin, and allows the admin to
-update the state. Raw queries (intended for cross-contract queries)
-can check a given member address and the total weight. Smart queries (designed
-for client API) can do the same, and also query the admin address as well as
-paginate over all members.
+## 在里面
 
-## Init
-
-To create it, you must pass in a list of members, as well as an optional
-`admin`, if you wish it to be mutable.
+要创建它，您必须传入成员列表以及可选的
+`admin`，如果你希望它是可变的。
 
 ```rust
 pub struct InitMsg {
@@ -35,24 +30,23 @@ pub struct Member {
 }
 ```
 
-Members are defined by an address and a weight. This is transformed
-and stored under their `CanonicalAddr`, in a format defined in
-[cw4 raw queries](01-spec.md#raw).
+成员由地址和权重定义。 这是变身
+并以定义的格式存储在它们的“CanonicalAddr”下
+[cw4 原始查询](01-spec.md#raw)。
 
-Note that 0 *is an allowed weight*. This doesn't give any voting rights, but
-it does define this address is part of the group. This could be used in
-e.g. a KYC whitelist to say they are allowed, but cannot participate in
-decision-making.
+请注意，0 *是允许的重量*。 这不赋予任何投票权，但是
+它确实定义了这个地址是组的一部分。 这可以用于
+例如 一个 KYC 白名单，表示他们被允许，但不能参与
+做决定。
 
-## Messages
+## 消息
 
-Basic update messages, queries, and hooks are defined by the
-[cw4 spec](01-spec.md). Please refer to it for more info.
+基本更新消息、查询和挂钩由
+[cw4 规范](01-spec.md)。 请参阅它以获取更多信息。
 
-`cw4-group` adds one message to control the group membership:
+`cw4-group` 添加一条消息来控制组成员身份:
 
-`UpdateMembers{add, remove}` - takes a membership diff and adds/updates the
-members, as well as removing any provided addresses. If an address is on both
-lists, it will be removed. If it appears multiple times in `add`, only the
-last occurrence will be used.
-
+`UpdateMembers{add, remove}` - 获取成员差异并添加/更新
+成员，以及删除任何提供的地址。 如果一个地址在两个
+列表，它将被删除。 如果它在 `add` 中多次出现，则只有
+将使用最后一次出现。

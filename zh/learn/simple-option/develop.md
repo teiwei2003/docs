@@ -1,12 +1,8 @@
----
-order: 3
----
-
-# Develop Contract
+# 开发合约
 
 <iframe src="https://player.vimeo.com/video/457702442" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
 
-First test if the starter works, and get your eyes used to rust test results:
+首先测试启动器是否工作，并让您的眼睛习惯生锈测试结果:
 
 ```shell
 cargo unit-test
@@ -44,25 +40,25 @@ test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 
 ```
 
-All good.
+都好。
 
-::: tip
-Timecode [https://vimeo.com/457702442#t=39s](https://vimeo.com/457702442#t=39s)
+::: 小费
+时间码 [https://vimeo.com/457702442#t=39s](https://vimeo.com/457702442#t=39s)
 :::
 
-[src/lib.rs](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/lib.rs) file contains wasm bindings. Wraps smart contract *(handle, init, query)* functions around rust functions. If you are not doing advanced wasm tweaking, don't touch it.
+[src/lib.rs](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/lib.rs) 文件包含 wasm 绑定。 围绕 Rust 函数包装智能合约 *(handle, init, query)* 函数。 如果您没有进行高级 wasm 调整，请不要碰它。
 
-## Messages
+## 消息
 
-::: tip
-Timecode [https://vimeo.com/457702442#t=1m46s](https://vimeo.com/457702442#t=1m46s)
+::: 小费
+时间码 [https://vimeo.com/457702442#t=1m46s](https://vimeo.com/457702442#t=1m46s)
 :::
 
-Development begins in [src/msg.rs](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/msg.rs) which contains the input data structures of the smart contract.
+开发开始于 [src/msg.rs](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/msg.rs)，其中包含智能合约的输入数据结构。
 
-### InitMsg
+### 初始化消息
 
-We will begin with [`InitMsg`](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/msg.rs). This struct has the initial values that initializes smart contract from the code and feeds in the data required for logic setup.
+我们将从 [`InitMsg`](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/msg.rs) 开始。 此结构具有从代码初始化智能合约的初始值，并提供逻辑设置所需的数据。
 
 ```rust
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -157,20 +153,20 @@ pub fn config_read(storage: &dyn Storage) -> ReadonlySingleton<State> {
 ```
 
 
-## Contract Handlers
+## 合同处理程序
 
-::: tip
-Timecode [https://vimeo.com/457702442#t=11m12s](https://vimeo.com/457702442#t=11m12s)
+::: 小费
+时间码 [https://vimeo.com/457702442#t=11m12s](https://vimeo.com/457702442#t=11m12s)
 :::
 
-Lego bricks **msgs**, **handler** and **state** are defined. Now we need to bind them together in [contract.rs](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/contract.rs).
+定义了乐高积木 **msgs**、**handler** 和 **state**。 现在我们需要在 [contract.rs](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/contract.rs) 中将它们绑定在一起。
 
-### Init
+### 在里面
 
-The init function will be called exactly once, before the contract is executed. It is a "privileged" function in that
-it can set configuration that can never be modified by any other method call. The first line parses the input from raw
-bytes into our contract-defined message. We then check if option is expired, then create the initial state. If expired,
-we return a generic contract error, otherwise, we store the state and return a success code:
+在执行合约之前，init 函数将被调用一次。 这是一个“特权”功能，因为
+它可以设置任何其他方法调用永远无法修改的配置。 第一行解析来自 raw 的输入
+字节到我们合约定义的消息中。 然后我们检查选项是否过期，然后创建初始状态。 如果过期，
+我们返回一个通用的合约错误，否则，我们存储状态并返回一个成功代码:
 
 ```rust
 pub fn init(
@@ -210,17 +206,17 @@ pub fn init(
 ) -> Result<InitResponse, ContractError> {
 ```
 
-You will see this signature all over CosmWasm handler functions. Execution context passed in to handler using Deps, which contains Storage, API and Querier functions; Env, which contains block, message and contract info; and msg, well, no explanation needed.
+您将在 CosmWasm 处理程序函数中看到这个签名。 使用 Deps 传递给 handler 的执行上下文，其中包含 Storage、API 和 Querier 函数； Env，包含区块、消息和合约信息； 和味精，嗯，不需要解释。
 
-`Result<T, ContractError>` is a type that represents either success ([`Ok`]) or failure ([`Err`]). If the execution is successful returns `T` type otherwise returns `ContractError`. Useful.
+`Result<T, ContractError>` 是一种表示成功([`Ok`])或失败([`Err`])的类型。 如果执行成功返回 `T` 类型，否则返回 `ContractError`。 有用。
 
-### Handle
+### 处理
 
-::: tip
-Timecode [https://vimeo.com/457702442#t=15m55s](https://vimeo.com/457702442#t=15m55s)
+::: 小费
+时间码 [https://vimeo.com/457702442#t=15m55s](https://vimeo.com/457702442#t=15m55s)
 :::
 
-`handle` method routes messages to functions. It is similar to Cosmos SDK handler design.
+`handle` 方法将消息路由到函数。 它类似于 Cosmos SDK 处理程序设计。
 
 ```rust
 pub fn handle(
@@ -265,10 +261,10 @@ pub fn handle_transfer(
 ```
 
 
-#### Execute
+#### 执行
 
-You will see `handle_execute` in plus and example smart contracts, but actually it is just a naming, nothing special.
-Most of the function is same with `transfer`. Just two new things: message fund check and sdk messages in return context.
+你会在 plus 和示例智能合约中看到 `handle_execute`，但实际上它只是一个命名，没什么特别的。
+大多数功能与`transfer`相同。 只有两个新东西:消息资金检查和返回上下文中的 sdk 消息。
 
 ```rust
 pub fn handle_execute(

@@ -1,8 +1,3 @@
----
-title: Active IBC Connections
-order: 3
----
+# 活动 IBC 连接
 
-# Active IBC connections
-
-Here is the list of active IBC connections that you can use to test applications. Contact us for adding new channels.
+以下是可用于测试应用程序的活动 IBC 连接列表。 联系我们以添加新频道。

@@ -1,16 +1,12 @@
----
-order: 3
----
+# Cosmic dApp 设计
 
-# Cosmic dApp design
+[`@cosmicdapp/design`](https://github.com/CosmWasm/dApps/tree/master/packages/design) 包提供了两种资源:主题和组件。 主题提供全局样式以实现跨 dApp 的视觉一致性，而组件将为我们提供布局原语和具有内部逻辑的可重用 React 组件。
 
-The [`@cosmicdapp/design`](https://github.com/CosmWasm/dApps/tree/master/packages/design) package provides two kinds of resources: theme and components. The theme provides global styles for visual consistency across the dApps, whereas the components will give us layout primitives and reusable React components with internal logic.
+示例余额检查器 dApp 将使用此包中的一些资源，让我们来看看它们。
 
-The example balance checker dApp will make use of some resources from this package, so let's take a look at them.
+## 主题
 
-## Theme
-
-We'll use the exported `GlobalStyle` in order to have visual consistency with the rest of the dApps. This React component includes a CSS reset; spacing, colors, and fonts CSS Custom Properties; and an override for some Ant Design classes. This is seen at first glance if you look at the `GlobalStyle` code:
+我们将使用导出的“GlobalStyle”，以便与其余 dApp 保持视觉一致性。 这个 React 组件包括一个 CSS 重置； 间距、颜色和字体 CSS 自定义属性； 以及一些 Ant Design 类的覆盖。 如果您查看 `GlobalStyle` 代码，第一眼就会看到这一点:
 
 ```jsx
 export function GlobalStyle(): JSX.Element {
@@ -26,26 +22,26 @@ export function GlobalStyle(): JSX.Element {
 }
 ```
 
-## Components
+## 组件
 
-### Layout primitives
+### 布局原语
 
-This resource offers some primitives based on the [Every Layout](https://every-layout.dev) book.
+该资源提供了一些基于 [Every Layout](https://every-layout.dev) 一书的原语。
 
-#### Stack
+#### 堆
 
-This React component displays its children as a stack with a configurable gap between them.
+这个 React 组件将其子组件显示为一个堆栈，它们之间有一个可配置的间隙。
 
-#### PageLayout
+#### 页面布局
 
-This React component is used as the wrapper for every view. It establishes a max width of page and centers the stacked children inside.
+这个 React 组件用作每个视图的包装器。 它建立页面的最大宽度并将堆叠的子项居中放置。
 
-### Components with logic
+### 具有逻辑的组件
 
-#### Login
+#### 登录
 
-The first view of the balance checker application. It offers three options for logging in: localStorage burner wallet, ledger wallet, or Keplr wallet.
+余额检查器应用程序的第一个视图。 它提供了三种登录选项:localStorage 燃烧器钱包、账本钱包或 Keplr 钱包。
 
-#### YourAccount
+#### 您的帐户
 
-A useful component that lets the user copy their own address to clipboard, and optionally show their current native balance.
+一个有用的组件，允许用户将他们自己的地址复制到剪贴板，并可选择显示他们当前的本机余额。

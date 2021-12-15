@@ -1,37 +1,32 @@
----
-title: Multi-Chain
-order: 2
----
+# 什么是多链合约？
 
-# What are Multi-Chain Contracts?
+CosmWasm 从头开始​​设计和构建，旨在成为智能合约的多链解决方案。
+由于它来自 Cosmos 生态系统，因此它专为网络设计也就不足为奇了
+区块链，而不是传统的区块链孤岛。但是我们所说的多链究竟是什么意思？
 
-CosmWasm is designed and built from the ground-up to be a multi-chain solution for smart contracts.
-As it comes from the Cosmos ecosystem, it is no surprise that this is designed for networks
-of blockchains, rather than the traditional blockchain silos. But what exactly do we mean by multi-chain?
+## 不同的链，相同的合约
 
-## Different Chain, Same Contract
+由于我们对宿主应用程序的要求很少，因此任何 Cosmos SDK 应用程序都很容易
+嵌入 `wasm` 模块并根据需要自定义许可或费用。所有代码
+被设计为与底层链的细节无关，所以只需编写一个
+CosmWasm 合约，你很快就能在 Cosmos 生态系统的许多不同链上运行。
 
-Since we make little requirements of the host application, it is easy for any Cosmos SDK app
-to embed the `wasm` module and customize the permissioning or fees as they wish. All code
-is designed to be agnostic to the details of the underlying chain, so just by writing a
-CosmWasm contract, you will soon be able to run on many different chains on the Cosmos ecosystem.
+[Regen Network](https://regen.network) 计划在启动时包含 CosmWasm 支持。许多其他连锁店正在考虑添加这种支持。
 
-[Regen Network](https://regen.network) plans to include CosmWasm support, when they launch. And a number of other chains are looking into adding this support.
+## 区块链间合约
 
-## Inter Blockchain Contracts
+如果你听说过 Cosmos，那很可能是关于【区块链间通信】(https://cosmos.network/ibc/)。 [Tendermint BFT 共识](https://tendermint.com) 的力量和他们的[新型保税权益证明算法](https://blog.cosmos.network/what-does-the-launch-of-cosmos- mean-for-the-blockchain-ecosystem-952e14f67d0d)只是他们启用革命性协议以允许在区块链之间进行无信任消息传递语义的基础。没有中间人，没有时间问题，完全安全。
 
-If you have heard anything about Cosmos, it is most likely about [Inter-Blockchain Communication](https://cosmos.network/ibc/). The power of [Tendermint BFT consensus](https://tendermint.com) and their [novel bonded proof of stake algorithm](https://blog.cosmos.network/what-does-the-launch-of-cosmos-mean-for-the-blockchain-ecosystem-952e14f67d0d) are just the foundation on which they enable a revolutionary protocol to allow trustless message passing semantics between blockchains. No middleman, no timing issue, full security.
+潜在意味着一条链上的代码可以在另一条链上执行交易。但是代码必须围绕这样的消息传递习语来设计。 CosmWasm 完全包含 [演员模型](./actor)，因此自然适用于此类 IBC。触发并忘记消息，而不是等待承诺并担心竞争条件和可重入攻击。随着 IBC 的稳定，我们将对 IBC 原语的一流支持添加到 [CosmWasm](https://github.com/CosmWasm/cosmwasm) 库以及 [Cosmos SDK 模块](https://github.com) 中。 com/CosmWasm/wasmd/tree/master/x/wasm) 托管它。
 
-The potential means code on one chain can execute a transaction on another chain. But the code must be designed around such a message-passing idiom. CosmWasm fully embraces the [actor model](./actor) and as such naturally lends itself to such IBC. Fire and forget messages, rather than awaiting a promise and worrying about race conditions and reentrancy attacks. As IBC stabilizes, we will be adding first class support for IBC primitives into the [CosmWasm](https://github.com/CosmWasm/cosmwasm) libraries, as well as the [Cosmos SDK module](https://github.com/CosmWasm/wasmd/tree/master/x/wasm) that hosts it.
+## 易于集成
 
-## Easy to Integrate
+CosmWasm 的另一个设计目标是更像是一个库而不是一个框架。这意味着它所需 API 的表面积很小，您可以选择加入大部分代码。它可以让您的生活变得轻松，但您也可以轻松地按照自己的方式构建它。这有两大好处:
 
-Another design goal of CosmWasm was to be more of a library than a framework. This means it has a small surface area of required APIs and you can opt-in to most of the code. It is there to make life easy for you, but you can easily build it your own way as well. This has two big benefits:
+首先是它可以更容易地添加对多种语言的支持来编写合约。因此我们可以添加对 [AssemblyScript](https://docs.assemblyscript.org/) 或 [Go](https:/ /github.com/tinygo-org/tinygo)，适合那些不喜欢用 Rust 编写的人。
 
-The first is that it makes it easier to add support for multiple languages to write contracts in. So we can add support for say, [AssemblyScript](https://docs.assemblyscript.org/) or [Go](https://github.com/tinygo-org/tinygo), for those who prefer not to write in Rust.
+第二个好处是，由于它对主机系统的要求有限，因此可以嵌入到其他框架中，而不仅仅是 Cosmos SDK。核心运行时逻辑 [`cosmwasm-vm`](https://github.com/CosmWasm/cosmwasm/tree/master/lib/vm) 在 Rust 中，[`go-cosmwasm`](https://github .com/CosmWasm/go-cosmwasm)提供了一个通用的 Go 绑定。由于 Go 和 Rust 是编写区块链最流行的两种语言，这为许多集成打开了大门。当然，除非你的链运行在 [Tendermint](https://tendermint.com) 或潜在的另一个 BFT Instant Finality Consensus 算法如 [Babble](https://babble.io/) 之上，否则合约不会能够参加IBC。
 
-The second benefit is that since it makes limited demands of the host system, it can be embedded in other frameworks, not just the Cosmos SDK. The core runtime logic [`cosmwasm-vm`](https://github.com/CosmWasm/cosmwasm/tree/master/lib/vm) is in Rust, and [`go-cosmwasm`](https://github.com/CosmWasm/go-cosmwasm) provides a generic Go binding to it. As Go and Rust are two of the most popular languages to write blockchains, this opens the door for many integrations. Of course, unless your chain is running on top of [Tendermint](https://tendermint.com) or potentially another BFT Instant Finality Consensus algorithm like [Babble](https://babble.io/), the contracts will not be able to participate with IBC.
+## 构建平台
 
-## Platform to Build On
-
-CosmWasm doesn't want to lock you to one blockchain, or even one programming language. It is designed to be adaptable to many environments, and *connect* blockchains. This makes it a solid platform to build on. Even if one chain doesn't pan out well, all your smart contracts and dApps can quickly be transferred to another chain. Or if your app grows quickly, you can launch your own chain to deploy the next version of the contracts, and transfer all existing tokens to your new chain via IBC. The possibilities are only limited by your imagination.
+CosmWasm 不想将你锁定在一种区块链，甚至一种编程语言中。它旨在适应多种环境，并*连接*区块链。这使它成为一个坚实的平台。即使一条链发展得不好，您所有的智能合约和 dApp 也可以迅速转移到另一条链上。或者，如果您的应用程序增长迅速，您可以启动自己的链来部署下一版本的合约，并通过 IBC 将所有现有代币转移到您的新链上。可能性仅受您的想象力的限制。

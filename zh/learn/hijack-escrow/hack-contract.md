@@ -1,10 +1,6 @@
----
-order: 2
----
+# 破解合约
 
-# Hack the Contract
-
-Now that you can compile and run tests, let's try to make some changes to the code and you can see if they work. If you didn't do this already in the last section, it is time to clone the examples repo and check out the escrow code:
+现在您可以编译和运行测试，让我们尝试对代码进行一些更改，您可以查看它们是否有效。 如果您在上一节中还没有这样做，那么是时候克隆示例存储库并查看托管代码了:
 
 ```shell
 git clone https://github.com/CosmWasm/cosmwasm-examples
@@ -14,22 +10,22 @@ git checkout escrow-0.10.0
 cd contracts/escrow
 ```
 
-Note: This guide is compatible with `CosmWasm v0.14.x` and `wasmd v0.16.x`.
+注意:本指南与 `CosmWasm v0.14.x` 和 `wasmd v0.16.x` 兼容。
 
-## A Walk-Through of the Escrow Contract
+## 托管合同的演练
 
-### Data Structures
+### 数据结构
 
-There are three key data structures used in the contract - for encoding the instantiation message, for encoding the execution messages, and for storing the contract data. We define all messages in `src/msg.rs`. The `State` structs are often in `state.rs`, but if only one then just inline in `contracts.rs`.
+合约中使用了三种关键数据结构——用于编码实例化消息、用于编码执行消息以及用于存储合约数据。我们在 `src/msg.rs` 中定义所有消息。 `State` 结构通常在 `state.rs` 中，但如果只有一个，那么只需内联在 `contracts.rs` 中。
 
-All of them must be prefixed with a long `derive` line to add various functionality. Otherwise, it should be pretty clear how the `State` defines the current condition of a contract, and `InitMsg` will provide the initial data to configure said contract. Please note that `State` is the *only information* persisted between multiple contract calls. Purpose of these `derive` directives:
+所有这些都必须以很长的 `derive` 行作为前缀以添加各种功能。否则，应该很清楚 `State` 如何定义合约的当前条件，`InitMsg` 将提供初始数据来配置所述合约。请注意，`State` 是多个合约调用之间保留的*唯一信息*。这些 `derive` 指令的目的:
 
-* `Serialize`, `Deserialize` generate methods so the [`serde-json`](https://github.com/serde-rs/json) library can de-serialize them (there is no [reflection](https://en.wikipedia.org/wiki/Reflection_(computer_programming)) in rust)
-* `Clone` allows you to make a copy of the object (`msg.clone()`)
-* `Debug` and `PartialEq` are very useful for testing. In particular they allow the use of `assert_eq!(expected, msg);`
-* `JsonSchema` is needed by [`schemars`](https://docs.rs/schemars/0.7.0/schemars), so we can use [`schema_for!`](https://docs.rs/schemars/0.7.0/schemars/macro.schema_for.html) to generate the json schema objects (in `schema/*.json`)
+* `Serialize`, `Deserialize` 生成方法，因此 [`serde-json`](https://github.com/serde-rs/json) 库可以反序列化它们(没有 [反射](https: //en.wikipedia.org/wiki/Reflection_(computer_programming)) in rust)
+* `Clone` 允许您制作对象的副本 (`msg.clone()`)
+* `Debug` 和 `PartialEq` 对测试非常有用。特别是它们允许使用 `assert_eq!(expected, msg);`
+* [`schemars`](https://docs.rs/schemars/0.7.0/schemars) 需要`JsonSchema`，所以我们可以使用[`schema_for!`](https://docs.rs/schemars /0.7.0/schemars/macro.schema_for.html) 生成 json 模式对象(在 `schema/*.json` 中)
 
-From `state.rs`:
+来自`state.rs`:
 
 ```rust
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -59,13 +55,13 @@ pub struct InstantiateMsg {
 }
 ```
 
-Note that we use `Addr`, which is a validated address wrapper with some helper functions for storage inside `State`, while we use invalidated  `String` address which should be validated by developer, for messages and anything that interacts with the user. There is [more info on addresses here](../../architecture/addresses).
+请注意，我们使用“Addr”，它是一个经过验证的地址包装器，带有一些用于存储在“State”中的辅助函数，而我们使用应由开发人员验证的无效的“String”地址，用于消息和与用户交互的任何内容。有 [关于地址的更多信息](../../architecture/addresses)。
 
-`Option<u64>` is a way of telling rust this field may be missing. It may either have a value, like `Some(123456)` or
-be `None`. This means the init message may omit those fields (or pass them as `null`) and we don't need to use some
-special value like `0` to signify disabled.
+`Option<u64>` 是一种告诉 rust 这个字段可能缺失的方法。它可能有一个值，比如 `Some(123456)` 或
+是`无`。这意味着 init 消息可能会省略这些字段(或将它们作为 `null` 传递)并且我们不需要使用一些
+像“0”这样的特殊值表示已禁用。
 
-Moving to the `ExecuteMsg` type, which defines the different contract methods, we make use of a slightly more complex rust construction, the [`enum`](https://doc.rust-lang.org/stable/rust-by-example/custom_types/enum.html). This is also known as [a tagged union or sum type](https://en.wikipedia.org/wiki/Tagged_union), and contains a fixed set of defined possible data types, or `variants`, *exactly one of which must be set*. We use each `variant` to encode a different method. For example `Execute::Refund{}` is a serializable request to refund the escrow, which is only valid after a timeout.
+转到定义不同合约方法的 `ExecuteMsg` 类型，我们使用稍微复杂的 Rust 构造，[`enum`](https://doc.rust-lang.org/stable/rust-by -example/custom_types/enum.html)。这也称为 [标记联合或总和类型](https://en.wikipedia.org/wiki/Tagged_union)，并包含一组固定的已定义可能数据类型或“变体”，*正是其中之一必须设置*。我们使用每个“变体”来编码不同的方法。例如 `Execute::Refund{}` 是一个可序列化的请求，用于退还托管，仅在超时后有效。
 
 ```rust
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -79,15 +75,15 @@ pub enum ExecuteMsg {
 }
 ```
 
-You can see another directive here (`#[serde(rename_all = "snake_case")]`). This ensure the json looks like: `{"approve": {"quantity": ...}}` instead of `{"Approve": {"quantity": ...}}`. This controls the code generated with `Serialize` and `Deserialize`. You see how compile-time codegen (via derive and macros) is a corner-stone of rust, and provides much of the functionality provided by runtime reflection in other, more dynamic, languages.
+你可以在这里看到另一个指令(`#[serde(rename_all = "snake_case")]`)。 这确保 json 看起来像:`{"approve": {"quantity": ...}}` 而不是 `{"Approve": {"quantity": ...}}`。 这控制了用 `Serialize` 和 `Deserialize` 生成的代码。 您会看到编译时代码生成(通过派生和宏)如何成为 Rust 的基石，并在其他更动态的语言中提供由运行时反射提供的大部分功能。
 
-### JSON Format
+### JSON 格式
 
-When a `ExecuteMsg` instance is encoded, it will end up looking like `{"approve": {"quantity": [{"amount": "10", "denom": "ATOM"}]}}` or `{"refund": {}}`. This is also the format we should use client side, when submitting a message body to later be processed by `execute`.
+当一个 `ExecuteMsg` 实例被编码时，它最终看起来像 `{"approve": {"quantity": [{"amount": "10", "denom": "ATOM"}]}}` 或 ` {“退款”:{}}`。 这也是我们应该在客户端使用的格式，当提交消息体以供稍后由 `execute` 处理时。
 
-### Instantiation Logic
+### 实例化逻辑
 
-The `instantiate` function will be called exactly once, before the contract is executed. It is a "privileged" function in that it can set configuration that can never be modified by any other method call. If you look at this example, the first line parses the input from raw bytes into our contract-defined message. We then create the initial state, and check if it is expired already. If expired, we return a generic contract error, otherwise, we store the state and return a success code:
+在执行合约之前，`instantiate` 函数将被调用一次。 它是一个“特权”功能，因为它可以设置任何其他方法调用都无法修改的配置。 如果你看这个例子，第一行将输入从原始字节解析为我们的合约定义的消息。 然后我们创建初始状态，并检查它是否已经过期。 如果过期，我们返回一个通用的合约错误，否则，我们存储状态并返回一个成功代码:
 
 ```rust
 pub fn instantiate(
@@ -116,9 +112,9 @@ pub fn instantiate(
 }
 ```
 
-`config` is defined in `state.rs` and is a helper wrapper for interacting with the underlying `Storage`. It handles prefixing and de/serializing
-for you automatically, removing some boilerplate. It is completely optional and you can use `Storage` directly as well. We also encourage
-you to develop other shared libraries for interacting with `Storage` if you want to make certain use cases easier (eg. representing a queue):
+`config` 定义在 `state.rs` 中，是一个辅助包装器，用于与底层的 `Storage` 交互。 它处理前缀和反/序列化
+自动为您删除一些样板。 它是完全可选的，您也可以直接使用“存储”。 我们也鼓励
+如果您想让某些用例更容易(例如，表示队列)，您可以开发其他共享库以与 `Storage` 交互:
 
 ```rust
 pub fn config(storage: &mut dyn Storage) -> Singleton<State> {
@@ -126,9 +122,9 @@ pub fn config(storage: &mut dyn Storage) -> Singleton<State> {
 }
 ```
 
-### Execution Logic
+### 执行逻辑
 
-Just as `init` is the entry point for instantiating a new contract, `handle` is the entry point for executing the code. Since `handle` takes an `enum` with multiple `variants`, we can't just jump into the business logic, but first start with loading the state, and dispatching the message:
+正如 `init` 是实例化新合约的入口点一样，`handle` 是执行代码的入口点。 由于 `handle` 接受一个带有多个 `variants` 的 `enum`，我们不能直接跳入业务逻辑，而是首先从加载状态和分派消息开始:
 
 ```rust
 pub fn execute(
@@ -145,14 +141,14 @@ pub fn execute(
 }
 ```
 
-CosmWasm parses the incoming json into a contract-specific `ExecuteMsg` automatically before calling, assuming a JSON-encoding message. We also see the use of `config_read` to load without any boilerplate. Note the trailing `?`. This works on `Result` types and means, "If this is an error, return the underlying error. If this is a success, give me the value". It is a very useful shorthand all over rust and replaces the `if err != nil { return err }` boilerplate in Go.
+CosmWasm 在调用之前自动将传入的 json 解析为特定于合约的 `ExecuteMsg`，假设是 JSON 编码的消息。我们还看到使用 `config_read` 在没有任何样板的情况下加载。注意尾随的`?`。这适用于 `Result` 类型并意味着，“如果这是一个错误，则返回潜在的错误。如果这是成功的，请给我值”。这是一个非常有用的 rust 速记，并替换了 Go 中的 `if err != nil { return err }` 样板。
 
-You will also see the [`match` statement](https://doc.rust-lang.org/1.30.0/book/2018-edition/ch06-02-match.html). This is another nice Rust idiom, and allows you to `switch` over multiple patterns. Here we check the multiple variants of the `ExecuteMsg` enum. Note that if you don't cover all cases, the compiler will refuse to proceed.
+您还将看到 [`match` 语句](https://doc.rust-lang.org/1.30.0/book/2018-edition/ch06-02-match.html)。这是另一个不错的 Rust 习惯用法，它允许您在多个模式之间“切换”。在这里，我们检查了 `ExecuteMsg` 枚举的多个变体。请注意，如果您没有涵盖所有情况，编译器将拒绝继续。
 
-We pass in `deps` to give the handlers access to runtime callbacks, which provide blockchain-specific logic. In particular, we currently use `deps.api` to validate `String` to `Addr` in a blockchain-specific manner. Or verify cryptographic signatures with `secp256k1_verify,ed25519_verify`. And we also use
-`deps.querier` to query the current balance of the contract.
+我们传入 `deps` 来让处理程序访问运行时回调，它提供特定于区块链的逻辑。特别是，我们目前使用 `deps.api` 以特定于区块链的方式将 `String` 验证为 `Addr`。或者使用 `secp256k1_verify,ed25519_verify` 验证加密签名。我们也使用
+`deps.querier` 查询合约的当前余额。
 
-If we now look into the `try_approve` function, we will see how we can respond to a message. We can return an `unauthorized` error if the `signer` is not what we expect, and `ContractError` if our business logic rejects the message. The `let amount =` line shows how we can use pattern matching to use the number of coins present in the msg if provided, or default to the entire balance of the contract.
+如果我们现在查看 `try_approve` 函数，我们将看到如何响应消息。如果 `signer` 不是我们期望的，我们可以返回 `unauthorized` 错误，如果我们的业务逻辑拒绝消息，我们可以返回 `ContractError`。 `let amount =` 行显示了我们如何使用模式匹配来使用 msg 中存在的硬币数量(如果提供)，或者默认为合约的整个余额。
 
 ```rust
 fn try_approve(
@@ -188,7 +184,7 @@ fn try_approve(
 }
 ```
 
-At the end, on success, we want to send some tokens. Cosmwasm contracts cannot call other contracts directly, instead, we create a message to represent our request (`CosmosMsg::Bank(BankMsg::Send)`) and return it as our contract ends. This will be parsed by the `wasm` module in go and it will execute and defined actions *in the same transaction*. This means, that while we will not get access to the return value, we can be ensured that if the send fails (user specified more coins than were in the escrow), all state changes in this contract would be reverted... just as if we returned `unauthorized`. This is pulled into a helper to make the code clearer:
+最后，如果成功，我们想发送一些令牌。 Cosmwasm 合约不能直接调用其他合约，相反，我们创建一条消息来表示我们的请求 (`CosmosMsg::Bank(BankMsg::Send)`) 并在我们的合约结束时返回它。 这将由 go 中的 `wasm` 模块解析，它将在同一事务中*执行和定义操作。 这意味着，虽然我们将无法访问返回值，但我们可以确保如果发送失败(用户指定的硬币比托管中的硬币多)，则该合约中的所有状态更改都将被还原......就像 如果我们返回“未经授权”。 这被拉入一个助手以使代码更清晰:
 
 ```rust
 fn send_tokens(to_address: Addr, amount: Vec<Coin>, action: &str) -> Response {
@@ -206,34 +202,34 @@ fn send_tokens(to_address: Addr, amount: Vec<Coin>, action: &str) -> Response {
 }
 ```
 
-Note that `Env` encodes a lot of information from the blockchain, essentially providing the `Context` if you are coming from Cosmos SDK. This is validated data and can be trusted to compare any messages against. Refer to [the standard `cosmwasm` types](https://github.com/CosmWasm/cosmwasm/blob/v0.10.0/packages/std/src/types.rs#L7-L41) for references to all the available types in the environment.
+请注意，`Env` 编码了来自区块链的大量信息，如果您来自 Cosmos SDK，则本质上提供了 `Context`。这是经过验证的数据，可以信任来比较任何消息。请参阅[标准`cosmwasm` 类型](https://github.com/CosmWasm/cosmwasm/blob/v0.10.0/packages/std/src/types.rs#L7-L41) 以获取所有可用类型的参考在环境中。
 
-## Adding a New Message
+## 添加新消息
 
-In this example, we will modify this contract to add some more functionality. In particular, let's make a backdoor to the contract. In the form of a `ExecuteMsg::Steal` variant that must be signed by some hard coded `THIEF` address and will release the entire contract balance to an address included in the message. Simple?
+在此示例中，我们将修改此合约以添加更多功能。特别是，让我们为合约制作一个后门。以 `ExecuteMsg::Steal` 变体的形式，必须由一些硬编码的 `THIEF` 地址签名，并将整个合约余额释放到消息中包含的地址。简单的？
 
-Note that this also demonstrates the need to verify the code behind a contract rather than just rely on raw wasm. Since we have a reproducible compilation step (details below), if I show you code I claim to belong to the contract, you can compile it and compare the hash to the hash stored on the blockchain, to verify that this really is the original rust code. We will be adding tooling to automate this step and make it simpler in the coming months, but for now, this example serves to demonstrate why it is important.
+请注意，这也表明需要验证合约背后的代码，而不仅仅是依赖原始 wasm。由于我们有一个可重复的编译步骤(详细信息如下)，如果我向您展示我声称属于合约的代码，您可以编译它并将哈希与存储在区块链上的哈希进行比较，以验证这确实是原始的锈代码。在接下来的几个月中，我们将添加工具来自动执行此步骤并使其更简单，但就目前而言，此示例用于说明为什么它很重要。
 
-### Adding the Handler
+### 添加处理程序
 
-Open up `src/msg.rs` in your [editor of choice](./intro#setting-up-your-ide) and let's add another variant to the `ExecuteMsg` enum, called `Steal`. Remember, it must have a destination address:
+在您的[选择的编辑器](./intro#setting-up-your-ide) 中打开`src/msg.rs`，让我们向`ExecuteMsg` 枚举添加另一个变体，称为`Steal`。请记住，它必须有一个目标地址:
 
-[Need a hint?](./edit-escrow-hints#handlemsg)
+[需要提示吗？](./edit-escrow-hints#handlemsg)
 
-Now, you can add the message handler. As a quick check, try running `cargo wasm` or look for the compile error in your IDE. Remember what I told you about `match`? Okay, now, add a function to process the `ExecuteMsg::Steal` variant. For the top level `THIEF`, you can use a placeholder address (we will set this to an address you own before deploying).
+现在，您可以添加消息处理程序。作为快速检查，尝试运行 `cargo wasm` 或在您的 IDE 中查找编译错误。还记得我告诉你的关于“匹配”的内容吗？好的，现在，添加一个函数来处理 `ExecuteMsg::Steal` 变体。对于顶级`THIEF`，您可以使用占位符地址(我们将在部署前将其设置为您拥有的地址)。
 
-[Need a hint?](./edit-escrow-hints#adding-handler)
+[需要提示吗？](./edit-escrow-hints#adding-handler)
 
-Once you are done, check that it compiles:
+完成后，检查它是否编译:
 
 ```shell
 cargo wasm
 ```
 
-### Writing a Test
+### 编写测试
 
-We have a number of tests inside of `contracts.rs` that serve as templates, so let's make use of them. You can copy the `handle_refund` test and rename it to `handle_steal`. Remember to include the `#[test]` declaration on top. Now, go in and edit it to test that the THIEF can indeed steal the funds, and no one else can. Make sure our backdoor is working properly before we try to use it.
+我们在 `contracts.rs` 中有许多测试作为模板，所以让我们使用它们。 您可以复制 `handle_refund` 测试并将其重命名为 `handle_steal`。 请记住在顶部包含 `#[test]` 声明。 现在，进入并编辑它以测试小偷确实可以窃取资金，而其他人则无法窃取。 在我们尝试使用它之前，请确保我们的后门工作正常。
 
-Now, try running `cargo unit-test` and see if your code works as planned. If it fails, try `RUST_BACKTRACE=1 cargo unit-test` to get a full stack trace. Now, isn't that nicer than trying to test Solidity contracts?
+现在，尝试运行 `cargo unit-test` 并查看您的代码是否按计划运行。 如果失败，请尝试“RUST_BACKTRACE=1 cargo unit-test”以获取完整的堆栈跟踪。 现在，这不是比尝试测试 Solidity 合约更好吗？
 
-[See solution here](./edit-escrow-hints#test-steal)
+[在此处查看解决方案](./edit-escrow-hints#test-steal)

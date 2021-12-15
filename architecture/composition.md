@@ -1,8 +1,3 @@
----
-title: Contract Composition
-order: 7
----
-
 # Contract Composition
 
 Given the [Actor model](./actor) of dispatching messages, and [synchronous queries](./query) implemented in CosmWasm v0.8, we have all the raw components
@@ -37,7 +32,7 @@ As of CosmWasm v0.8, we now allow the contracts to make synchronous *read-only* 
 As with [Messages](#messages), we have three fundamental types:
 
 * `Contract` - This will query a given contract address with a given message (provided in serialized form). It assumes the caller has access to the API format.
-* [Module interfaces](#modules) - These are standardized interfaces that can be supported by any chain to expose native modules under a *portable* interface.  
+* [Module interfaces](#modules) - These are standardized interfaces that can be supported by any chain to expose native modules under a *portable* interface.
 * [`Custom`](#customization) - This encapsulates a chain-dependent extension to to query custom native modules. Ideally they should be *immutable* on the same chain over time, but they make no portability guarantees.
 
 Cross-Contract queries take the address of the contract and a serialized `QueryMsg` in the contract-specific format, and synchronously get
@@ -51,7 +46,7 @@ method as a wrapper around the `query` implementation provided by the Trait.
 In order to enable better integrations with the native blockchain, we are providing a set of standardized module interfaces
 that should work consistently among all CosmWasm chain. The most basic one
 is to the `Bank` module, which provides access to the underlying native tokens. This gives us `BankMsg::Send` as well as
-`BankQuery::Balance` and `BankQuery::AllBalances` to check balances and move tokens. 
+`BankQuery::Balance` and `BankQuery::AllBalances` to check balances and move tokens.
 
 The second standardized module is `staking`, which provides some standardized messages for `Delegate`, `Undelegate`,
 `Redelegate` and `Withdraw`, as well as querying `Validators` and `Delegations`. These interfaces are designed to support
@@ -101,7 +96,7 @@ The features are currently `staking`, which assumes a PoS system, and `iterator`
 ### Immutability
 
 Contracts are immutable and encode the query and message formats in their bytecode. If we allowed dispatching `sdk.Msg` in the native format
-(be it json, amino or protobuf), and the format of native messages change, then the contracts would break. 
+(be it json, amino or protobuf), and the format of native messages change, then the contracts would break.
 This may mean that a staking module could never undelegate the tokens. If you think this is a theoretical issue, please note that every major
 update of the Cosmos SDK has produced such breaking changes and has migrations for them. Migrations that cannot be performed on immutable contracts.
 Thus, we need to ensure that our design provides an immutable API to a potentially mutable runtime, which is a primary design criteria when

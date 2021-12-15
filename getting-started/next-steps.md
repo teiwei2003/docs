@@ -1,7 +1,3 @@
----
-order: 6
----
-
 # Next Steps
 
 This is a very simple example for the escrow contract we developed, but it should show you what is

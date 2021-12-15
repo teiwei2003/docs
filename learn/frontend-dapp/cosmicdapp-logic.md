@@ -1,7 +1,3 @@
----
-order: 2
----
-
 # Cosmic dApp logic
 
 The [`@cosmicdapp/logic`](https://github.com/CosmWasm/dApps/tree/master/packages/logic) package provides three kinds of resources that will make it easier to develop CosmJS based dApps: config, utils, and service. In order to better understand the example balance checker dApp that we'll be developing, we'll go over those utilities that will be used in the app.

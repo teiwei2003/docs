@@ -1,11 +1,6 @@
----
-title: Actor Model
-order: 3
----
+# 合约调用的 Actor 模型
 
-# Actor Model for Contract Calls
-
-The [actor model](https://en.wikipedia.org/wiki/Actor_model) is a design pattern, often used in to build reliable, distributed systems. The fundamental points, in my opinion, are that each `Actor` has exclusive access to its own internal state, and that `Actors` cannot call each other directly, only dispatch messages over some `Dispatcher` (that maintains the state of the system and can map addresses to code and storage). Fundamentally the `Actor` pattern can be encapsulated in such an interface:
+[actor 模型](https://en.wikipedia.org/wiki/Actor_model) 是一种设计模式，常用于构建可靠的分布式系统。 在我看来，基本点是每个`Actor` 都可以独占访问它自己的内部状态，并且`Actors` 不能直接相互调用，只能通过一些`Dispatcher`(维护系统状态) 并且可以将地址映射到代码和存储)。 基本上，`Actor` 模式可以封装在这样的接口中:
 
 ```rust
 pub trait Actor {
@@ -18,51 +13,51 @@ pub struct Msg {
 }
 ```
 
-This is the basic model that was used to model contracts in CosmWasm. You can see the same influence in the function `pub fn handle<T: Storage>(store: &mut T, params: Params, msg: Vec<u8>) -> Result<Response>`. `Response` contains `Vec<Msg>` and a little metadata. `store` is access to the contract's internal state. And `params` is some global immutable context. So, just a little bit of syntax around the same design. From this basic design, a few other useful aspects can be derived:
+这是用于在 CosmWasm 中为合约建模的基本模型。你可以在函数`pub fn handle<T: Storage>(store: &mut T, params: Params, msg: Vec<u8>) -> Result<Response>`中看到同样的影响。 `Response` 包含 `Vec<Msg>` 和一些元数据。 `store` 是对合约内部状态的访问。 `params` 是一些全局不可变的上下文。所以，围绕相同的设计只需要一点点语法。从这个基本设计中，可以得出一些其他有用的方面:
 
-First, there is a **loose coupling** between Actors, limited to the format of the data packets (the recipient must support a superset of what you send). There is no complex API or function pointers to pass around. This is much like using REST or RPC calls as a boundary between services, which is a scalable way to compose systems from many vendors.
+首先，Actors 之间存在**松散耦合**，仅限于数据包的格式(接收方必须支持您发送的超集)。没有复杂的 API 或函数指针可以传递。这很像使用 REST 或 RPC 调用作为服务之间的边界，这是一种组合来自许多供应商的系统的可扩展方式。
 
-Secondly, each `Actor` can effectively run on its own thread, with its own queue. This both enables concurrency (which we don't make use of in CosmWasm... yet), and **serialized execution** within each actor (which we do rely upon). This means that it is impossible for the `Handle` method above to be executed in the middle of a previously executed `Handle` call. `Handle` is a synchronous call and returns before the `Actor` can process the next message. This feature is what [protects us from reentrancy by design](../architecture/smart-contracts#avoiding-reentrancy-attacks).
+其次，每个`Actor` 都可以有效地运行在自己的线程上，有自己的队列。这既可以实现并发(我们在 CosmWasm 中还没有使用......)，并且在每个 actor 中**序列化执行**(我们确实依赖)。这意味着上面的 Handle 方法不可能在先前执行的 Handle 调用中间执行。 `Handle` 是一个同步调用，并在 `Actor` 处理下一条消息之前返回。这个特性是[通过设计保护我们免受重入](../architecture/smart-contracts#avoiding-reentrancy-attacks)。
 
-Another important aspect related to CosmWasm is **locality**. That is, actors can only communicate with other actors **whose address they previously received**. We will go more into depth on [addresses and naming](./addresses) in the next page, but the key point is that for two actors to communicate, an external message (from the contract creator, or potentially a user) must be sent to the actor. This is a flexible way to set up topologies in a distributed manner. The only thing that must be hard-coded is the data format to pass to such addresses. Once some standard interfaces are established (like ERC20, ERC721, ENS, etc), then we can support composability between large classes of contracts, with different backing code, but sharing a common API.
+与 CosmWasm 相关的另一个重要方面是 **locality**。也就是说，actor 只能与其他actor **他们之前收到的地址**进行通信。我们将在下一页更深入地讨论 [地址和命名](./addresses)，但关键是要让两个参与者进行通信，外部消息(来自合约创建者，或者可能是用户)必须是送给演员。这是一种以分布式方式设置拓扑的灵活方式。唯一必须硬编码的是传递到这些地址的数据格式。一旦建立了一些标准接口(如 ERC20、ERC721、ENS 等)，那么我们就可以支持大类合约之间的可组合性，具有不同的支持代码，但共享一个公共 API。
 
-## Security Benefits
+## 安全优势
 
-By enforcing **private internal state**, a given contract can guarantee all valid transitions in its internal state. This is in contrast to the capabilities model used in Cosmos SDK, where trusted modules are passed a `StoreKey` in their constructor, which allows *full read and write access to the other module's storage*. In the Cosmos SDK, we can audit the modules before calling them, and safely pass in such powerful set of rights at compile time. However, there are no compile time checks in a smart contract system and we need to produce stricter boundaries between contracts. This allows us to comprehensively reason over all possibles transitions in a contract's state (and use quick-check like methods to test it).
+通过强制执行**私有内部状态**，给定的合约可以保证其内部状态中的所有有效转换。这与 Cosmos SDK 中使用的功能模型形成对比，其中受信任的模块在其构造函数中传递了一个“StoreKey”，这允许*对另一个模块的存储进行完全读写访问*。在 Cosmos SDK 中，我们可以在调用模块之前对其进行审计，并在编译时安全地传递如此强大的权限集。但是，智能合约系统中没有编译时检查，我们需要在合约之间产生更严格的界限。这使我们能够全面推理合约状态中所有可能的转换(并使用类似快速检查的方法来测试它)。
 
-As mentioned above, **serialized execution** prevents all concurrent execution of a contract's code. This is like an automatic mutex over the entire contract code. This is exactly the issue that one of the most common Ethereum attacks, reentrancy, makes use of. Contract A calls into contract B, which calls back into contract A. There may be local changes in memory in contract A from the first call (eg. deduct a balance), which are not yet persisted, so the second call can use the outdated state a second time (eg. authorize sending a balance twice). By enforcing serialized execution, the contract will write all changes to storage before exiting, and have a proper view when the next message is processed.
+如上所述，**序列化执行**阻止了合约代码的所有并发执行。这就像整个合约代码上的自动互斥锁。这正是最常见的以太坊攻击之一，可重入性，利用的问题。合约 A 调用合约 B，合约 B 回调到合约 A。第一次调用时合约 A 中的内存可能存在本地更改(例如扣除余额)，尚未持久化，因此第二次调用可以使用过时的第二次声明(例如，授权发送余额两次)。通过强制序列化执行，合约将在退出前将所有更改写入存储，并在处理下一条消息时有正确的视图。
 
-## Atomic Execution
+## 原子执行
 
-One problem with sending messages is atomically committing a state change over two contracts. There are many cases where we want to ensure that all returned messages were properly processed before committing our state. There are ideas like "three-phase-commit" used in distributed databases, but since in the normal case, all actors are living in the same binary, we can handle this in the `Keeper`. Before executing a Msg that came from an external transaction, we create a SavePoint of the global data store, and pass in a subset to the first contract. We then execute all returned messages inside the same sub-transaction. If all messages succeed, then we can commit the sub-transaction. If any fails (or we run out of gas), we abort execution and rollback the state to before the first contract was executed.
+发送消息的一个问题是在两个合约上原子地提交状态更改。在很多情况下，我们希望确保在提交状态之前所有返回的消息都得到了正确处理。分布式数据库中使用了像“三阶段提交”这样的想法，但由于在正常情况下，所有参与者都生活在同一个二进制文件中，我们可以在 `Keeper` 中处理这个问题。在执行来自外部事务的 Msg 之前，我们创建全局数据存储的 SavePoint，并将子集传递给第一个合约。然后我们在同一个子事务中执行所有返回的消息。如果所有消息都成功，那么我们可以提交子事务。如果有任何失败(或者我们耗尽了gas)，我们将中止执行并将状态回滚到第一个合约执行之前。
 
-This allows us to optimistically update code, relying on rollback for error handling. For example if an exchange matches a trade between two "ERC20" tokens, it can make the offer as fulfilled and return two messages to move token A to the buyer and token B to the seller. (ERC20 tokens use a concept of allowance, so the owner "allows" the exchange to move up to X tokens from their account). When executing the returned messages, it turns out the the buyer doesn't have sufficient token B (or provided an insufficient allowance). This message will fail, causing the entire sequence to be reverted. Transaction failed, the offer was not marked as fulfilled, and no tokens changed hands.
+这使我们能够乐观地更新代码，依靠回滚进行错误处理。例如，如果交易所匹配两个“ERC20”代币之间的交易，它可以使要约履行并返回两条消息，将代币 A 转移给买方，将令牌 B 转移给卖方。 (ERC20 代币使用配额的概念，因此所有者“允许”交易所从他们的账户中最多转移 X 个代币)。在执行返回的消息时，事实证明买方没有足够的令牌 B(或提供的配额不足)。此消息将失败，导致整个序列被还原。交易失败，报价未标记为已完成，并且没有代币易手。
 
-While many developers may be more comfortable thinking about directly calling the other contract in their execution path and handling the errors, you can achieve almost all the same cases with such an *optimistic update and return* approach. And there is no room for making mistakes in the contract's error handling code.
+虽然许多开发人员可能更愿意考虑在他们的执行路径中直接调用另一个合约并处理错误，但您可以使用这种*乐观的更新和返回*方法来实现几乎所有相同的情况。并且在合约的错误处理代码中没有犯错的余地。
 
-## Dynamically Linking Host Modules
+## 动态链接主机模块
 
-The aspects of **locality** and **loose coupling** mean that we don't even need to link to other CosmWasm contracts. We can send messages to anything the Dispatcher has an address for. For example, we can return a `SendMsg`, which will be processed by the native `x/supply` module in Cosmos SDK, moving native tokens. As we define standard interfaces for composability, we can define interfaces to call into core modules (bond and unbond your stake...), and then pass in the address to the native module in the contract constructor.
+**局部性**和**松耦合**的方面意味着我们甚至不需要链接到其他 CosmWasm 合约。我们可以向 Dispatcher 有地址的任何东西发送消息。例如，我们可以返回一个 `SendMsg`，它将被 Cosmos SDK 中的原生 `x/supply` 模块处理，移动原生令牌。当我们为可组合性定义标准接口时，我们可以定义接口以调用核心模块(绑定和解除绑定您的股份......)，然后将地址传递给合约构造函数中的本机模块。
 
-## Inter Blockchain Messaging
+## 区块链间消息传递
 
-Since the Actor model doesn't attempt to make synchronous calls to another contract, but just returns a message "to be executed", it is a nice match for making cross-chain contract calls using [IBC](https://cosmos.network/ibc). The only caveat here is that the *atomic execution* guarantee we provided above no longer applies here. The other call will not be called by the same dispatcher, so we need to store an intermediate state in the contract itself. That means a state that cannot be changed until the result of the IBC call is known, then can be safely applied or reverted.
+由于 Actor 模型不会尝试对另一个合约进行同步调用，而只是返回一条消息“待执行”，因此它非常适合使用 [IBC](https://cosmos.network/ibc)。这里唯一的警告是我们上面提供的*原子执行*保证不再适用于这里。另一个调用不会被同一个调度器调用，因此我们需要在合约本身中存储一个中间状态。这意味着在知道 IBC 调用的结果之前无法更改的状态，然后可以安全地应用或恢复。
 
-For example, if we want to move tokens from chain A to chain B, we would first prepare a send:
+例如，如果我们想将代币从链 A 移动到链 B，我们首先要准备发送:
 
-1. Contract A reduces token supply of sender
-2. Contract A creates a "escrow" of those tokens linked to IBC message id, sender and receiving chain.
-3. Contract A commits state and returns a message to initiate an IBC transaction to chain B.
-4. If the IBC send part fails, then the contract is atomically reverted as above.
+1. 合约 A 减少发送方的代币供应
+2. 合约 A 创建链接到 IBC 消息 ID、发送方和接收链的代币的“托管”。
+3. 合约 A 提交状态并返回消息以发起 IBC 交易到链 B。
+4.如果IBC发送部分失败，则合约如上原子还原。
 
-After some time, a "success" or "error"/"timeout" message is returned from the IBC module to the token contract:
+一段时间后，“成功”或“错误”/“超时”消息从 IBC 模块返回到令牌合约:
 
-1. Contract A validates the message came from the IBC handler (authorization) and refers to a known IBC message ID it has in escrow.
-2. If it was a success, the escrow is deleted and the escrowed tokens are placed in an account for "Chain B" (meaning that only a future IBC message from Chain B may release them).
-3. If it was an error, the escrow is deleted and the escrowed tokens are returned to the account of the original sender.
+1. 合约 A 验证来自 IBC 处理程序(授权)的消息，并引用它在托管中的已知 IBC 消息 ID。
+2. 如果成功，则删除托管并将托管的代币放入“B 链”的账户中(意味着只有来自 B 链的未来 IBC 消息可能会释放它们)。
+3. 如果是错误，则托管被删除，托管的代币返回到原始发件人的账户。
 
-You can imagine a similar scenario working for cases like moving NFT ownership, cross-chain staking, etc. We will expand on these possibilities and provide tooling to help make proper design once the IBC code in Cosmos SDK is stabilized (and included in a release), but the contract design is made with this in mind.
+你可以想象一个类似的场景适用于移动 NFT 所有权、跨链质押等情况。一旦 Cosmos SDK 中的 IBC 代码稳定(并包含在一个版本中)，我们将扩展这些可能性并提供工具来帮助进行适当的设计)，但合同设计是考虑到这一点的。
 
-## Credits
+## 学分
 
-Much thanks to [Aaron Craelius](https://github.com/aaronc), who came up with this design of using an Actor model to avoid reentrancy attacks.
+非常感谢 [Aaron Craelius](https://github.com/aaronc)，他提出了使用 Actor 模型来避免重入攻击的设计。

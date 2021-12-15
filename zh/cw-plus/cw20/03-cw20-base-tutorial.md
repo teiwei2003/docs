@@ -1,56 +1,51 @@
----
-title: cw20-base Tutorial
-order: 3
----
+# cw20-base 教程
 
-# cw20-base Tutorial
-
-:::warning
-This tutorial does not work with cosmjs 0.23. It will be fixed when 0.24 is out.
+:::警告
+本教程不适用于 cosmjs 0.23。当 0.24 出来时它会被修复。
 :::
 
-This is a simple tutorial showing you how to use of powerful node REPL to interact with
-a CW20 token contract (fungible tokens, like ERC20) on [musselnet](https://github.com/CosmWasm/testnets/tree/master/musselnet).
+这是一个简单的教程，向您展示如何使用强大的节点 REPL 进行交互
+[musselnet](https://github.com/CosmWasm/testnets/tree/master/musselnet) 上的 CW20 代币合约(可替代代币，如 ERC20)。
 
-I will walk you through uploading contract code and creating a concrete instance (the same `cw20-base`
-wasm code can be reused to create dozens of token contracts with different symbols and distributions).
-Then I will show you how to easily interact with this contract. As JSON manipulation and local variables
-are not so much fun in BASH, we use the [`@cosmjs/cli`](https://github.com/CosmWasm/cosmjs/tree/master/packages/cli)
-tool instead of the `wasmd` CLI tool.
+我将引导您完成上传合约代码并创建一个具体实例(相同的`cw20-base`
+wasm 代码可以重用以创建数十个具有不同符号和分布的代币合约)。
+然后我将向您展示如何轻松地与该合约进行交互。作为 JSON 操作和局部变量
+在 BASH 中没有那么多乐趣，我们使用 [`@cosmjs/cli`](https://github.com/CosmWasm/cosmjs/tree/master/packages/cli)
+工具而不是 `wasmd` CLI 工具。
 
-But, before we get into the fun part of playing with the smart contracts, I want to make sure
-you know how to use your tools and not loose your private keys.
+但是，在我们进入玩智能合约的有趣部分之前，我想确保
+你知道如何使用你的工具而不是丢失你的私钥。
 
-You must have Node 10+ installed locally to run it. It has been tested on Ubuntu, and may not
-work properly on Windows (we assume a HOME environmental variable). PRs welcome.
+您必须在本地安装 Node 10+ 才能运行它。它已经在 Ubuntu 上测试过，可能没有
+在 Windows 上正常工作(我们假设一个 HOME 环境变量)。欢迎 PR。
 
-## Connecting to the chain
+##连接到链
 
-The first step before doing anything is ensuring we can create an account and connect to the chain.
-You will always use the following command to start up the `@cosmjs/cli` with some cw20-specific helpers preloaded
-(in addition to all the general helpers it has).
+做任何事情之前的第一步是确保我们可以创建一个帐户并连接到链。
+您将始终使用以下命令来启动 `@cosmjs/cli` 并预加载一些特定于 cw20 的帮助程序
+(除了它拥有的所有一般助手)。
 
 ```shell
 npx @cosmjs/cli@^0.23 --init https://raw.githubusercontent.com/CosmWasm/cosmwasm-plus/master/contracts/cw20-base/helpers.ts
 ```
 
-Once this downloads the source and starts up, you should see a bunch of yellow text (explaining what code is preloaded),
-followed by a familiar node prompt: `>> `. Please note this is a super-charged REPL, it allows the use of `await`
-to easily work with `Promises`, and also does type-checks before executing code. You don't need to define types,
-but if you type `client.getCodez()`, you will get the helpful message:
-`Property 'getCodez' does not exist on type 'SigningCosmWasmClient'. Did you mean 'getCodes'?`,
-much better than the typical `TypeError: client.getCodez is not a function`
-or worse `cannot call undefined`.
+下载源代码并启动后，您应该会看到一堆黄色文本(说明预加载了哪些代码)，
+接着是一个熟悉的节点提示:`>>`。 请注意这是一个超级充电的 REPL，它允许使用 `await`
+轻松使用`Promises`，并在执行代码之前进行类型检查。 你不需要定义类型，
+但是如果你输入`client.getCodez()`，你会得到有用的信息:
+'SigningCosmWasmClient' 类型不存在属性 'getCodez'。 你的意思是 'getCodes' 吗？`,
+比典型的“TypeError: client.getCodez is not a function”好得多
+或更糟的是`不能调用未定义`。
 
-Without further ado, let's get to use it, and please do read the error messages:
+事不宜迟，让我们开始使用它，并请阅读错误消息:
 
 ```js
 const client = await useOptions(hackatomOptions).setup(YOUR_PASSWORD_HERE);
 client.getAccount();
 ```
 
-This will take a few seconds as we hit the faucet the first time to ensure you have
-some tokens in your account to pay fees. When it returns, you should see something like this:
+这将需要几秒钟的时间，因为我们第一次按下水龙头以确保您
+您帐户中的一些代币以支付费用。 当它返回时，您应该看到如下内容:
 
 ```js
 { address: 'cosmos16hn7q0yhfrm28ta9zlk7fu46a98wss33xwfxys',
@@ -60,59 +55,59 @@ some tokens in your account to pay fees. When it returns, you should see somethi
   sequence: 0 }
 ```
 
-## Reloading your Wallet
+## 重新加载你的钱包
 
-You can keep typing in the shell, or close it and run some sections later.
-Always start off with:
+您可以继续在 shell 中输入，或者关闭它并稍后运行一些部分。
+始终从以下开始:
 
 ```js
 const client = await useOptions(hackatomOptions).setup(YOUR_PASSWORD_HERE);
 ```
 
-to set up your client. `useOptions` takes the musselnet configuration from everything from
-URLs to tokens to bech32prefix. When you call `setup` with a password, it checks for
-`~/.helder.key` and creates a new key if it is not there, otherwise it loads the key from the file.
-Your private key (actually mnemonic) is stored encrypted, and you need the same password to use it again.
-Try `cat ~/.helder.key` to prove to yourself that it is indeed encrypted, or try reloading with a different
-password.
+设置您的客户端。 `useOptions` 从所有内容中获取 musselnet 配置
+指向 bech32prefix 的令牌的 URL。 当您使用密码调用 `setup` 时，它会检查
+`~/.helder.key` 并在它不存在时创建一个新密钥，否则它从文件中加载密钥。
+您的私钥(实际上是助记符)是加密存储的，您需要相同的密码才能再次使用它。
+尝试使用 `cat ~/.helder.key` 来向自己证明它确实是加密的，或者尝试使用不同的重新加载
+密码。
 
-If you want the mnemonic, you can recover it at anytime, as long as you still have the file and the password.
-You could use this later to recover, or use the same mnemonic to import the key into the `helder` cli tool.
+如果你想要助记词，你可以随时恢复，只要你还有文件和密码。
+您可以稍后使用它来恢复，或者使用相同的助记符将密钥导入到 `helder` cli 工具中。
 
 ```js
 useOptions(hackatomOptions).recoverMnemonic(YOUR_PASSWORD_HERE)
 ```
 
 ::: warning
-This command saves the key to `~/.helder.key` encrypted. If you forget the password, either delete it or pass a
-`filename` along with a password to create a new key.
+此命令将密钥保存到加密的`~/.helder.key`。 如果您忘记密码，请将其删除或通过
+`filename` 和密码一起创建一个新的密钥。
 :::
 
-Also, try this with a invalid password and see how it fails.
+另外，用无效的密码试试这个，看看它是如何失败的。
 
-Now that you feel a bit more secure about your keys (and ability to load them later), let's get into working with
-some contracts.
+现在您对自己的密钥(以及以后加载它们的能力)感到更加安全，让我们开始使用
+一些合同。
 
-## Sending CW20 Tokens
+## 发送 CW20 代币
 
-Now that you have set up your client, let's get going and try out the
+现在您已经设置了客户端，让我们开始尝试
 [`cw20-base`](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-base)
-token contract, which implements the
-[`cw20` spec](https://github.com/CosmWasm/cosmwasm-plus/blob/master/packages/cw20/README.md).
+代币合约，它实现了
+[`cw20` 规范](https://github.com/CosmWasm/cosmwasm-plus/blob/master/packages/cw20/README.md)。
 
-We will show how to upload the compiled wasm code, instantiate your own contract (possibly
-reusing code), and then mint and transfer tokens on that contract.
+我们将展示如何上传编译好的 wasm 代码，实例化你自己的合约(可能
+重用代码)，然后在该合约上铸造和转移代币。
 
-## Upload and Instantiate a Contract
+## 上传并实例化合约
 
-I will walk you though how to set up an example CW20 contract on Heldernet.
+我将带您了解如何在 Heldernet 上设置示例 CW20 合同。
 
-### Example: STAR
+### 示例:星
 
-The first contract I uploaded was STAR tokens, or "Golden Stars" to be distribute to the
-[first 3 validators](https://bigdipper.musselnet.cosmwasm.com/validators) on the network.
+我上传的第一个合约是 STAR 代币，或“金星”，分发给
+[前 3 个验证器](https://bigdipper.musselnet.cosmwasm.com/validators) 在网络上。
 
-Please do not copy this verbatum, but look to see how such a contract is setup and deployed the first time.
+请不要复制这个逐字逐句，而是看看第一次如何设置和部署这样的合同。
 
 ```js
 const client = await useOptions(hackatomOptions).setup(YOUR_PASSWORD_HERE);
@@ -151,10 +146,10 @@ console.log(await contract.balance());
 // 0
 ```
 
-### Try this at home: MINE
+### 在家里试试这个:我的
 
-Now that we have that uploaded, we can easily make a second contract. This one, please
-do run through and customize the field names and token amounts before entering them.
+现在我们已经上传了，我们可以轻松地签订第二份合同。 这个请
+在输入字段名称和令牌数量之前，请务必运行并自定义它们。
 
 ```js
 const client = await useOptions(hackatomOptions).setup(YOUR_PASSWORD_HERE);
@@ -189,14 +184,14 @@ mine.tokenInfo()
 mine.minter()
 ```
 
-Look, you're rich now! Time to share the wealth.
+看，你现在有钱了！ 是时候分享财富了。
 
-## Using a contract
+## 使用合约
 
-In this section, we will show you how to use your newly constructed token.
-You can keep typing along in the same REPL that you used to create the `MINE`
-tokens (or whatever better name you invented), but if you closed it down and
-come back, here's how to re-connect:
+在本节中，我们将向您展示如何使用您新构建的令牌。
+您可以继续输入用于创建“MINE”的相同 REPL
+令牌(或任何你发明的更好的名字)，但如果你关闭它并
+回来，这是重新连接的方法:
 
 ```js
 const client = await useOptions(hackatomOptions).setup(YOUR_PASSWORD_HERE);
@@ -217,10 +212,10 @@ mine.minter()
 mine.balance()
 ```
 
-Okay, you are connected to your contract. Let's see what cw20 is capable of.
-Here I will show you how you can mint tokens (you did give yourself
-that special permission on init, right?) and transfer tokens to other
-users.
+好的，您已连接到您的合同。 让我们看看 cw20 有什么能力。
+在这里，我将向您展示如何铸造代币(您确实给了自己
+init 的特殊权限，对吧？)并将令牌转移给其他人
+用户。
 
 ```js
 const someone = "cosmos13nt9rxj7v2ly096hm8qsyfjzg5pr7vn56p3cay";
@@ -251,5 +246,5 @@ mine.balance(other)
 mine.balance()
 ```
 
-Great, you are moving stuff around and see it in your queries and in the block explorer.
-Time to act like a pro.
+太好了，您正在四处移动内容并在您的查询和块浏览器中看到它。
+是时候表现得像个专业人士了。

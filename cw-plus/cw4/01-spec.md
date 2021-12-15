@@ -1,8 +1,3 @@
----
-title: cw4 Spec
-order: 1
----
-
 # CW4 Spec: Group Members
 
 cw4 package source code: [https://github.com/CosmWasm/cosmwasm-plus/blob/master/packages/cw4/README.md](https://github.com/CosmWasm/cosmwasm-plus/blob/master/packages/cw4/README.md)

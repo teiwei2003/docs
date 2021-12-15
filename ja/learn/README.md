@@ -1,6 +1,4 @@
----
-title: Name Service
----
+# Name Service
 
 In this section we will show you how to develop CosmWasm smart contracts.
 

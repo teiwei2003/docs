@@ -1,7 +1,3 @@
----
-order: 2
----
-
 # CW1 Subkeys
 
 [CW1 Subkeys](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw1-subkeys)

@@ -1,34 +1,30 @@
----
-order: 2
----
-
-# Setup
+# 设置
 
 <iframe src="https://player.vimeo.com/video/457712351" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
 
-## Coding Environment
+## 编码环境
 
-### Rust and IDE
-This section is a summary of [Getting Started / Installation and Setting Up Environment](../../getting-started/installation.md).
-You can go to the doc, setup rust and preferred IDE then and come back here. We recommend using Intellij IDEA.
+### Rust 和 IDE
+本节是[入门/安装和设置环境](../../getting-started/installation.md)的总结。
+您可以转到文档，设置 rust 和首选 IDE，然后返回此处。我们推荐使用 Intellij IDEA。
 
-## Project Starter
+## 项目启动器
 
-Project starter template repo is there for spinning new smart contract quickly.
-With one command, project layout, boiler plate, git, and even Circle CI for auto testing/formatting/linting will be set up. Cool huh.
-Here is the repo: [cosmwasm-template](https://github.com/CosmWasm/cosmwasm-template)
+项目启动模板 repo 可用于快速旋转新的智能合约。
+使用一个命令，项目布局、样板、git，甚至用于自动测试/格式化/linting 的 Circle CI 都将被设置。很酷吧。
+这是 repo:[cosmwasm-template](https://github.com/CosmWasm/cosmwasm-template)
 
-Assuming you have a followed section above, then the following should get you a new repo to start a contract:
+假设您有上面的后续部分，那么以下内容应该会为您提供一个新的存储库来启动合同:
 
-First, install **cargo-generate**. Unless you did that before, run this line now:
+首先，安装**cargo-generate**。除非你以前这样做过，否则现在运行这一行:
 
 `cargo install cargo-generate --features vendored-openssl`
 
-Now, use it to create your new contract. Go to the folder in which you want to place it and run:
+现在，使用它来创建您的新合同。转到要放置它的文件夹并运行:
 
-`cargo generate --git https://github.com/CosmWasm/cosmwasm-template.git --name simple-option`
+`货物生成 --git https://github.com/CosmWasm/cosmwasm-template.git --name simple-option`
 
-Initialize git repo:
+初始化 git 仓库:
 
 ```shell
 git add .

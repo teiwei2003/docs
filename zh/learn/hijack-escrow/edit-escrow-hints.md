@@ -1,12 +1,8 @@
----
-order: 3
----
+# 提示
 
-# Hints
+**！！ 剧透警告!!**
 
-**!! SPOILER ALERT !!**
-
-This sections contains solutions to previous section's questions.
+本节包含对上一节问题的解答。
 
 ## ExecuteMsg
 
@@ -117,7 +113,7 @@ fn handle_steal() {
 }
 ```
 
-You will also have to add `MOCK_CONTRACT_ADDR` to the test imports, like:
+您还必须将“MOCK_CONTRACT_ADDR”添加到测试导入中，例如:
 
 ```rust
 use cosmwasm_std::testing::{mock_dependencies, mock_env, MOCK_CONTRACT_ADDR};

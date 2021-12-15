@@ -1,8 +1,3 @@
----
-title: IBC Relayer
-order: 2
----
-
 # Relayer
 
 Interchain connections require external processes called [relayer](https://github.

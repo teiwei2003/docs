@@ -1,14 +1,10 @@
----
-order: 4
----
-
-# Testing
+# 测试
 
 <iframe src="https://player.vimeo.com/video/457705991" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
 
-At this point your code should be compiling, although we did not test if it works.
-You can deploy the code to the chain everytime when you make a change. But come on, your time is more valuable than that.
-Also, good to keep the contract break-free and tested for future changes.
+此时您的代码应该正在编译，尽管我们没有测试它是否有效。
+每次进行更改时，您都可以将代码部署到链中。 但是来吧，你的时间比那更宝贵。
+此外，最好保持合同不受干扰并测试未来的变化。
 
 ```rust
 #[cfg(test)]
@@ -54,12 +50,12 @@ fn proper_initialization() {
 }
 ```
 
-Good we now have a test environment initializer. This is a very simple one, you can pass in variables to the function and do different tweaks.
-Check cosmwasm-plus for more.
+很好，我们现在有一个测试环境初始化程序。 这是一个非常简单的方法，您可以将变量传递给函数并进行不同的调整。
+查看 cosmwasm-plus 了解更多信息。
 
-### Mock Dependencies, Environment, and Message Info
+### 模拟依赖、环境和消息信息
 
-There are two three mocking tools we should improve on:
+我们应该改进两个三个模拟工具:
 
 ```rust
 /// All external requirements that can be injected for unit tests.
@@ -76,7 +72,7 @@ pub fn mock_dependencies(
 }
 ```
 
-This sets up dependencies for testing such as storage, api, and querier.
+这为测试设置了依赖项，例如存储、api 和查询器。
 
 ```rust
 /// Returns a default enviroment with height, time, chain_id, and contract address

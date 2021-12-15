@@ -1,7 +1,3 @@
----
-order: 5
----
-
 # Develop dApp
 
 To showcase the previously explained utilities, we'll create the balance checker dApp from the template.

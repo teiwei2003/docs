@@ -1,12 +1,12 @@
 # 文档自述文件
 
-## 运行
+## run
 
 `npm i && npm run serve`
 
 ## 建造
 
-`npm run build`
+`npm 运行构建`
 
 ## 部署
 

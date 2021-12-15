@@ -1,8 +1,3 @@
----
-title: Advanced Tips
-order: 2
----
-
 # Advanced REPL tips
 
 ::: danger

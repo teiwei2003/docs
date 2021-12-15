@@ -1,7 +1,3 @@
----
-order: 2
----
-
 # Hack the Contract
 
 Now that you can compile and run tests, let's try to make some changes to the code and you can see if they work. If you didn't do this already in the last section, it is time to clone the examples repo and check out the escrow code:

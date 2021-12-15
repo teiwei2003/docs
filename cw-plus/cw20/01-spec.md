@@ -1,7 +1,3 @@
----
-order: 1
----
-
 # CW20 Spec: Fungible Tokens
 
 cw20 package source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/packages/cw20](https://github.com/CosmWasm/cosmwasm-plus/tree/master/packages/cw20)

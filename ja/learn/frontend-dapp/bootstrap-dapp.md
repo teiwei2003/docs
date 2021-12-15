@@ -1,7 +1,3 @@
----
-order: 4
----
-
 # Bootstrap dApp
 
 There are two approaches to bootstrap a new dApp: as a lerna package in the monorepo or as a standalone app.

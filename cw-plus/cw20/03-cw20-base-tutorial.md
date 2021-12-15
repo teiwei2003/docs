@@ -1,8 +1,3 @@
----
-title: cw20-base Tutorial
-order: 3
----
-
 # cw20-base Tutorial
 
 :::warning

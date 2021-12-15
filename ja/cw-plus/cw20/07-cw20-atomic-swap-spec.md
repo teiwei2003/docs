@@ -1,8 +1,3 @@
----
-title: cw20-atomic-swap Spec
-order: 7
----
-
 # Atomic Swaps
 
 cw20-atomic-swap source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-atomic-swap](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-atomic-swap)
