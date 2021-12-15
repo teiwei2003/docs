@@ -1,40 +1,36 @@
----
-title: Smart Contracts Over Governance
----
+# 介绍
 
-# Introduction
+CsomWasm 证明了作为 Cosmos Hub 核心的智能合约容器的潜力。 {概要}
 
-CsomWasm proves the potential of a smart contract container at the heart of the Cosmos Hub. {synopsis}
+CosmWasm 的承诺之一是在 Cosmos Hub 上实现灵活的智能合约执行。使用集线器上的 CosmWasm，
+网络参与者可以提议部署智能合约，在治理中投票以启用它们。
 
-One of the promises of CosmWasm is to enable flexible smart contract execution on Cosmos Hub. With CosmWasm on the Hub,
-network participants can propose to deploy smart contracts, vote in governance to enable them.
+在本节中，您将学习在集线器上体验智能合约所需的所有知识。如果您对智能合约感兴趣
+开发，消化 [Getting Started](/getting-started/intro.md) 文档。
 
-In this section you will learn all the knowledge required to experience smart contract on the hub. If you are interested in smart contract
-development, digest the [Getting Started](/getting-started/intro.md) documentation.
+## Wasmd 授权设置
 
-## Wasmd Authorization Settings
+CosmWasm 提供了可以通过多种方式配置的链上智能合约部署授权机制:
 
-CosmWasm provides on-chain smart contract deployment authorization mechanisms that can be configured many ways:
+- 对所有人免费，即完全无需管理员。任何人都可以部署。
+- 完全许可，意味着只有管理员可以部署。
+- 通过链上治理。合约的部署由治理投票决定。
+- 按业主，按合同签订合同。
 
-- Free for all, meaning fully without an admin. Anyone can deploy.
-- Fully permissioned, meaning only an admin can deploy.
-- By on-chain governance. Deployment of a contract is determined by governance votes.
-- By owner, contract by contract basis.
+### 在编译时启用治理建议
 
-### Enable Governance Proposals at Compile Time
-
-As gov proposals bypass the existing authorization policy they are disabled and require to be enabled at compile time.
+当 gov 提案绕过现有的授权策略时，它们被禁用并需要在编译时启用。
 ```
 -X github.com/CosmWasm/wasmd/app.ProposalsEnabled=true - enable all x/wasm governance proposals (default false)
 -X github.com/CosmWasm/wasmd/app.EnableSpecificProposals=MigrateContract,UpdateAdmin,ClearAdmin - enable a subset of the x/wasm governance proposal types (overrides ProposalsEnabled)
 ```
 
-If you are using `gaiaflex` binary executable you don't need to build using flags above since it is already included in
-the binary build.
+如果您使用的是`gaiaflex` 二进制可执行文件，则不需要使用上面的标志进行构建，因为它已经包含在
+二进制构建。
 
-### Init Parameters Via Genesis
+### 通过 Genesis 初始化参数
 
-Initial authorization configuration is in genesis file:
+初始授权配置在 genesis 文件中:
 
 ```json
 "wasm": {
@@ -47,27 +43,27 @@ Initial authorization configuration is in genesis file:
 }
 ```
 
-These configurations in gaiaflex testnet means only governance can upload and init smart contracts.
+gaiaflex 测试网中的这些配置意味着只有治理才能上传和初始化智能合约。
 
-### Available configurations
-- `code_upload_access` - who can upload a wasm binary: `Nobody`, `Everybody`, `OnlyAddress`. Needs to be defined in the genesis.
-can be changed later by governance votes.
-- `instantiate_default_permission` - platform default, who can instantiate a wasm binary when the code owner has not set it
-In this tutorial, we will show you deploying a smart contract on a governed network.
+### 可用配置
+- `code_upload_access` - 谁可以上传 wasm 二进制文件:`Nobody`、`Everybody`、`OnlyAddress`。需要在创世中定义。
+以后可以通过治理投票进行更改。
+- `instantiate_default_permission` - 平台默认，当代码所有者没有设置它时，谁可以实例化一个 wasm 二进制文件
+在本教程中，我们将向您展示在受管控网络上部署智能合约。
 
-CosmWasm extends Cosmos SDK governance module to enable deployment of smart contracts after proposals.
+CosmWasm 扩展了 Cosmos SDK 治理模块，以支持在提案后部署智能合约。
 
-## Get Sample cw-subkeys Contract
+## 获取示例 cw-subkeys 合同
 
-There are two options to get the sample contract:
+获取样本合同有两种选择:
 
-1. Download [source code](https://github.com/CosmWasm/cosmwasm-plus/tree/v0.1.1/contracts/cw20-base), and [compile](/getting-started/compile-contract.md) it your self.
+1.下载【源代码】(https://github.com/CosmWasm/cosmwasm-plus/tree/v0.1.1/contracts/cw20-base)，并【编译】(/getting-started/compile-contract.md )它是你的自我。
 
-2. Download [pre-compiled binary](https://github.com/CosmWasm/cosmwasm-plus/releases/download/v0.1.1/cw20_base.wasm).
+2.下载【预编译二进制文件】(https://github.com/CosmWasm/cosmwasm-plus/releases/download/v0.1.1/cw20_base.wasm)。
 
-## Submit Proposal
+## 提交提案
 
-Deployment command is down below:
+部署命令如下:
 
 ```shell
 wasmcli tx gov submit-proposal wasm-store cw1-subkeys.wasm \
@@ -81,22 +77,22 @@ wasmcli tx gov submit-proposal wasm-store cw1-subkeys.wasm \
  --from account
 ```
 
-If you run `wasmcli tx gov submit-proposal wasm-store -h`, you will notice two more important flags:
+如果你运行 `wasmcli tx gov submit-proposal wasm-store -h`，你会注意到两个更重要的标志:
 
 ```shell
 --instantiate-everybody string      Everybody can instantiate a contract from the code, optional
 --instantiate-only-address string   Only this address can instantiate a contract instance from the code, optional
 ```
 
-By default, the first flag is enabled. If you want only one address to be able to initiate the contract,
-set the `instantiate-only-address` flag.
+默认情况下，启用第一个标志。 如果你只希望一个地址能够发起合约，
+设置“仅实例化地址”标志。
 
-If either of these flags are set, the voting committee should decide if that is acceptable for the given contract.
-Instantiate-everybody might make sense for a multisig (everyone makes their own), but not for creating a new token.
+如果设置了这些标志中的任何一个，投票委员会应该决定这对于给定的合同是否可以接受。
+实例化每个人可能对多重签名有意义(每个人都有自己的)，但不适用于创建新令牌。
 
-## Vote
+## 投票
 
-After the proposal creation, it needs to be approved by governance voting.
+提案创建后，需要通过治理投票通过。
 ```shell
 wasmcli tx gov vote [proposal-id] yes --from account
 ```
@@ -113,9 +109,9 @@ wasmcli tx wasm instantiate [code_id] “$INIT” \
  --from account
 ```
 
-## Interact
+## 相互作用
 
-If you have admin access to the contract you can add or remove admins by running the command:
+如果您对合同具有管理员访问权限，则可以通过运行以下命令添加或删除管理员:
 
 ```
 export UPDATE_ADMINS_MSG=’{“update_admins”: {“admins”:[“cosmos1u3nufc2kjslj2t3pugxhjv4zc8adw5thuwu0tm”, “cosmos1fp9qlazkm8kgq304kalev6e69pyp5kmdd5pcgj”]}}’
@@ -123,7 +119,7 @@ wasmcli tx wasm execute $CONTRACT_ADDRESS “$UPDATE_ADMINS_MSG” \
 --from account
 ```
 
-Subkey allowances can execute send token transaction using the command:
+子密钥限额可以使用以下命令执行发送令牌交易:
 ```
 export SEND_MSG=’{“execute”:{“msgs”:[{“bank”:{“send”:{“amount”:[{“denom”:”umuon”,”amount”:”1000"}],”from_address”:”cosmos18vd8fpwxzck93qlwghaj6arh4p7c5n89uzcee5",”to_address”:”cosmos1cs63ehtq6lw86vc87t42cnhcmydtnrffzdjhkz”}}}]}}’
 wasmcli tx wasm execute $CONTRACT_ADDRESS “$SEND_MSG” --from account

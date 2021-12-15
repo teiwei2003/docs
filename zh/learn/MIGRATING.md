@@ -1,20 +1,16 @@
----
-title: Migrating Contracts
----
+# 迁移合约
 
-# Migrating Contracts
-
-This guide explains what is needed to upgrade contracts when migrating over
-major releases of `cosmwasm`. Note that you can also view the
-[complete CHANGELOG](./CHANGELOG.md) to understand the differences.
+本指南解释了迁移时升级合同所需的条件
+`cosmwasm` 的主要版本。 请注意，您还可以查看
+[完整的 CHANGELOG](./CHANGELOG.md) 以了解差异。
 
 ## 0.13 -> 0.14
 
-- The minimum Rust supported version for 0.14 is 1.51.0. Verify your Rust
-  version is >= 1.51.0 with: `rustc --version`
+- 0.14 支持的最低 Rust 版本是 1.51.0。 验证你的 Rust
+   版本 >= 1.51.0 带有:`rustc --version`
 
-- Update CosmWasm and schemars dependencies in Cargo.toml (skip the ones you
-  don't use):
+- 更新 Cargo.toml 中的 CosmWasm 和 schemars 依赖项(跳过那些
+   不要使用):
 
   ```
   [dependencies]
@@ -29,19 +25,19 @@ major releases of `cosmwasm`. Note that you can also view the
   # ...
   ```
 
-- Rename the `init` entry point to `instantiate`. Also, rename `InitMsg` to
-  `InstantiateMsg`.
+- 将 `init` 入口点重命名为 `instantiate`。 另外，将`InitMsg`重命名为
+   `实例化消息`。
 
-- Rename the `handle` entry point to `execute`. Also, rename `HandleMsg` to
-  `ExecuteMsg`.
+- 将 `handle` 入口点重命名为 `execute`。 另外，将`HandleMsg`重命名为
+   `执行消息`。
 
-- Rename `InitResponse`, `HandleResponse` and `MigrateResponse` to `Response`.
-  The old names are still supported (with a deprecation warning), and will be
-  removed in the next version. Also, you'll need to add the `submessages` field
-  to `Response`.
+- 将`InitResponse`、`HandleResponse` 和`MigrateResponse` 重命名为`Response`。
+   旧名称仍然受支持(带有弃用警告)，并将被
+   在下一个版本中删除。 此外，您还需要添加 `submessages` 字段
+   到`响应`。
 
-- Remove `from_address` from `BankMsg::Send`, which is now automatically filled
-  with the contract address:
+- 从`BankMsg::Send`中删除`from_address`，现在会自动填充
+   与合同地址:
 
   ```rust
   // before
@@ -58,7 +54,7 @@ major releases of `cosmwasm`. Note that you can also view the
   });
   ```
 
-- Use the new entry point system. From `lib.rs` remove
+- 使用新的入口点系统。 从`lib.rs` 中删除
 
   ```rust
   #[cfg(target_arch = "wasm32")]
@@ -70,8 +66,8 @@ major releases of `cosmwasm`. Note that you can also view the
   cosmwasm_std::create_entry_points_with_migration!(contract);
   ```
 
-  Then add the macro attribute `#[entry_point]` to your `contract.rs` as
-  follows:
+然后将宏属性 `#[entry_point]` 添加到你的 `contract.rs` 作为
+   如下:
 
   ```rust
   use cosmwasm_std::{entry_point, … };
@@ -155,17 +151,17 @@ major releases of `cosmwasm`. Note that you can also view the
   }
   ```
 
-  `MessageInfo::funds` was always empty since [MsgMigrateContract] does not have
-  a funds field. `MessageInfo::sender` should not be needed for authentication
-  because the chain checks permissions before calling `migrate`. If the sender's
-  address is needed for anything else, this should be expressed as part of the
-  migrate message.
+`MessageInfo::funds` 始终为空，因为 [MsgMigrateContract] 没有
+   一个资金领域。 身份验证不需要`MessageInfo::sender`
+   因为链在调用 `migrate` 之前会检查权限。 如果发件人的
+   其他任何事情都需要地址，这应该表示为
+   迁移消息。
 
-  [msgmigratecontract]:
-    https://github.com/CosmWasm/wasmd/blob/v0.15.0/x/wasm/internal/types/tx.proto#L86-L96
+   [msgmigrate合同]:
+     https://github.com/CosmWasm/wasmd/blob/v0.15.0/x/wasm/internal/types/tx.proto#L86-L96
 
-- Add mutating helper methods to `Response` that can be used instead of creating
-  a `Context` that is later converted to a response:
+- 向 `Response` 添加变异辅助方法，可以用来代替创建
+   稍后转换为响应的 `Context`:
 
   ```rust
   // before
@@ -226,19 +222,19 @@ major releases of `cosmwasm`. Note that you can also view the
   use cosmwasm_std::Pair;
   ```
 
-- If necessary, add a wildcard arm to the `match` of now non-exhaustive message
-  types `BankMsg`, `BankQuery`, `WasmMsg` and `WasmQuery`.
+- 如有必要，将通配符臂添加到现在非详尽消息的“匹配”中
+   输入 `BankMsg`、`BankQuery`、`WasmMsg` 和 `WasmQuery`。
 
-- `HumanAddr` has been deprecated in favour of simply `String`. It never added
-  any significant safety bonus over `String` and was just a marker type. The new
-  type `Addr` was created to hold validated addresses. Those can be created via
-  `Addr::unchecked`, `Api::addr_validate`, `Api::addr_humanize` and JSON
-  deserialization. In order to maintain type safety, deserialization into `Addr`
-  must only be done from trusted sources like a contract's state or a query
-  response. User inputs must be deserialized into `String`. This new `Addr` type
-  makes it easy to use human readable addresses in state:
+- `HumanAddr` 已被弃用，取而代之的是简单的 `String`。 它从未添加
+   任何比 `String` 显着的安全奖励，只是一种标记类型。 新的
+   类型 `Addr` 被创建来保存经过验证的地址。 这些可以通过创建
+   `Addr::unchecked`、`Api::addr_validate`、`Api::addr_humanize` 和 JSON
+   反序列化。 为了保持类型安全，反序列化为`Addr`
+   只能从受信任的来源完成，例如合约状态或查询
+   回复。 用户输入必须反序列化为 `String`。 这个新的`Addr`类型
+   使在 state 中使用人类可读地址变得容易:
 
-  With pre-validated `Addr` from `MessageInfo`:
+   使用来自 `MessageInfo` 的预先验证的 `Addr`:
 
   ```rust
   // before
@@ -296,40 +292,40 @@ major releases of `cosmwasm`. Note that you can also view the
   );
   ```
 
-  The existing `CanonicalAddr` remains unchanged and can be used in cases in
-  which a compact binary representation is desired. For JSON state this does not
-  save much data (e.g. the bech32 address
-  cosmos1pfq05em6sfkls66ut4m2257p7qwlk448h8mysz takes 45 bytes as direct ASCII
-  and 28 bytes when its canonical representation is base64 encoded). For fixed
-  length database keys `CanonicalAddr` remains handy though.
+现有的 `CanonicalAddr` 保持不变，可用于以下情况
+  需要紧凑的二进制表示。对于 JSON 状态，这不会
+  保存大量数据(例如 bech32 地址
+  cosmos1pfq05em6sfkls66ut4m2257p7qwlk448h8mysz 需要 45 个字节作为直接 ASCII
+  当其规范表示为 base64 编码时为 28 个字节)。对于固定
+  长度数据库键`CanonicalAddr` 仍然很方便。
 
-- Replace `StakingMsg::Withdraw` with `DistributionMsg::SetWithdrawAddress` and
-  `DistributionMsg::WithdrawDelegatorReward`. `StakingMsg::Withdraw` was a
-  shorthand for the two distribution messages. However, it was unintuitive
-  because it did not set the address for one withdraw only but for all following
-  withdrawls. Since withdrawls are [triggered by different
-  events][distribution docs] such as validators changing their commission rate,
-  an address that was set for a one-time withdrawl would be used for future
-  withdrawls not considered by the contract author.
+- 将 `StakingMsg::Withdraw` 替换为 `DistributionMsg::SetWithdrawAddress` 和
+  `DistributionMsg::WithdrawDelegatorReward`。 `StakingMsg::Withdraw` 是一个
+  两个分发消息的简写。然而，这是不直观的
+  因为它没有为一次取款设置地址，而是为所有后续设置
+  撤回。由于取款是 [由不同的
+  事件][分发文档]，例如验证者改变他们的佣金率，
+  为一次性提款设置的地址将用于未来
+  合同作者不考虑撤回。
 
-  If the contract never set a withdraw address other than the contract itself
-  (`env.contract.address`), you can simply replace `StakingMsg::Withdraw` with
-  `DistributionMsg::WithdrawDelegatorReward`. It is then never changed from the
-  default. Otherwise you need to carefully track what the current withdraw
-  address is. A one-time change can be implemented by emitted 3 messages:
+  如果合约从未设置合约本身以外的提款地址
+  (`env.contract.address`)，你可以简单地将 `StakingMsg::Withdraw` 替换为
+  `DistributionMsg::WithdrawDelegatorReward`。然后它永远不会从
+  默认。否则你需要仔细跟踪当前的提款
+  地址是。一次性更改可以通过发出 3 条消息来实现:
 
-  1. `SetWithdrawAddress { address: recipient }` to temporarily change the
-     recipient
-  2. `WithdrawDelegatorReward { validator }` to do a manual withdrawl from the
-     given validator
-  3. `SetWithdrawAddress { address: env.contract.address.into() }` to change it
-     back for all future withdrawls
+  1.`SetWithdrawAddress { address:收件人}`来临时改变
+     接受者
+  2.`WithdrawDelegatorReward { validator }` 做一次人工提现
+     给定的验证器
+  3.`SetWithdrawAddress { address: env.contract.address.into() }` 改变它
+     返回所有未来的提款
 
-  [distribution docs]: https://docs.cosmos.network/v0.42/modules/distribution/
+  [分发文档]:https://docs.cosmos.network/v0.42/modules/distribution/
 
-- The block time in `env.block.time` is now a `Timestamp` which stores
-  nanosecond precision. `env.block.time_nanos` was removed. If you need the
-  compnents as before, use
+- `env.block.time` 中的区块时间现在是一个 `Timestamp` 存储
+  纳秒精度。 `env.block.time_nanos` 被移除。如果您需要
+  组件和以前一样，使用
   ```rust
   let seconds = env.block.time.nanos() / 1_000_000_000;
   let nsecs = env.block.time.nanos() % 1_000_000_000;
@@ -887,23 +883,23 @@ Contract Code:
 
 At this point `cargo wasm` should pass.
 
-### Update test code
+### 更新测试代码
 
-Both:
+两个都:
 
-- Update all imports from `cosmwasm::mock::*` to `cosmwasm_std::testing::*`
-- Use `from_binary` not `from_slice` on all query responses (update imports)
-  - `from_slice(res.as_slice())` -> `from_binary(&res)`
-- Replace `coin("123", "FOO")` with `coins(123, "FOO")`. We renamed it to coins
-  to be more explicit that it returns `Vec<Coin>`, and now accept a `u128` as
-  the first argument for better type-safety. `coin` is now an alias to
-  `Coin::new` and returns one `Coin`.
-- Remove the 4th argument (contract balance) from all calls to `mock_env`, this
-  is no longer stored in the environment.
-- `dependencies` was renamed to `mock_dependencies`. `mock_dependencies` and
-  `mock_instance` take a 2nd argument to set the contract balance (visible for
-  the querier). If you need to set more balances, use `mock_XX_with_balances`.
-  The follow code block explains:
+- 将所有从 `cosmwasm::mock::*` 导入到 `cosmwasm_std::testing::*`
+- 在所有查询响应中使用 `from_binary` 而不是 `from_slice`(更新导入)
+   - `from_slice(res.as_slice())` -> `from_binary(&res)`
+- 将 `coin("123", "FOO")` 替换为 `coins(123, "FOO")`。 我们将其重命名为硬币
+   更明确地说，它返回 `Vec<Coin>`，现在接受一个 `u128` 作为
+   更好的类型安全的第一个参数。 `coin` 现在是一个别名
+   `Coin::new` 并返回一个 `Coin`。
+- 从所有对 `mock_env` 的调用中删除第四个参数(合约余额)，这个
+   不再存储在环境中。
+- `dependencies` 重命名为 `mock_dependencies`。 `mock_dependencies` 和
+   `mock_instance` 采用第二个参数来设置合约余额(可见于
+   查询者)。 如果您需要设置更多余额，请使用 `mock_XX_with_balances`。
+   下面的代码块解释了:
 
   ```rust
   // before: balance as last arg in mock_env
@@ -915,44 +911,44 @@ Both:
   let env = mock_env(&deps.api, "creator", &coins(15, "earth"));
   ```
 
-Unit Tests:
+单元测试:
 
-- Replace `dependencies` with `mock_dependencies`
+- 将 `dependencies` 替换为 `mock_dependencies`
 
-Integration Tests:
+集成测试:
 
-- We no longer check errors as strings but have rich types:
-  - Before:
+- 我们不再将错误检查为字符串，而是具有丰富的类型:
+  - 前:
     `match err { ContractResult::Err(msg) => assert_eq!(msg, "Unauthorized"), ... }`
-  - After: `match err { Err(StdError::Unauthorized{ .. }) => {}, ... }`
-- Remove all imports / use of `ContractResult`
-- You must specify `CosmosMsg::Native` type when calling
-  `cosmwasm_vm::testing::{handle, init}`. You will want to
-  `use cosmwasm_std::{HandleResult, InitResult}` or
-  `use cosmwasm_std::{HandleResponse, InitResponse}`. If you don't use custom
-  native types, simply update calls as follows:
+  - 之后:`match err { Err(StdError::Unauthorized{ .. }) => {}, ... }`
+- 删除所有导入/使用`ContractResult`
+- 调用时必须指定`CosmosMsg::Native` 类型
+  `cosmwasm_vm::testing::{handle, init}`。你会想要
+  `使用 cosmwasm_std::{HandleResult, InitResult}` 或
+  `使用 cosmwasm_std::{HandleResponse, InitResponse}`。如果你不使用自定义
+  本机类型，只需按如下方式更新调用:
   - `let res = init(...)` => `let res: InitResult = init(...)`
   - `let res = init(...).unwrap()` =>
-    `let res: InitResponse = init(...).unwrap()`
+    `让资源:InitResponse = init(...).unwrap()`
   - `let res = handle(...)` => `let res: HandleResult = handle(...)`
   - `let res = handle(...).unwrap()` =>
     `let res: HandleResponse = handle(...).unwrap()`
 
-### Update schema code
+### 更新架构代码
 
-All helper functions have been moved into a new `cosmwasm-schema` package.
+所有的辅助函数都被移到了一个新的 `cosmwasm-schema` 包中。
 
-- Add `cosmwasm-schema = "0.8"` to `[dev-dependencies]` in `Cargo.toml`
-- Remove `serde_json` `[dev-dependency]` if there, as cosmwasm-schema will
-  handle JSON output internally.
-- Update `examples/schema.rs` to look
-  [more like queue](https://github.com/CosmWasm/cosmwasm/blob/master/contracts/queue/examples/schema.rs),
-  but replacing all the imports and type names with those you currently have.
-- Regenerate schemas with `cargo schema`
+- 将 `cosmwasm-schema = "0.8"` 添加到 `Cargo.toml` 中的 `[dev-dependencies]`
+- 删除 `serde_json` `[dev-dependency]` 如果有的话，因为 cosmwasm-schema 会
+  在内部处理 JSON 输出。
+- 更新 `examples/schema.rs` 以查看
+  [更像队列](https://github.com/CosmWasm/cosmwasm/blob/master/contracts/queue/examples/schema.rs)，
+  但是将所有导入和类型名称替换为您当前拥有的名称。
+- 使用 `cargo schema` 重新生成模式
 
-### Polishing
+### 抛光
 
-After so many changes, remember to let the linters do their jobs.
+经过这么多更改后，请记住让 linters 完成它们的工作。
 
 - `cargo fmt`
 - `cargo clippy`

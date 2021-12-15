@@ -1,7 +1,3 @@
----
-order: 2
----
-
 # Rough Roadmap
 
 So far, CosmWasm is an effort of a [small team](http://confio.tech) funded by [ICF Grants](https://interchain.io). We have been building out core technology to support various blockchains in the Cosmos Ecosystem. The following is the currently planned roadmap, largely based on the remaining funding of the ICF Grant. If there is strong interest (and funding) from a project that wishes to deploy this to production, the roadmap priorities may be modified.
@@ -93,6 +89,6 @@ Add IBC support (based on ICF grant):
 
 * Support for writing CosmWasm contracts in *AssemblyScript* or *TinyGo*
 * Stricter and more configurable gas metering
-* Support for more host platforms (Beyond Linux and OSX on i686/Amd64) 
+* Support for more host platforms (Beyond Linux and OSX on i686/Amd64)
 * Other features as requested by projects building on CosmWasm.
 * Further developing the "concept chain"

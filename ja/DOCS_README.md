@@ -1,12 +1,13 @@
 # DOCS README
-## 実行
 
-`npm i && npm runserve`
+## Run
 
-## ビュールド
+`npm i && npm run serve`
+
+## Build
 
 `npm run build`
 
-## デプロイ
+## Deployment
 
-生成された静的ファイルを `.vuepress/dist`にデプロイします🚀
+Deploy the generated static files in `.vuepress/dist` 🚀

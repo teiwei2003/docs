@@ -1,33 +1,28 @@
----
-title: cw20-escrow Spec
-order: 5
----
+# CW20 托管
 
-# CW20 Escrow
+cw20-escrow 源代码:[https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-escrow](https://github.com/CosmWasm/cosmwasm-plus/tree/master/合同/cw20-托管)
 
-cw20-escrow source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-escrow](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-escrow)
+这是一个托管元合约，允许多个用户
+创建独立的托管。每个托管都有一个发件人、收件人、
+和仲裁者。它还有一个唯一的 id(供将来调用以引用它)
+和一个可选的超时。
 
-This is an escrow meta-contract that allows multiple users to
-create independent escrows. Each escrow has a sender, recipient,
-and arbiter. It also has a unique id (for future calls to reference it)
-and an optional timeout.
+基本功能是发件人使用资金创建托管。
+仲裁者可以随时决定将资金释放给任何一方
+预期的收件人或原始发件人(但不是其他人)，
+如果它通过可选超时，任何人都可以退还锁定
+令牌给原始发件人。
 
-The basic function is the sender creates an escrow with funds.
-The arbiter may at any time decide to release the funds to either
-the intended recipient or the original sender (but no one else),
-and if it passes with optional timeout, anyone can refund the locked
-tokens to the original sender.
+我们还添加了一个名为“top_up”的函数，它允许任何人添加更多
+随时为合同提供资金。
 
-We also add a function called "top_up", which allows anyone to add more
-funds to the contract at any time.
+## 代币类型
 
-## Token types
+这份合同不仅要实用，而且要作为一个简单的
+CW20“接收器”的示例。并演示如何提供相同的调用
+本机令牌(通过典型的`HandleMsg` 路由)，或cw20 令牌(通过`Receiver` 接口)。
 
-This contract is meant not just to be functional, but also to work as a simple
-example of an CW20 "Receiver". And demonstrate how the same calls can be fed
-native tokens (via typical `HandleMsg` route), or cw20 tokens (via `Receiver` interface).
-
-Both `create` and `top_up` can be called directly (with a payload of native tokens),
-or from a cw20 contract using the [Receiver Interface](01-spec.md#receiver).
-This means we can load the escrow with any number of native or cw20 tokens (or a mix),
-allow of which get released when the arbiter decides.
+`create` 和 `top_up` 都可以直接调用(带有原生令牌的负载)，
+或使用 [接收器接口](01-spec.md#receiver) 的 cw20 合约。
+这意味着我们可以使用任意数量的原生代币或 cw20 代币(或混合代币)加载托管，
+允许在仲裁者决定时释放。

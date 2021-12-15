@@ -1,31 +1,26 @@
----
-title: cw20-staking Spec
-order: 6
----
+# CW20 质押衍生品
 
-# CW20 Staking Derivates
+cw20-staking 源代码:[https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-staking](https://github.com/CosmWasm/cosmwasm-plus/tree/master/合约/cw20-staking)
+这是一个样本合约，它发布了一种最小形式的抵押衍生品。
+这将用于集成测试并作为其他构建的基础
+更复杂的逻辑。
 
-cw20-staking source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-staking](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-staking)
-This is a sample contract that releases a minimal form of staking derivatives.
-This is to be used for integration tests and as a foundation for other to build
-more complex logic upon.
+## 功能
 
-## Functionality
+一方面，这充当 CW20 代币，持有一个列表
+多个地址的余额，以及公开查询和转账(没有
+津贴和“转移”以将逻辑集中在赌注上)。
+但是，它没有初始余额。相反，它铸造和燃烧它们基于
+代表团。
 
-On one side, this acts as a CW20 token, holding a list of
-balances for multiple addresses, and exposing queries and transfers (no
-allowances and "transfer from" to focus the logic on the staking stuff).
-However, it has no initial balance. Instead, it mints and burns them based on
-delegations.
+对于这样的“绑定曲线”，我们公开了两种额外的消息类型。一个“羁绊”
+消息将原生质押代币发送到合约以绑定到验证器
+并将适当数量的衍生代币记入用户。同样地
+你可以烧掉你的一些衍生代币，合约将解除绑定
+用户账户的比例权益(在典型的 21 天之后
+解绑期)。
 
-For such a "bonding curve" we expose two additional message types. A "bond"
-message sends native staking tokens to the contract to be bonded to a validator
-and credits the user with the appropriate amount of derivative tokens. Likewise
-you can burn some of your derivative tokens, and the contract will unbond the
-proportional amount of stake to the user's account (after typical 21-day
-unbonding period).
-
-To show an example of charging for such a service, we allow the contract owner
-to take a small exit tax, thus maybe 98% of the tokens will be unbonded and sent
-to the original account, and 2% of the tokens are not unbonded, but rather
-transferred to the owners account. (The ownership can also be transferred).
+为了展示对此类服务收费的示例，我们允许合同所有者
+收取少量退出税，因此可能 98% 的代币将被取消绑定并发送
+到原始账户，并且 2% 的代币不是未绑定的，而是
+转入业主账户。 (所有权也可以转让)。

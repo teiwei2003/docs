@@ -1,42 +1,38 @@
----
-order: 3
----
+# 设置环境
 
-# Setting Up Environment
+您需要一个环境来运行合约。您可以在本地运行您的节点或连接到
+现有网络。为方便测试，musselnet 网络已上线，您可以使用它来部署和运行您的
+合同。如果您想针对本地区块链进行设置和运行，请[单击
+这里](#run-local-node-optional)
 
-You need an environment to run contracts. You can either run your node locally or connect to an
-existing network. For easy testing, musselnet network is online, you can use it to deploy and run your
-contracts. If you want to setup and run against a local blockchain, [click
-here](#run-local-node-optional)
-
-To verify testnet is currently running, make sure the following URLs are all working for you:
+要验证测试网当前是否正在运行，请确保以下 URL 都适合您:
 
 - [https://rpc.musselnet.cosmwasm.com/status](https://rpc.musselnet.cosmwasm.com/status)
 - [https://faucet.musselnet.cosmwasm.com/status](https://faucet.musselnet.cosmwasm.com/status)
 - [https://lcd.musselnet.cosmwasm.com/node_info](https://lcd.musselnet.cosmwasm.com/node_info)
 
-We have set up two native tokens - `FRITES` (`ufrites`) for becoming a validator and `MAYO` (`umayo`) for
-paying fees.
-Available frontends:
+我们已经设置了两个原生代币 - `FRITES` (`urites`) 用于成为验证器，`MAYO` (`umayo`) 用于
+支付费用。
+可用的前端:
 
-- [Block explorer](https://musselnet.cosmwasm.aneka.io/)
-- [Code explorer](https://code-explorer.musselnet.cosmwasm.com/)
+- [区块浏览器](https://musselnet.cosmwasm.aneka.io/)
+- [代码浏览器](https://code-explorer.musselnet.cosmwasm.com/)
 
-You can use these to explore txs, addresses, validators and contracts
-feel free to deploy one pointing to our rpc/lcd servers and we will list it.
+您可以使用这些来探索交易、地址、验证器和合约
+随意部署一个指向我们的 rpc/lcd 服务器，我们将列出它。
 
-You can find more information about other testnets:
-[CosmWasm/testnets](https://github.com/CosmWasm/testnets) and [Testnet
-section](./../testnets/testnets.md).
+您可以找到有关其他测试网的更多信息:
+[CosmWasm/testnets](https://github.com/CosmWasm/testnets) 和 [Testnet
+部分](./../testnets/testnets.md)。
 
-When interacting with network, you can either use `wasmd` which is a Go client or Node REPL. Altough Node REPL is
-recommended for contract operations, since JSON manipulation is not intuitive with the Shell/Go client.
+与网络交互时，您可以使用 Go 客户端或 Node REPL 的 `wasmd`。尽管节点 REPL 是
+推荐用于合约操作，因为 JSON 操作对于 Shell/Go 客户端并不直观。
 
-## Setup Go CLI
+## 设置 Go CLI
 
-Let's configure `wasmd` exec, point it to testnets, create wallet and ask tokens from faucet:
+让我们配置 `wasmd` exec，将其指向测试网，创建钱包并从 faucet 请求代币:
 
-First source the musselnet network configurations to the shell:
+首先将 musselnet 网络配置源到 shell:
 
 ```shell
 source <(curl -sSL https://raw.githubusercontent.com/CosmWasm/testnets/master/musselnet/defaults.env)
@@ -68,34 +64,34 @@ JSON=$(jq -n --arg addr $(wasmd keys show -a fred) '{"denom":"umayo","address":$
 JSON=$(jq -n --arg addr $(wasmd keys show -a thief) '{"denom":"umayo","address":$addr}') && curl -X POST --header "Content-Type: application/json" --data "$JSON" https://faucet.musselnet.cosmwasm.com/credit
 ```
 
-## Export wasmd Parameters
+## 导出 wasmd 参数
 
-If you intend to use wasmd as client, we recommend you to setup these variables.
-Otherwise You will have to define type in node, chain id and gas-prices details with every command you execute.
-Also for this tutorial we will use these variables. So make sure you export these before proceeding.
+如果您打算使用 wasmd 作为客户端，我们建议您设置这些变量。
+否则，您必须在执行的每个命令中定义节点类型、链 id 和 gas-prices 详细信息。
+同样在本教程中，我们将使用这些变量。 因此，请确保在继续之前导出这些。
 
 ```bash
 export NODE=(--node "https://rpc.musselnet.cosmwasm.com:443")
 export TXFLAG=($NODE --chain-id ${CHAIN_ID} --gas-prices 0.01umayo --gas auto --gas-adjustment 1.3)
 ```
 
-## Setup Node REPL
+## 设置节点 REPL
 
 
-Beyond the standard CLI tooling, we have also produced a flexible TypeScript library
-[CosmJS](https://github.com/CosmWasm/cosmjs), which runs in Node.js as well as in modern browsers
-and handles queries and submitting transactions. Along with this library, we produced
-[@cosmjs/cli](https://www.npmjs.com/package/@cosmjs/cli), which is a super-charged Node console. It
-supports `await`, does type checking for helpful error messages, and preloads many CosmJS utilities.
-If you are comfortable with the Node console, you will probably find this easier and more powerful
-than the CLI tooling.
+除了标准的 CLI 工具，我们还制作了一个灵活的 TypeScript 库
+[CosmJS](https://github.com/CosmWasm/cosmjs)，在 Node.js 和现代浏览器中运行
+并处理查询和提交交易。 与这个库一起，我们制作了
+[@cosmjs/cli](https://www.npmjs.com/package/@cosmjs/cli)，这是一个超级充电的Node控制台。 它
+支持 `await`，对有用的错误消息进行类型检查，并预加载许多 CosmJS 实用程序。
+如果您对 Node 控制台感到满意，您可能会发现它更简单、更强大
+比 CLI 工具。
 
-Full usage and installation [instructions are on the
-README](https://github.com/CosmWasm/cosmjs/tree/master/packages/cli), also here are the source codes prepacked with
-network configurations you can use on-the-fly:
+完整的使用和安装 [说明在
+README](https://github.com/CosmWasm/cosmjs/tree/master/packages/cli)，这里也是预打包的源代码
+您可以即时使用的网络配置:
 
-::: warning
-The command below is obsolete and updated soon.
+::: 警告
+下面的命令已过时并很快更新。
 :::
 
 ```shell
@@ -120,10 +116,10 @@ client.getAccount()
 ```
 
 
-You need to put RPC endpoint and
-## Run Local Node (optional)
+你需要把 RPC 端点和
+## 运行本地节点(可选)
 
-If you are interested in running your local network you can use the script below:
+如果您有兴趣运行本地网络，可以使用以下脚本:
 
 ```shell
 # default home is ~/.wasmd

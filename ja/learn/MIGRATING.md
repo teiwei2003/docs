@@ -1,7 +1,3 @@
----
-title: Migrating Contracts
----
-
 # Migrating Contracts
 
 This guide explains what is needed to upgrade contracts when migrating over

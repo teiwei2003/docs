@@ -1,7 +1,3 @@
----
-order: 4
----
-
 # Downloading and Compiling Contract
 
 In this section, we will download a sample contract, compile to it to wasm binary executable.

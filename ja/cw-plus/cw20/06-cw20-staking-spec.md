@@ -1,8 +1,3 @@
----
-title: cw20-staking Spec
-order: 6
----
-
 # CW20 Staking Derivates
 
 cw20-staking source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-staking](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-staking)

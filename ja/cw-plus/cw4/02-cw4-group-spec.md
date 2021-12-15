@@ -1,8 +1,3 @@
----
-title: cw4-group Spec
-order: 2
----
-
 # CW4 Group
 
 cw4-group source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw4-group](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw4-group)

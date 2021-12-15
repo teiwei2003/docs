@@ -1,7 +1,3 @@
----
-title: Smart Contracts Over Governance
----
-
 # Introduction
 
 CsomWasm proves the potential of a smart contract container at the heart of the Cosmos Hub. {synopsis}

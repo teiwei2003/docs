@@ -1,8 +1,3 @@
----
-title: Multi-Chain
-order: 2
----
-
 # What are Multi-Chain Contracts?
 
 CosmWasm is designed and built from the ground-up to be a multi-chain solution for smart contracts.

@@ -1,47 +1,42 @@
----
-title: Querying
-order: 5
----
+# 查询合约状态
 
-# Querying Contract State
+在很多情况下，您希望查看合同的状态。既可以作为外部客户端(使用 cli)，也可以在执行合同时。例如，我们在上一节讨论了解析像“Alice”或“Bob”这样的名字，这需要查询另一个合约。我们将首先介绍两种类型的查询 - 原始查询和自定义查询 - 然后查看通过 *外部客户端 * 以及 *内部客户端 *(另一个合约)进行查询的语义。我们不仅会特别关注它的实际工作方式，还会特别关注从一个合约到另一个合约执行查询的设计和安全问题。
 
-There are many cases where you want to view the state of a contract. Both as an external client (using the cli), but also while executing a contract. For example, we discussed resolving names like "Alice" or "Bob" in the last section, which would require a query to another contract. We will first cover the two types of queries - raw and custom - then look at the semantics of querying via an *external client*, as well an *internal client* (another contract). We will pay special attention not only to how it works practically, but also the design and security issues of executing queries from one contract to another.
+**注意** 这已针对 CosmWasm 0.8 进行了更新，完全支持跨合约查询。
 
-**Note** This has been updated for CosmWasm 0.8 with full support for cross-contract queries.
+## 原始查询
 
-## Raw Queries
+要实现的最简单查询只是对键值存储的原始读取访问。如果调用者(外部客户端或其他合约)传入合约存储中使用的原始二进制密钥，我们可以轻松返回原始二进制值。这种方法的好处是非常容易实现和通用。缺点是它将调用者链接到存储的*实现*，并且需要知道正在执行的确切合同。
 
-The simplest query to implement is just raw read access to the key-value store.  If the caller (either external client, or other contract) passes in the raw binary key that is used in the contract's storage, we can easily return the raw binary value. The benefit of this approach is that it is very easy to implement and universal. The downside is that it links the caller to the *implementation* of the storage and requires knowledge of the exact contract being executed.
+这是在 `wasmd` 运行时内实现的，并绕过 VM。因此，它不需要 CosmWasm 合约的支持，并且所有合约状态都是可见的。这样的 `query_raw` 函数暴露给所有调用者(外部和内部)。
 
-This is implemented inside the `wasmd` runtime and circumvents the VM. As a consequence it requires no support from the CosmWasm contract and all contract state is visible. Such a `query_raw` function is exposed to all callers (external and internal).
+## 自定义查询
 
-## Custom Queries
+在很多情况下，与*实现*紧密耦合是不可取的，我们宁愿依赖*接口*。例如，我们将为调用合约的“ERC20”`HandleMsg`定义一个标准，并且我们希望为`QueryMsg`定义这样一个标准。例如，按地址查询余额，通过授予者+被授予者查询津贴，查询代币信息(代码、小数等)。通过定义标准*接口*，我们允许许多实现，包括复杂的合约，其中“ERC20”接口只是其功能的一小部分。
 
-There are many cases where it is undesirable to couple tightly to *implementation*, and we would rather depend on an *interface*. For example, we will define a standard for "ERC20" `HandleMsg` for calling the contract and we would want to define such a standard for a `QueryMsg`. For example, query balance by address, query allowance via granter + grantee, query token info (ticker, decimals, etc). By defining a standard *interface*, we allow many implementations, including complex contracts, where the "ERC20" interface is only a small subset of their functionality.
+为了启用自定义查询，我们允许每个合约公开一个 `query` 函数，该函数可以以只读模式访问其数据存储。它可以加载任何它想要的数据，甚至可以对其进行计算。此方法公开为`query_custom` 以调用调用者(外部和内部)。数据格式(查询和响应)是合约需要的任何格式，并且应该与 `HandleMsg` 和 `InitMsg` 一起记录在公共模式中。
 
-To enable custom queries, we allow each contract to expose a `query` function, that can access its data store in read-only mode. It can load any data it wishes and even perform calculations on it. This method is exposed as `query_custom` to call callers (external and internal). The data format (both query and response) is anything the contract desires, and should be documented in the public schema, along with `HandleMsg` and `InitMsg`.
+请注意，执行合约可能会消耗无限量的 gas。尽管 `query_raw` 将读取一个键并且成本很小，而且大部分是固定的，我们需要对这些查询强制执行 gas 限制。这对于外部和内部调用的处理方式不同，将在下面讨论。
 
-Note that executing a contract may consume an unbounded amount gas. Whereas `query_raw` will read one key and has a small, mostly fixed cost, we need to enforce a gas limit on these queries. This is done differently for external and internal calls and discussed below.
+## 外部查询
 
-## External Queries
+外部查询是所有 web 和 cli 客户端使用区块链的典型方式。他们调用 Tendermint RPC，后者调用 Cosmos SDK 中的“abci_query”，后者委托给模块来处理它。据我所知，查询有一个无限的gas限制，因为它们只在一个节点上执行，并且不能减慢整个区块链的速度。此功能通常不会在验证节点上公开。当前 SDK 中公开的查询功能是硬编码的，并且具有开发人员设计的执行时间限制。这限制了滥用。但是如果有人上传一个无限循环的 wasm 合约，然后使用它来 DoS 任何公开查询的公共 RPC 节点呢？
 
-External queries are the typical way all web and cli clients work with the blockchain. They call Tendermint RPC, which calls into `abci_query` in the Cosmos SDK, which delegates down to the module to handle it. As far as I know, there is an infinite gas limit on queries, as they are only executed on one node, and cannot slow down the entire blockchain. This functionality is generally not exposed on validating nodes. The query functionality exposed in the current SDK is hard coded, and has execution time limits designed by the developers. This limits abuse. But what about someone uploading a wasm contract with an infinite loop, and then using that to DoS any public RPC node that exposes querying?
+为了避免此类问题，我们需要为所有外部调用的 `query_custom` 交易定义一些固定的 gas 限制。这不会收取费用，但用于限制滥用。但是，很难定义标准值，因为免费的公共节点更喜欢少量，但我可能希望同步我自己的存档节点并执行复杂的查询。因此，可以在特定于应用程序的配置文件中定义所有 `query_custom` 调用的 gas 限制，每个节点操作员可以自定义该文件，并具有合理的默认限制。这将允许公共节点保护自己免受复杂查询的影响，同时仍然允许可选查询对特殊配置的节点中的所有合约数据执行大量聚合。
 
-To avoid such issues, we need to define some fixed gas limit for all `query_custom` transaction called externally. This will not charge a fee, but is used to limit abuse. However, it is difficult to define a standard value, for a free public node would prefer a small amount, but I may want to sync my own archive node and perform complex queries. Thus, a gas limit for all `query_custom` calls can be defined in an app-specific configuration file, which can be customized by each node operator, with a sensible default limit. This will allow public nodes to protect themselves from complex queries, while still allowing optional queries to perform large aggregation over all contract data in specially-configured nodes.
+请注意，`abci_query` 调用永远不会读取模块的当前“进行中”状态，而是使用最后提交块之后状态的只读快照。
 
-Note that the `abci_query` call never reads the current "in-progress" state of the modules, but uses a read-only snapshot of the state after the last committed block.
+## 内部查询
 
-## Internal Queries
+虽然合约之间的许多交互可以通过发送消息轻松建模，但在某些情况下，我们希望同步查询其他模块，而不改变它们的状态。例如，如果我想将名称解析为 [规范地址](./addresses#canonical-addresses)，或者如果我想在启用某些操作之前检查某个帐户(在另一个合约中)的 KYC 状态。可以将其建模为一系列消息，但它非常复杂，并且使得这种简单的用例在系统中几乎无法使用。
 
-While many interactions between contracts can easily be modelled by sending messages, there are some cases where we would like to synchronously query other modules, without altering their state. For example, if I want to resolve a name to a [Canonical Address](./addresses#canonical-addresses), or if I want to check KYC status of some account (in another contract) before enabling some action. One could model this as a series of messages, but it is quite complex and makes such simple use-cases almost unusable in the system.
+但是，这种设计违反了 [actor 模型](./actor) 的基本原则之一，即每个合约都可以独占访问其自己的内部状态。 (在这方面，`query_raw` 和`query_custom` 都失败了)。这不仅仅是一个理论上的问题，如果处理不当，这可能会导致并发和重入问题。我们不想把这种安全关键推理推到合约开发者的圈子里，而是在平台中提供这些安全保证。然而，提供旧数据也会导致许多可能的错误和错误，特别是因为我们使用相同的`Querier` 接口
+与原生 SDK 模块交互，*包括查询合约自身的余额*。
 
-However, this design violates one of the basic principles of the [actor model](./actor), namely that each contract has exclusive access to its own internal state. (Both `query_raw` and `query_custom` fail in this regard). Far from just being a theoretical issue, this may lead to concurrency and reentrancy issues if not handled correctly. We do not want to push such safety critical reasoning into the laps of the contract developers, but rather provide these security guarantees in the platform. However, providing old data also leads to many possible errors and bugs, especially since we use the same `Querier` interface
-to interact with the native SDK modules, *including querying the contract's own balance*.
+因此，我们在执行当前 CosmWasm 消息*之前为“查询器”提供了对状态快照的只读访问权限。由于我们采取
+快照，并且正在执行的合约和被查询的合约都具有*在合约执行之前*的数据的只读访问权限，这仍然是
+使用 Rust 的借用规则是安全的(作为安全设计的占位符)。当前合约只写入缓存，成功后刷新。
 
-As such, we provide the `Querier` with read-only access to the state snapshot *right before execution of the current CosmWasm message*. Since we take a
-snapshot and both the executing contract and the queried contract have read-only access to the data *before the contract execution*, this is still
-safe with Rust's borrowing rules (as a placeholder for secure design). The current contract only writes to a cache, which is flushed afterwards on success.
+另一个问题是避免重入。由于这些查询是同步调用的，它们可以回调到调用合约中并可能导致问题。由于查询只有只读访问权限并且不会产生副作用，因此这不像同步执行远程合约那么危险，但仍然可能是一个需要考虑的问题。值得注意的是，它只能访问当前执行之前的状态。我看不到比查询函数有意返回错误数据会导致更多错误的地方，但这是一个可以进行更多调查的地方。
 
-Another issue is to avoid reentrancy. Since these queries are called synchronously, they can call back into the calling contract and possibly cause issues. Since queries only have read-only access and cannot have side-effects, this is not nearly as dangerous as executing a remote contract synchronously, but still may be an issue to consider. Notably, it will only have access to the state before the current execution. I cannot see a place where this could cause more errors than a query function intentionally returning false data, but it is a place to investigate more.
-
-Since all queries are performed as part of a transaction, that already has a strongly enforced gas limit, we don't need extra work here. All storage reads and data processing performed as part of a query are deducted from the same gas meter as the rest of the transaction, and thus limit processing time. We consider adding explicit guards against re-entrancy or max query depth, but have not enforced them yet in `wasmd`. As more work on cross-contract queries comes to fruition, this is another place to investigate.
+由于所有查询都是作为交易的一部分执行的，这已经有一个严格执行的 gas 限制，我们在这里不需要额外的工作。作为查询的一部分执行的所有存储读取和数据处理都从与交易的其余部分相同的燃气表中扣除，从而限制了处理时间。我们考虑添加显式保护以防止重入或最大查询深度，但尚未在 `wasmd` 中强制执行它们。随着更多关于跨合约查询的工作取得成果，这是另一个需要调查的地方。

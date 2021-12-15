@@ -1,15 +1,10 @@
----
-title: Names and Addresses
-order: 4
----
-
 # Names and Addresses
 
 Blockchains (almost?) all use addresses to identify external actors via a hash of a public key, and many newer ones extended this to identify on-chain "smart contracts" with unique addresses as well. On chain, addresses are represented by a use a concise, immutable binary format, typically 20 or 32 bytes long, often derived from a hashing function. However, there are many human-readable representations of these binary addresses, which are shown to clients. For example, [Bech32](https://en.bitcoin.it/wiki/Bech32) `bc1qc7slrfxkknqcq2jevvvkdgvrt8080852dfjewde450xdlk4ugp7szw5tk9`, hex `0x8617E340B3D01FA5F11F306F4090FD50E238070D` or [checksumned hex](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-55.md) `0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed`, and even [large integers](https://research.kudelskisecurity.com/2018/01/16/blockchains-how-to-steal-millions-in-264-operations/) `3040783849904107057L`.
 
 ## Addr
 
-Addresses in Cosmos SDK are 20 character long strings, and contain security checks - such as chain-prefix in Bech32, and checksums in Bech32 and checksummed hex (EIP55). 
+Addresses in Cosmos SDK are 20 character long strings, and contain security checks - such as chain-prefix in Bech32, and checksums in Bech32 and checksummed hex (EIP55).
 Since CosmWasm is an extension of Cosmos SDK, it follows the same address rules; wallets, smart contracts, modules have an identifier address with defined prefix. `cosmos1...` for gaia, `wasm1...` for CosmWasm testnets.
 
 For passing address to contracts, pass it as string and then validate the input to an: **Addr**
@@ -25,7 +20,7 @@ This means that if `message.signer` is always the string address that signed the
 
 This is where we define a *Canonical Address*. This is defined to be stable and unique. That is, for one given account, there is only ever one canonical address (for the life of the blockchain). We define a *canonical address* format that potentially multiple string addresses can be converted to. It can be transformed back and forth without any changes
 
-We define the *Canonical Address* as the binary representation used internally in the blockchain. This is what the native tokens are indexed by and therefore must never change for the life of an account. This is the representation that can be used for all **storage lookups** (if you use part of an address as the key in the storage). 
+We define the *Canonical Address* as the binary representation used internally in the blockchain. This is what the native tokens are indexed by and therefore must never change for the life of an account. This is the representation that can be used for all **storage lookups** (if you use part of an address as the key in the storage).
 
 ## Naming
 

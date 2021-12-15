@@ -1,8 +1,3 @@
----
-title: cw20-base Spec
-order: 2
----
-
 # CW20 Basic
 
 This is a basic implementation of a cw20 contract. It implements

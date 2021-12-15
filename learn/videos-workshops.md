@@ -1,7 +1,3 @@
----
-title: Videos and Workshops
----
-
 # Videos and Workshops
 
 Here are the videos, events, workshops that can feed your learning hunger for CosmWasm!

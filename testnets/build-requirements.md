@@ -1,8 +1,3 @@
----
-title: Build Requirements
-order: 1
----
-
 # Build Requirements
 
 For minimum system requirements instances with 2 processor CPU and 4GB memory is recommended.

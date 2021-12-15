@@ -1,16 +1,12 @@
----
-order: 5
----
+# 上传和交互
 
-# Uploading and Interacting
+我们已经准备好了二进制文件。 现在是时候看到一些 wasm 行动了。 您可以使用 [Go CLI](#go-cli) 或
+[节点控制台](#node-console) 如你所愿。
 
-We have the binary ready. Now it is time to see some wasm action. You can use [Go CLI](#go-cli) or
-[Node Console](#node-console) as you wish.
+## 去 CLI
 
-## Go CLI
-
-We generated a wasm binary executable in the previous chapter. Let's put it into use. Now, we will
-upload the code to the blockchain. Afterwards, you can download the bytecode to verify it is proper:
+我们在上一章中生成了一个 wasm 二进制可执行文件。 让我们把它投入使用。 现在，我们将
+将代码上传到区块链。 之后，您可以下载字节码以验证它是否正确:
 
 ```shell
 # see how many codes we have now
@@ -31,10 +27,10 @@ wasmd query wasm code $CODE_ID $NODE download.wasm
 diff contract.wasm download.wasm
 ```
 
-### Instantiating the Contract
+### 实例化合约
 
-We can now create an instance of this wasm contract. Here the verifier will fund an escrow, that
-will allow fred to control payout and upon release, the funds go to bob.
+我们现在可以创建这个 wasm 合约的实例。 在这里，验证者将为托管提供资金，即
+将允许 fred 控制支出，并且在发布后，资金将转到 bob。
 
 ```shell
 # instantiate contract and verify
@@ -96,16 +92,16 @@ wasmd query account $(wasmd keys show bob -a) $NODE
 wasmd query account $CONTRACT $NODE
 ```
 
-## Node Console
+## 节点控制台
 
-If you set up the Node Console / REPL in the [client setup section](./setting-env#setup-node-repl), you can use
-that to deploy and execute your contract. I think you will find that JSON manipulation and parsing
-is a bit nicer in JavaScript than in Shell Script.
+如果您在[客户端设置部分](./setting-env#setup-node-repl) 中设置了节点控制台/REPL，则可以使用
+部署和执行你的合同。 我想你会发现 JSON 操作和解析
+在 JavaScript 中比在 Shell 脚本中好一点。
 
-First, go to the cli directory and start up your console:
+首先，进入 cli 目录并启动你的控制台:
 
-::: warning
-The command below is obsolete and updated soon.
+::: 警告
+下面的命令已过时并很快更新。
 :::
 
 ```shell
@@ -150,9 +146,9 @@ fredClient.getAccount(bobAddr);
 process.cwd()
 ```
 
-### Uploading with JS
+### 使用 JS 上传
 
-Now, we go back to the Node console and upload the contract and instantiate it:
+现在，我们回到 Node 控制台并上传合约并实例化它:
 
 ```js
 const wasm = fs.readFileSync('contract.wasm');
@@ -177,10 +173,10 @@ JSON.parse(fromUtf8(raw))
 // note the addresses are stored in base64 internally, not bech32, but the data is there... this is why we often implement smart queries on real contracts
 ```
 
-### Executing Contract with JS
+### 与 JS 执行合约
 
-Once we have properly configured the contract, let's show how to use it, both the proper "approve"
-command:
+一旦我们正确配置了合约，让我们展示如何使用它，正确的“批准”
+命令:
 
 ```js
 const approve = {approve: {quantity: [{amount: "50000", denom: "umayo"}]}};

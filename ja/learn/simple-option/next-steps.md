@@ -1,7 +1,3 @@
----
-order: 5
----
-
 # Next Steps
 
 We covered a lot of essentials of CosmWasm in this tutorial/workshop combo. We have more reading and learning resources for you:

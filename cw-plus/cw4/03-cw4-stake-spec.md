@@ -1,8 +1,3 @@
----
-title: cw4-stake Spec
-order: 3
----
-
 # CW4 Stake
 
 cw4-stake source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw4-stake](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw4-stake)

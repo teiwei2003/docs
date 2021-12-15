@@ -1,8 +1,3 @@
----
-title: cw3 MultiSig/Voting Contracts Spec
-order: 1
----
-
 # CW3 Spec: MultiSig/Voting Contracts
 
 [CW3](https://github.com/CosmWasm/cosmwasm-plus/tree/master/packages/cw3) is a specification for voting contracts based on CosmWasm.

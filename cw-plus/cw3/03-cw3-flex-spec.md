@@ -1,8 +1,3 @@
----
-title: cw3-flex-multisig Spec
-order: 3
----
-
 # CW3 Flexible Multisig
 
 cw3-flex-multisig source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw3-flex-multisig](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw3-flex-multisig)

@@ -1,52 +1,47 @@
----
-title: cw3-fixed-multisig Spec
-order: 2
----
+# CW3 固定多重签名
 
-# CW3 Fixed Multisig
+cw3-fixed-multisig 源代码:[https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw3-fixed-multisig](https://github.com/CosmWasm/cosmwasm-plus/树/主/合同/cw3-fixed-multisig)
 
-cw3-fixed-multisig source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw3-fixed-multisig](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw3-fixed-multisig)
+这是 [cw3 规范](01-spec.md) 的简单实现。
+它是一个多重签名，具有在初始化时创建的一组固定地址。
+每个地址可能有相同的权重(K of N)，或者一些可能有额外的投票
+力量。这很像原生的 Cosmos SDK 多重签名，除了
+而不是聚合链下签名并提交最终结果，
+我们汇总了链上的批准。
 
-This is a simple implementation of the [cw3 spec](01-spec.md).
-It is a multisig with a fixed set of addresses created upon initialization.
-Each address may have the same weight (K of N), or some may have extra voting
-power. This works much like the native Cosmos SDK multisig, except that rather
-than aggregating the signatures off chain and submitting the final result,
-we aggregate the approvals on-chain.
+这可以按原样使用，并且可能是 cw3 最安全的实现
+(因为它是最简单的)，但我们将添加更复杂的情况，例如
+在更新多重签名集时，同一组的不同投票规则
+具有不同的权限，甚至允许令牌加权投票。全程
+相同的客户端界面。
 
-This is usable as is, and probably the most secure implementation of cw3
-(as it is the simplest), but we will be adding more complex cases, such
-as updating the multisig set, different voting rules for the same group
-with different permissions, and even allow token-weighted voting. All through
-the same client interface.
+## 在里面
 
-## Init
+要创建多重签名，您必须传入一组带有权重的 `HumanAddr`
+对于每个人，以及通过提案所需的权重。去创造
+3 个多重签名中的 2 个，通过权重为 1 且 `required_weight` 为 2 的 3 个选民。
 
-To create the multisig, you must pass in a set of `HumanAddr` with a weight
-for each one, as well as a required weight to pass a proposal. To create
-a 2 of 3 multisig, pass 3 voters with weight 1 and a `required_weight` of 2.
+请注意，0 *是允许的重量*。这不赋予任何投票权，但是
+它确实允许该密钥提交稍后可以由
+选民。任何不在选民集中的地址都不能提交提案。
 
-Note that 0 *is an allowed weight*. This doesn't give any voting rights, but
-it does allow that key to submit proposals that can later be approved by the
-voters. Any address not in the voter set cannot submit a proposal.
+## 处理过程
 
-## Handle Process
+首先，登记选民必须提交提案。这也包括
+提案人首先对提案投“赞成”票。提议者可以设置
+投票过程的到期时间，或者默认为限制
+创建合同时提供(因此可以在几次之后关闭提案
+天)。
 
-First, a registered voter must submit a proposal. This also includes the
-first "Yes" vote on the proposal by the proposer. The proposer can set
-an expiration time for the voting process, or it defaults to the limit
-provided when creating the contract (so proposals can be closed after several
-days).
+在提案过期之前，任何权重非零的选民都可以添加他们的
+投票。只计算“是”票。如果之前提交了足够多的“是”选票
+提案到期日期，状态设置为“已通过”。
 
-Before the proposal has expired, any voter with non-zero weight can add their
-vote. Only "Yes" votes are tallied. If enough "Yes" votes were submitted before
-the proposal expiration date, the status is set to "Passed".
+一旦提案“通过”，任何人都可以提交“执行”消息。这会
+触发提案发送提案中所有存储的消息并更新
+它的状态为“已执行”，因此无法再次运行。 (注意如果执行失败
+出于任何原因 - 燃料不足，资金不足等 - 状态更新将
+被恢复，它将保持“通过”，所以你可以再试一次)。
 
-Once a proposal is "Passed", anyone may submit an "Execute" message. This will
-trigger the proposal to send all stored messages from the proposal and update
-it's state to "Executed", so it cannot run again. (Note if the execution fails
-for any reason - out of gas, insufficient funds, etc - the state update will
-be reverted, and it will remain "Passed", so you can try again).
-
-Once a proposal has expired without passing, anyone can submit a "Close"
-message to mark it closed. This has no effect beyond cleaning up the UI/database.
+一旦提案过期未通过，任​​何人都可以提交“关闭”
+将其标记为关闭的消息。除了清理 UI/数据库之外，这没有任何影响。

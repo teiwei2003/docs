@@ -1,7 +1,3 @@
----
-order: 2
----
-
 # Setup
 
 <iframe src="https://player.vimeo.com/video/457712351" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>

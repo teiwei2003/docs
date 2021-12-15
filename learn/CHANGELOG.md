@@ -1,7 +1,4 @@
----
-title: Changelog
----
-
+# Change Log
 ## [0.14.0] - 2021-05-03
 
 ### Added

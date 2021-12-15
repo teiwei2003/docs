@@ -1,78 +1,73 @@
----
-title: cw20-bonding Spec
-order: 4
----
+# CW20 粘合曲线
 
-# CW20 Bonding curve
+cw20-bonding-curve 源代码:[https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-bonding](https://github.com/CosmWasm/cosmwasm-plus/tree/主/合同/cw20-bonding)
 
-cw20-bonding-curve source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-bonding](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-bonding)
+这建立在 [Basic CW20 interface](01-spec.md)
+在 [`cw20-base`](02-cw20-base-spec.md) 中实现
 
-This builds on the [Basic CW20 interface](01-spec.md)
-as implemented in [`cw20-base`](02-cw20-base-spec.md)
+这有三个目的:
 
-This serves three purposes:
+* 适用于任意键合曲线的可用且可扩展的合约
+* 演示如何扩展 `cw20-base` 以添加额外功能
+* [接收器接口](01-spec.md#receiver) 的演示
 
-* A usable and extensible contract for arbitrary bonding curves
-* A demonstration of how to extend `cw20-base` to add extra functionality
-* A demonstration of the [Receiver interface](01-spec.md#receiver)
+## 设计
 
-## Design
+有两种变体 - 接受本机令牌和接受 cw20 令牌
+作为 *reserve* 令牌(这是输入到绑定曲线的令牌)。
 
-There are two variants - accepting native tokens and accepting cw20 tokens
-as the *reserve* token (this is the token that is input to the bonding curve).
+Minting:当输入发送到合约时(通过`HandleMsg::Buy{}`
+使用本机令牌，或通过 `HandleMsg::Receive{}` 使用 cw20 令牌)，
+这些代币保留在合约中，并且它向合约发行自己的代币
+发件人的帐户(称为*供应*令牌)。
 
-Minting: When the input is sent to the contract (either via `HandleMsg::Buy{}`
-with native tokens, or via `HandleMsg::Receive{}` with cw20 tokens),
-those tokens remain on the contract and it issues it's own token to the
-sender's account (known as *supply* token).
+燃烧:我们覆盖了燃烧功能，不仅燃烧所请求的代币，
+但也要向烧毁的账户释放适当数量的输入代币
+自定义令牌
 
-Burning: We override the burn function to not only burn the requested tokens,
-but also release a proper number of the input tokens to the account that burnt
-the custom token
+Curves:`handle`指定了一个bonding函数，发送给参数化
+`handle_fn`(完成所有工作)。编译时设置曲线
+合约。事实上，许多合约可以只包装 `cw20-bonding` 和
+指定自定义曲线参数。
 
-Curves: `handle` specifies a bonding function, which is sent to parameterize
-`handle_fn` (which does all the work). The curve is set when compiling
-the contract. In fact many contracts can just wrap `cw20-bonding` and
-specify the custom curve parameter.
+阅读更多关于[此处的粘合曲线数学](https://yos.io/2018/11/10/bonding-curves/)
 
-Read more about [bonding curve math here](https://yos.io/2018/11/10/bonding-curves/)
+注意:第一个版本只接受本机令牌作为
 
-Note: the first version only accepts native tokens as the
+### 数学
 
-### Math
+给定价格曲线 f(x) = 第 x 个代币的价格，我们想弄清楚
+如何从债券曲线买入和卖出。其实我们可以看看
+发行的总供应量。让`F(x)` 是`f(x)` 的积分。我们已经发出
+发送到合约的“F(x)”的“x”代币。或者，反过来，如果我们发送
+`x` 代币到合约，它将铸造 `F^-1(x)` 代币。
 
-Given a price curve `f(x)` = price of the `x`th token, we want to figure out
-how to buy into and sell from the bonding curve. In fact we can look at
-the total supply issued. let `F(x)` be the integral of `f(x)`. We have issued
-`x` tokens for `F(x)` sent to the contract. Or, in reverse, if we send
-`x` tokens to the contract, it will mint `F^-1(x)` tokens.
-
-From this we can create some formulas. Assume we currently have issued `S`
-tokens in exchange for `N = F(S)` input tokens. If someone sends us `x` tokens,
-how much will we issue?
+由此我们可以创建一些公式。假设我们目前已经发布了`S`
+令牌以换取“N = F(S)”输入令牌。如果有人向我们发送 `x` 代币，
+我们将发行多少？
 
 `F^-1(N+x) - F^-1(N)` = `F^-1(N+x) - S`
 
-And if we sell `x` tokens, how much we will get out:
+如果我们出售 `x` 代币，我们会得到多少:
 
 `F(S) - F(S-x)` = `N - F(S-x)`
 
-Just one calculation each side. To be safe, make sure to round down and
-always check against `F(S)` when using `F^-1(S)` to estimate how much
-should be issued. This will also safely give us how many tokens to return.
+每边只计算一个。为安全起见，请确保四舍五入并
+使用`F^-1(S)`来估计多少时，总是检查`F(S)`
+应该发出。这也将安全地给我们返回多少代币。
 
-There is built in support for safely [raising i128 to an integer power](https://doc.rust-lang.org/std/primitive.i128.html#method.checked_pow).
-There is also a crate to [provide nth-root of for all integers](https://docs.rs/num-integer/0.1.43/num_integer/trait.Roots.html).
-With these two, we can handle most math except for logs/exponents.
+内置支持安全地[将 i128 提升到整数幂](https://doc.rust-lang.org/std/primitive.i128.html#method.checked_pow)。
+还有一个板条箱[为所有整数提供 n 次根](https://docs.rs/num-integer/0.1.43/num_integer/trait.Roots.html)。
+有了这两个，我们可以处理除对数/指数之外的大多数数学。
 
-Compare this to [writing it all in solidity](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/7b7ff729b82ea73ea168e495d9c94cb901ae95ce/contracts/math/Power.sol)
+将此与[以可靠方式编写所有内容](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/7b7ff729b82ea73ea168e495d9c94cb901ae95ce/contracts/math/Power.sol)进行比较
 
-Examples:
+例子:
 
-Price Constant: `f(x) = k` and `F(x) = kx` and `F^-1(x) = x/k`
+价格常数:`f(x) = k` 和 `F(x) = kx` 和 `F^-1(x) = x/k`
 
-Price Linear: `f(x) = kx` and `F(x) = kx^2/2` and `F^-1(x) = (2x/k)^(0.5)`
+价格线性:`f(x) = kx` 和 `F(x) = kx^2/2` 和 `F^-1(x) = (2x/k)^(0.5)`
 
-Price Square Root: `f(x) = x^0.5` and `F(x) = x^1.5/1.5` and `F^-1(x) = (1.5*x)^(2/3)`
+价格平方根:`f(x) = x^0.5` 和 `F(x) = x^1.5/1.5` 和 `F^-1(x) = (1.5*x)^(2/3)`
 
-We will only implement these curves to start with, and leave it to others to import this with more complex curves,
+我们只会在开始时实现这些曲线，而让其他人使用更复杂的曲线来导入它，

@@ -1,16 +1,12 @@
----
-order: 5
----
+# 下一步
 
-# Next Steps
+我们在本教程/研讨会组合中介绍了 CosmWasm 的许多基本知识。 我们为您提供更多阅读和学习资源:
 
-We covered a lot of essentials of CosmWasm in this tutorial/workshop combo. We have more reading and learning resources for you:
+- [入门](/getting-started/intro.md)，最好的入门文档。
+- [学习](/learn/)，更多教程。
+- [cosmwasm-examples](https://github.com/CosmWasm/cosmwasm-examples/)，简单的智能合约示例。
+- [cosmwasm-plus](/cw-plus/general/overview.md)，生产级智能合约。
 
-- [Getting Started](/getting-started/intro.md), best starter docs.
-- [Learn](/learn/), more tutorials.
-- [cosmwasm-examples](https://github.com/CosmWasm/cosmwasm-examples/), simple smart contract examples.
-- [cosmwasm-plus](/cw-plus/general/overview.md), production grade smart contracts.
+并且不要忘记加入 [CosmWasm Discord](https://docs.cosmwasm.com/chat)。
 
-And don't forget to join the [CosmWasm Discord](https://docs.cosmwasm.com/chat).
-
-Happy to answer all your questions and see deploy contract messages racing for to be the first in the transaction.
+很高兴回答您的所有问题，并看到部署合同消息争先恐后地成为交易中的第一个。

@@ -1,36 +1,32 @@
----
-order: 2
----
+# CW1 子键
 
-# CW1 Subkeys
+[CW1 子密钥](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw1-subkeys)
+灵感来自 [Cosmos SDK 功能提案](https://forum.cosmos.network/t/proposal-adding-subkey-feature-to-cosmos-sdk-and-apply-it-to-the-hub/2358) .
 
-[CW1 Subkeys](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw1-subkeys)
-is inspired by [Cosmos SDK feature proposal](https://forum.cosmos.network/t/proposal-adding-subkey-feature-to-cosmos-sdk-and-apply-it-to-the-hub/2358).
+这是一个基本的代理合约。用内部的一些代币发起合约，
+允许的帐户可以在
+津贴(`spender, denom`) 每个账户的限制。津贴逻辑类似
+到 [CW20](../cw20/01-spec.md)。授权后，他们的津贴将减少，并且
+发送消息将被中继。如果他们没有足够的授权，
+或者，如果他们尝试代理任何其他消息类型，则尝试将被拒绝。
+管理员可以在 init msg 广播期间或之后为帐户添加限额
+在里面。
 
-This is a basic proxy contract. Initiated contract with some tokens inside,
-allowed accounts can execute `CosmosMsg::Bank(BankMsg::Send{})` within the
-allowance(`spender, denom`) limits per account basis. Allowance logic is similar
-to [CW20](../cw20/01-spec.md). After authorization their allowance will be reduced, and
-the send message will be relayed. If they don't have sufficient authorization,
-or if they try to proxy any other message type, then the attempt will be rejected.
-Admin can add an allowance for an account during init msg broadcast or after
-init.
+合约包含允许和禁止指定密钥执行的许可逻辑
+具体消息。目前，这些消息是 staking 消息(目前涵盖 _Delegate、Undelegate、Redelegate、Withdraw_)，
+但只需几行代码即可添加新的消息类型。津贴和权限检查是分开进行的，这意味着一个子密钥可以有消费代币的津贴，
+但没有许可的消息执行，反之亦然。
 
-The contract consists permissioning logic that allows and disallows specified keys to execute
-specific messages. For now these messages are staking messages (covers _Delegate, Undelegate, Redelegate, Withdraw_ for now),
-but it is just few lines of code to add new message types. Allowance and permission checks works separately, meaning a subkey can have allowance to spend tokens,
-but no permissioned message execution and vice versa.
+##合约演示
 
-## Contract demo
-
-First, initialize node repl:
+首先，初始化节点repl:
 
 ```shell
 npx @cosmjs/cli@^0.23 --init https://raw.githubusercontent.com/CosmWasm/cosmwasm-plus/v0.3.2/contracts/cw1-subkeys/helpers.ts
 ```
 
 ::: warning
-Helper code is compatible with cw1-subkeys smart contract version **v0.3.2**
+Helper代码兼容cw1-subkeys智能合约版本**v0.3.2**
 :::
 
 Load wallet:
@@ -40,7 +36,7 @@ const client = await useOptions(hackatomOptions).setup(PASSWORD);
 const factory = CW1(client);
 ```
 
-Upload the code and the contract:
+上传代码和合约:
 
 ```ts
 // upload using code below
@@ -55,8 +51,8 @@ contract.contractAddress
 // address -> 'cosmos1q7kc6y94zuvr7wsekg45e6pr8nhef6ku9ugw8r'
 ```
 
-We created a contract from a code with only `address` as admin. Update admins
-for demonstration.
+我们从一个只有“地址”作为管理员的代码创建了一个合同。 更新管理员
+用于演示。
 
 ```ts
 // Use a key you control to test out execute with subkey
@@ -69,11 +65,11 @@ const friendAddr = "cosmos1ve2n9dd4uy48hzjgx8wamkc7dp7sfdv82u585d"
 contract.updateAdmins([address, friendAddr]);
 ```
 
-After the last line, two admins have control over the sub key master contract.
-You can see the new admin added by running `contract.admins()`
-Let's delete friends address from admins, you would not want him to
-run away with the funds. Remove his address from admins and freeze the contract.
-Freezing means admins cannot be modified afterwards.
+在最后一行之后，两个管理员可以控制子密钥主合约。
+您可以通过运行 `contract.admins()` 看到添加的新管理员
+让我们从管理员那里删除朋友地址，你不会希望他
+带着资金逃跑。 从管理员中删除他的地址并冻结合同。
+冻结意味着管理员之后无法修改。
 
 ```ts
 contract.updateAdmins([address])
@@ -94,7 +90,7 @@ contract.increaseAllowance(friendAddr, {denom: "ucosm", amount: "90000"})
 contract.allowance(friendAddr)
 ```
 
-Now test if he can execute the message. Open another terminal screen:
+现在测试他是否可以执行消息。 打开另一个终端屏幕:
 
 ```ts
 const friendClient = await useOptions(hackatomOptions).setup(PASSWORD, KEY_FILE);
@@ -111,9 +107,9 @@ his allowance on admin terminal:
 contract.decreaseAllowance(randomAddress, {denom: "ucosm", amount: "69999"}, { at_height: { height: 40000}})
 ```
 
-After these operations he will only have _1 ucosm_ to spend. The prank's
-best part is `at_height` field. After height 40000 his allowance will become
-inactive meaning he can't spend the tokens anymore.
+在这些操作之后，他将只有 _1 ucosm_ 可以花费。 恶作剧的
+最好的部分是 `at_height` 字段。 身高 40000 后，他的津贴将变为
+不活动意味着他不能再花费代币了。
 
 ### Permissions
 
@@ -134,9 +130,9 @@ contract.execute([unmsg])
 
 ```
 
-## Contribution
+## 贡献
 
-This contracts logic can be improved by adding different message types,
-various permissions for message types, daily spendable amount etc. Check
-[the cosmos sdk proposal](https://forum.cosmos.network/t/proposal-adding-subkey-feature-to-cosmos-sdk-and-apply-it-to-the-hub/2358) for
-more ideas.
+可以通过添加不同的消息类型来改进此合约逻辑，
+消息类型、每日可消费金额等的各种权限。检查
+[cosmos sdk 提案](https://forum.cosmos.network/t/proposal-adding-subkey-feature-to-cosmos-sdk-and-apply-it-to-the-hub/2358)
+更多的想法。

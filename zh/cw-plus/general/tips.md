@@ -1,24 +1,19 @@
----
-title: Advanced Tips
-order: 2
----
+# 高级 REPL 技巧
 
-# Advanced REPL tips
-
-::: danger
-You must read [cw20 tutorial](../cw20/03-cw20-base-tutorial.md) first. This section builds on
-top of it.
+::: 危险
+你必须先阅读【cw20教程】(../cw20/03-cw20-base-tutorial.md)。 本节建立在
+最重要的。
 :::
 
-You got your hands dirty with Node REPL. Now let's dig in a bit deeper of some
-advanced functions you can use.
+使用 Node REPL 弄脏了你的手。 现在让我们深入挖掘一些
+您可以使用的高级功能。
 
-## Interactive Discovery
+##交互式发现
 
-So far you have been cut-and-pasting commands in the tutorials when using
-node repl. But what else can you do with this contract? Luckily Javascript
-has some nice introspection. And, we added some extra bonuses there. Just type
-`mine` in the REPL and see the list of methods:
+到目前为止，您已经在使用时对教程中的命令进行了剪切和粘贴
+节点复制 但是你还能用这份合同做什么？ 幸运的是 Javascript
+有一些很好的内省。 而且，我们在那里添加了一些额外的奖励。 只需输入
+REPL 中的 `mine` 并查看方法列表:
 
 ```
 >> mine
@@ -35,13 +30,13 @@ has some nice introspection. And, we added some extra bonuses there. Just type
   transferFrom: [AsyncFunction: transferFrom] }
 ```
 
-But how do I call them? What arguments do they take?
-You can always go look up the
-[original helper file on the web](https://github.com/CosmWasm/cosmwasm-plus/blob/master/contracts/cw20-base/helpers.ts#L151-L167)
-and see all the types defined there.
+但是我怎么称呼他们呢？ 他们采取什么论据？
+你可以随时去查
+[网络原始帮助文件](https://github.com/CosmWasm/cosmwasm-plus/blob/master/contracts/cw20-base/helpers.ts#L151-L167)
+并查看那里定义的所有类型。
 
-But why switch to a browser and get distracted by something else?
-There is a great `.type` operator to show you this without ever leaving the REPL:
+但是为什么切换到浏览器并被其他东西分心呢？
+有一个很棒的 `.type` 操作符可以在不离开 REPL 的情况下向你展示这一点:
 
 ```
 >> const _i = mine.increaseAllowance
@@ -65,7 +60,7 @@ const mine: CW20Instance
 const mine: CW20Instance
 ```
 
-Armed with that knowledge, let's try to add an allowance and query it:
+有了这些知识，让我们尝试添加一个津贴并查询它
 
 ```js
 mine.increaseAllowance(other, "5000")
@@ -91,8 +86,8 @@ const { setup } = useOptions(hackatomOptions);
 const setup: (password: string, filename?: string) => Promise<SigningCosmWasmClient>
 ```
 
-Yup... it takes a second argument. You don't HAVE to store your keys in `~/.coral.key`. That's just
-a default. It also means we could make 2 clients using different key files.
+是的......它需要第二个参数。 您不必将密钥存储在`~/.coral.key` 中。 那只是
+默认值。 这也意味着我们可以使用不同的密钥文件创建 2 个客户端。
 
 ```js
 const client = await setup(YOUR_PASSWORD_HERE)
@@ -109,8 +104,8 @@ client.getAccount()
 partner.getAccount()
 ```
 
-This let's us then try more complex use cases with the CW20 contract.
-Sending back and forth, `transferFrom`, `burnFrom`, etc
+这让我们然后使用 CW20 合约尝试更复杂的用例。
+来回发送、`transferFrom`、`burnFrom`等
 
-That's enough hints from me.
-Time for you to go play with the contract on your own...
+从我这里得到的提示就足够了。
+是时候让你自己去玩合同了……

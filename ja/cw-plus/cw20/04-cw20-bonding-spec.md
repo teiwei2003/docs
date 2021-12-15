@@ -1,8 +1,3 @@
----
-title: cw20-bonding Spec
-order: 4
----
-
 # CW20 Bonding curve
 
 cw20-bonding-curve source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-bonding](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-bonding)

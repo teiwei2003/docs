@@ -1,16 +1,12 @@
----
-order: 4
----
-
 # Bootstrap dApp
 
-There are two approaches to bootstrap a new dApp: as a lerna package in the monorepo or as a standalone app.
+有两种方法可以引导新的 dApp:作为 monorepo 中的 lerna 包或作为独立应用程序。
 
-## Monorepo template
+## Monorepo 模板
 
-With this approach, we'll create another lerna package in the `packages/` directory that will use the local `logic` and `design` packages as dependencies.
+通过这种方法，我们将在 `packages/` 目录中创建另一个 lerna 包，该包将使用本地 `logic` 和 `design` 包作为依赖项。
 
-For that, you only need to copy the `_template` directory into `packages/` and rename it to `balance-checker`:
+为此，您只需要将 `_template` 目录复制到 `packages/` 并将其重命名为 `balance-checker`:
 
 ```shell
 git clone https://github.com/CosmWasm/dApps.git

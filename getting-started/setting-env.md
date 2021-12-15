@@ -1,7 +1,3 @@
----
-order: 3
----
-
 # Setting Up Environment
 
 You need an environment to run contracts. You can either run your node locally or connect to an

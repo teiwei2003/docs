@@ -1,13 +1,9 @@
----
-order: 2
----
-
 # Installation
 
 In this section, we will gear up your workhorse for developing, deploying and, enjoying smart
 contracts on Cosmos SDK.
 
-## Go
+## Run
 
 You can setup golang following [official
 documentation](https://github.com/golang/go/wiki#working-with-go). The latest versions of `wasmd`
