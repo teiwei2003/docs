@@ -1,13 +1,13 @@
-# DOCS README
+# 文档自述文件
 
-## Run
+## run
 
 `npm i && npm run serve`
 
-## Build
+## 建造
 
-`npm run build`
+`npm 运行构建`
 
-## Deployment
+## 部署
 
-Deploy the generated static files in `.vuepress/dist` 🚀
+将生成的静态文件部署到`.vuepress/dist` 🚀

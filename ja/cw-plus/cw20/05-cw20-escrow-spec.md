@@ -1,28 +1,28 @@
-# CW20 Escrow
+# CW20ホスティング
 
-cw20-escrow source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-escrow](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-escrow)
+cw20-エスクローソースコード:[https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-escrow](https://github.com/CosmWasm/cosmwasm-plus/tree/master/契約/cw20-管理)
 
-This is an escrow meta-contract that allows multiple users to
-create independent escrows. Each escrow has a sender, recipient,
-and arbiter. It also has a unique id (for future calls to reference it)
-and an optional timeout.
+これは、複数のユーザーを許可する管理メタ契約です
+独立したホスティングを作成します。各ホスティングには、送信者、受信者、
+そして仲裁人。また、一意のIDがあります(今後の呼び出しでそれを参照するため)
+そして、オプションのタイムアウト。
 
-The basic function is the sender creates an escrow with funds.
-The arbiter may at any time decide to release the funds to either
-the intended recipient or the original sender (but no one else),
-and if it passes with optional timeout, anyone can refund the locked
-tokens to the original sender.
+基本的な機能は、送信者が資金を使用してエスクローを作成することです。
+仲裁人はいつでも任意の当事者に資金を解放することを決定できます
+意図された受信者または元の送信者(他の誰かではない)、
+オプションのタイムアウトを通過すると、誰でもロックを返すことができます
+トークンは元の送信者に渡されます。
 
-We also add a function called "top_up", which allows anyone to add more
-funds to the contract at any time.
+また、「top_up」という関数を追加しました。これにより、誰でもさらに追加できます。
+いつでも契約に資金を提供します。
 
-## Token types
+## トークンタイプ
 
-This contract is meant not just to be functional, but also to work as a simple
-example of an CW20 "Receiver". And demonstrate how the same calls can be fed
-native tokens (via typical `HandleMsg` route), or cw20 tokens (via `Receiver` interface).
+この契約は、実用的であるだけでなく、単純なものでなければなりません。
+CW20「レシーバー」の例。そして、同じ呼び出しを提供する方法を示します
+ネイティブトークン(通常の `HandleMsg`ルート経由)またはcw20トークン(` Receiver`インターフェース経由)。
 
-Both `create` and `top_up` can be called directly (with a payload of native tokens),
-or from a cw20 contract using the [Receiver Interface](01-spec.md#receiver).
-This means we can load the escrow with any number of native or cw20 tokens (or a mix),
-allow of which get released when the arbiter decides.
+`create`と` top_up`の両方を直接呼び出すことができます(ネイティブトークンでロード)、
+または、[Receiver Interface](01-spec.md#receiver)のcw20コントラクトを使用します。
+これは、任意の数のネイティブトークンまたはcw20トークン(またはハイブリッドトークン)を使用して、カストディをロードできることを意味します。
+仲裁人が決定したときに解放することが許可されています。

@@ -1,16 +1,16 @@
-# Downloading and Compiling Contract
+# 契約書をダウンロードしてコンパイルする
 
-In this section, we will download a sample contract, compile to it to wasm binary executable.
+このセクションでは、サンプルコントラクトをダウンロードし、wasmバイナリ実行可能ファイルにコンパイルします。
 
-Please first review the [client setup instructions](./setting-env.md), and configure and verify a
-client, either Go CLI or Node.js console.
+まず、[クライアント設定手順](./setting-env.md)を確認し、設定して確認してください。
+クライアント、GoCLIまたはNode.jsコンソール。
 
-## Compiling and Testing Contract
+## コントラクトをコンパイルしてテストします
 
-Let's download the repo in which we collect
-[`cosmwasm-examples`](https://github.com/CosmWasm/cosmwasm-examples) and try out an existing simple
-escrow contract that can hold some native tokens and gives the power to an arbiter to release them
-to a pre-defined beneficiary. First, clone the repo and try to build the wasm bundle:
+収集したリポジトリをダウンロードしましょう
+[`cosmwasm-examples`](https://github.com/CosmWasm/cosmwasm-examples)そして既存のシンプルなものを試してみてください
+いくつかのネイティブトークンを保持し、仲裁人にそれらを解放する権限を与えることができるエスクロー契約
+所定の受益者へ。 まず、リポジトリのクローンを作成し、wasmパッケージのビルドを試みます。
 
 ```shell
 # get the code
@@ -25,17 +25,17 @@ rustup default stable
 cargo wasm
 ```
 
-After this compiles, it should produce a file in
-`target/wasm32-unknown-unknown/release/cw_escrow.wasm`. A quick `ls -l` should show around 2MB. This
-is a release build, but not stripped of all unneeded code. To produce a much smaller version, you
-can run this which tells the compiler to strip all unused code out:
+コンパイル後、
+`target/wasm32-unknown-unknown/release/cw_escrow.wasm`。 高速の `ls-l`は約2MBを表示するはずです。 この
+これはリリースバージョンですが、不要なコードがすべて削除されるわけではありません。 小さいバージョンを作成するには、
+これを実行して、未使用のコードをすべて削除するようコンパイラーに指示できます。
 
 ```shell
 RUSTFLAGS='-C link-arg=-s' cargo wasm
 ```
 
-This produces a file about 174kB. We use this and another optimizer in the next [last section](#Optimized-Compilation) to produce the final product uploaded to the blockchain. You don't need to worry about running this yourself (unless you are
-curious), but you should have an idea of the final size of your contract this way.
+これにより、約174kBのファイルが生成されます。 次の[最後のセクション](#Optimized-Compilation)でこれと別のオプティマイザーを使用して、ブロックチェーンにアップロードされた最終製品を生成します。 これを自分で実行することを心配する必要はありません(
+好奇心が強い)、しかしあなたはこのように契約の最終的なサイズを理解する必要があります。
 
 ## Unit Tests
 
@@ -58,17 +58,17 @@ test contract::tests::handle_approve ... ok
 test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 ```
 
-`RUST_BACKTRACE=1` will provide you with full stack traces on any error, which is super useful. This
-only works for unit tests (which test native rust code, not the compiled wasm). Also, if you want to
-know where `cargo wasm` and `cargo unit-test` come from, they are just aliases defined in
-`.cargo/config`. Take a look there to understand the cargo flags more.
+`RUST_BACKTRACE = 1`は、エラーの完全なスタックトレースを提供します。これは非常に便利です。 この
+単体テストにのみ適しています(コンパイルされたwasmではなくネイティブのRustコードをテストします)。 また、必要に応じて
+`cargowasm`と` cargounit-test`がどこから来たのかを知ってください。
+`.cargo/config`。 貨物標識の詳細については、こちらをご覧ください。
 
-## Optimized Compilation
+## 最適化されたコンパイル
 
-Smart contract binary size must be as small as possible for reduced gas cost. This will not only cost
-less on deployment, also for every single interaction. Simply, **optimize production code** using [cosmwasm/rust-optimizer](https://github.com/CosmWasm/rust-optimizer).
-**rust-optimizer** also produces reproducible builds of cosmwasm smart contracts.
-This means third parties can verify the contract is the actually the claimed code.
+スマートコントラクトのバイナリサイズは、ガスコストを削減するために可能な限り小さくする必要があります。 これは費用がかかるだけではありません
+展開を減らし、すべての対話にも適用されます。 簡単に言うと、[cosmwasm/rust-optimizer](https://github.com/CosmWasm/rust-optimizer)**本番コードを最適化**を使用します。
+** rust-optimizer **は、繰り返し可能なcosmwasmスマートコントラクト構築も生成します。
+これは、サードパーティが契約が実際に要求されたコードであることを確認できることを意味します。
 
 ```shell
 docker run --rm -v "$(pwd)":/code \

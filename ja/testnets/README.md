@@ -1,26 +1,26 @@
-# Testnets
+# テストネット
 
-In this section we will explain how to join testnets, where to find testnet configurations, and some scripts to make the process faster.
+このセクションでは、テストネットに参加する方法、テストネット構成を見つける場所、およびプロセスを高速化するためのいくつかのスクリプトについて説明します。
 
-## Select Your Network
+## ネットワークを選択してください
 
-You can find active and in-active testnet information such as configs and endpoints on [CosmWasm/testnets](https://github.com/CosmWasm/testnets).
+[CosmWasm/testnets](https://github.com/CosmWasm/testnets)で、構成やエンドポイントなどのアクティブおよび非アクティブなテストネット情報を見つけることができます。
 
-## Setup
+## 設定
 
-Let's start rolling your node and start producing blocks in testnet environment.
+ノードのローリングを開始し、テストネット環境でブロックの生成を開始しましょう。
 
-**Before starting**, you can use [CosmWasm/tesnets/devops](https://github.com/CosmWasm/testnets/tree/master/devops) that contains easy setup scripts for wasmd
-node, faucet, [block explorer](https://github.com/CosmWasm/big-dipper), lcd, nginx etc. Scripts
-below does the some thing as **devops repo** in essence, just more manual and excludes nginx and system supervisor. Feel free
-to use them. We use [cosmovisor](https://github.com/cosmos/cosmos-sdk/tree/master/cosmovisor) upgrade manager to handle network upgrades.
-Our installation scripts can help you with both setting up cosmovisor and wasmd: [wasmd w/cosmovisor setup scripts](https://github.com/CosmWasm/testnets/tree/master/devops/node/cosmovisor)g
+**始める前に** [CosmWasm/tesnets/devops](https://github.com/CosmWasm/testnets/tree/master/devops)を使用できます。これには、wasmdの簡単なセットアップスクリプトが含まれています。
+ノード、蛇口、[ブロックエクスプローラー](https://github.com/CosmWasm/big-dipper)、lcd、nginx、その他のスクリプト
+以下は基本的に** devopsレポジトリ**として機能しますが、より手動であり、nginxとシステムスーパーバイザーは含まれていません。ランダム
+それらを使用してください。 [cosmovisor](https://github.com/cosmos/cosmos-sdk/tree/master/cosmovisor)アップグレードマネージャーを使用して、ネットワークのアップグレードを処理します。
+インストールスクリプトは、cosmovisorとwasmdのセットアップに役立ちます:[wasmd w/cosmovisorセットアップスクリプト](https://github.com/CosmWasm/testnets/tree/master/devops/node/cosmovisor)g
 
-### Manual Setup
+### 手動設定
 
-First of all make sure you followed the installation steps in [build requirements section](./build-requirements.md). You should have the required binaries. If you just want to copy and execute the scripts below, make sure to set up environment variables:
+まず、[ビルド要件セクション](./build-requirements.md)のインストール手順に従っていることを確認してください。必要なバイナリが必要です。次のスクリプトをコピーして実行するだけの場合は、必ず環境変数を設定してください。
 
-Below is the [musselnet configuration](https://github.com/CosmWasm/testnets/tree/master/musselnet).
+以下は[Musselnet構成](https://github.com/CosmWasm/testnets/tree/master/musselnet)です。
 
 ```shell
 export CHAIN_ID="musselnet-4"
@@ -45,8 +45,8 @@ export COSMOVISOR_NAME=wasmd
 export SEED_NODE="c065c5ac440d1a9ba484a9a8b25c24d264b0a1a6@49.12.67.47:26656"
 ```
 
-For running these scripts seamlessly, We recommend you to create a directory for CosmWasm tooling:
-`mkdir CosmWasm && cd CosmWasm && export CW_DIR=$(pwd)`
+これらのスクリプトをシームレスに実行するには、CosmWasmツールのディレクトリを作成することをお勧めします。
+`mkdir CosmWasm && cd CosmWasm && export CW_DIR = $(pwd)
 
 ```shell
 cd $CW_DIR
@@ -90,18 +90,18 @@ curl -sSL $APP_CONFIG_URL > ~/.wasmd/config/app.toml
 wasmd start --p2p.seeds $SEED_NODE
 ```
 
-Now you should be seeing blocks being replayed and your node is catching up with the testnet. This could take a while.
+これで、ブロックが再生され、ノードがテストネットに追いついていることがわかります。 これは時間がかかる場合があります。
 
-### Become A Validator(optional)
+### バリデーターになる(オプション)
 
-In order to join the network as validator, you need some staking tokens.
-Please ask some in [discord testnets channel](https://docs.cosmwasm.com/chat)
+バリデーターとしてネットワークに参加するには、ステーキングトークンが必要です。
+[discord testnetschannel](https://docs.cosmwasm.com/chat)で質問してください
 
-If you want to participate in active block building, you need some coins staked to your validators address.
+アクティブなブロック構築に参加したい場合は、バリデーターのアドレスにいくつかのコインを誓約する必要があります。
 
-For those interested in validator stack, here is a good reading source on validator architectures: [certus one blog](https://kb.certus.one/)
+ベリファイアスタックに関心のある方のために、ベリファイアアーキテクチャに関する優れた資料を以下に示します。[certus one blog](https://kb.certus.one/)
 
-**Note**: make sure your validator is synced before upgrading to validator
+**注**:バリデーターにアップグレードする前に、バリデーターが同期されていることを確認してください
 
 ```shell
 wasmd tx staking create-validator \
@@ -118,15 +118,15 @@ wasmd tx staking create-validator \
   --from=mywallet
 ```
 
-### Run the Light Client Daemon
+### ライトクライアントデーモンを実行する
 
-With wasmd version v0.13 lcd client and node merged. To enable light client, change `app.toml/api` value to true.
+wasmdバージョンv0.13lcdクライアントおよびノー​​ドとマージされました。 ライトクライアントを有効にするには、 `app.toml/api`の値をtrueに変更します。
 
-## Joining To Be Launched Testnets
+## 今後のテストネットに参加する
 
-::: tip
-You need to have your address and informations defined in networks genesis file to join not yet launched testnets.
-Here is the script you can run to take care of it automatically.
+::: ヒント
+まだ開始されていないテストネットに参加するには、ネットワークジェネシスファイルでアドレスと情報を定義する必要があります。
+これは、自動的に処理するために実行できるスクリプトです。
 :::
 
 ```shell
@@ -152,8 +152,8 @@ git push
 # Open PR to CosmWasm/testnets:master (https://github.com/CosmWasm/testnets)
 ```
 
-After the network is launched you can follow [Joining Live Testnets](#joining-live-testnets).
+ネットワークが開始したら、[ライブテストネットへの参加](#joining-live-testnets)をフォローできます。
 
-## Deploying Contracts to Testnet
+## コントラクトをテストネットにデプロイします
 
-[Getting Started section](../getting-started/intro.md) is the best reading source that teaches you the process of compiling and deploying contracts using a basic smart contract. If you are interested in developing your own contracts, after reading getting started tutorials head to [Hijacking Escrow](../learn/hijack-escrow/intro.md) where you play around with the example escrow contract.
+[はじめに](../getting-started/intro.md)は、基本的なスマートコントラクトを使用してコントラクトをコンパイルおよびデプロイするプロセスを説明するための最良の資料です。 独自の契約を作成することに興味がある場合は、サンプルのエスクロー契約を使用できる入門チュートリアルを読んだ後、[Hijacking Escrow](../learn/hijack-escrow/intro.md)にアクセスしてください。

@@ -1,47 +1,47 @@
-# CosmWasm Documentation
+# CosmWasmドキュメント
 
-CosmWasm is a new smart contracting platform built for the cosmos ecosystem. If you haven't yet heard of it, please [check out this intro](https://blog.cosmos.network/announcing-the-launch-of-cosmwasm-cc426ab88e12). The purpose of this documentation is to give a deep dive into the technology for developers who wish to try it out or integrate it into their product. Particularly, it is aimed at Go developers with experience with the Cosmos SDK, as well as Rust developers looking for a blockchain platform. {synopsis}
+CosmWasmは、Cosmosエコシステム用に構築された新しいスマートコントラクトプラットフォームです。聞いたことがない場合は、[この紹介をチェックしてください](https://blog.cosmos.network/annoucing-the-launch-of-cosmwasm-cc426ab88e12)。このドキュメントの目的は、このドキュメントを試してみたり、製品に統合したりして、テクノロジに関する洞察を得たい開発者に提供することです。特に、Cosmos SDKの経験があるGo開発者、およびブロックチェーンプラットフォームを探しているRust開発者を対象としています。 {まとめ}
 
-## How to use CosmWasm
+## CosmWasmの使用方法
 
-CosmWasm is written as a module that can plug into the Cosmos SDK. This means that anyone currently building a blockchain using the Cosmos SDK can quickly and easily add CosmWasm smart contracting support to their chain, without adjusting existing logic. We also provide a sample binary of CosmWasm integrated into the `gaiad` binary, called [`wasmd`](https://github.com/CosmWasm/wasmd), so you can launch a new smart-contract enabled blockchain out of the box, using documented and tested tooling and the same security model as the Cosmos Hub.
+CosmWasmは、CosmosSDKにプラグインできるモジュールとして記述されています。つまり、現在Cosmos SDKを使用してブロックチェーンを構築している人は誰でも、既存のロジックを調整することなく、CosmWasmスマートコントラクトサポートをチェーンにすばやく簡単に追加できます。また、[`wasmd`](https://github.com/CosmWasm/wasmd)と呼ばれる` gaiad`バイナリファイルに統合されたCosmWasmサンプルバイナリファイルも提供しているため、ボックスからレコードとテストを使用できます。ツールコスモスハブと同じセキュリティモデル。
 
-You will need a running blockchain to host your contracts and use them from an app. We will explain how to [connect to a testnet](/getting-started/setting-env.md#setting-up-environment) or [set up a local "dev net"](/getting-started/setting-env.md#run-local-node-optional) in a later section. And plan to soon release a hosted testnet, to which all developers can simply upload their contracts, in order to easy run a demo and to share their contract with others.
+コントラクトをホストし、アプリケーションからそれらを使用するには、実行中のブロックチェーンが必要になります。 [テストネットに接続する](/getting-started/setting-env.md#setting-up-environment)または[ローカルの「開発ネットワーク」を設定する](/getting-started/setting-env.md)方法を説明します。後半の#run-local-node-optional)。また、ホストされたテストネットを間もなくリリースする予定です。すべての開発者は、契約をテストネットにアップロードするだけで、デモを簡単に実行したり、契約を他の人と共有したりできます。
 
-## Sections
+## 部
 
-* [Getting Started](/getting-started/intro.md) dives you into hands-on training. It gently leads you through
-modifying, deploying, and executing a smart contract on a local blockchain. It is the ideal place to go through and get acquainted with all the aspects of the system, without too much hard work coding.
+* [はじめに](/getting-started/intro.md)を使用すると、実践的なトレーニングに参加できます。優しくご案内します
+ローカルブロックチェーンでスマートコントラクトを変更、デプロイ、実行します。コーディング作業をあまり行わずに、システムのすべての側面を理解し、理解するのに理想的な場所です。
 
-* [Architecture](/architecture/multichain.md) explains much of the high-level design and architecture of CosmWasm.
-Before you start designing systems, it is good to understand the mental model and capabilities of the system. If you just want to get your hands dirty with working code, you can skip this section for now and come back later when you are ready to ponder design.
+* [Architecture](/architecture/multichain.md)は、CosmWasmの多くの高レベルの設計とアーキテクチャについて説明しています。
+システムの設計を開始する前に、システムのメンタルモデルと機能を理解するのが最善です。動作するコードに触れたいだけの場合は、このセクションをスキップして、設計について考える準備ができたら戻ってください。
 
-* [Testnets](/testnets/build-requirements.md) is a good first point if you are searching for a live
-network to test and hack your smart contracts on a stable and easy to use testing environment. Also, "**We have enough validators joined the testnets**", said no one ever 😉
+* [Testnets](/testnets/build-requirements.md)リアルタイムを探している場合
+ネットワークは、安定した使いやすいテスト環境でスマートコントラクトをテストしてクラックします。さらに、「**テストネットに参加するのに十分なバリデーターがあります**」、誰もそれを言ったことがありません😉
 
-* [Learn](/learn/README.md) will demonstrate developing smart contracts from zero to production with step by step
-explanations, code snippets, scripts and more.
+* [Learn](/learn/README.md)は、ゼロから本番環境へのスマートコントラクトの開発を徐々に示します
+説明、コードスニペット、スクリプトなど。
 
-* [Workshops](/learn/videos-workshops.md) has great collection of demonstrations and verbal explanation of
-  CosmWasm tech stack recorded by our team in various events and organisations.
+* [ワークショップ](/learn/videos-workshops.md)は多くのデモと口頭での説明を集めました
+  CosmWasmテクノロジースタックは、さまざまな活動や組織で私たちのチームによって記録されました。
 
-* [Community](/community/hall-of-fame.md) for community interactions.
+* [Community](/community/hall-of-fame.md)は、コミュニティの相互作用に使用されます。
 
-* [Plus](/cw-plus/general/overview.md) is for state of art CosmWasm smart contracts.
+* [Plus](/cw-plus/general/overview.md)は、最も高度なCosmWasmスマートコントラクトに適しています。
 
-* [IBC](/ibc/01-overview.md) is for all the things related to CosmWasm and IBC. Relayers, Active Network Connections, IBC enabled
-  smart contracts and more.
+* [IBC](/ibc/01-overview.md)は、CosmWasmとIBCに関連するすべてのものです。リピーター、アクティブなネットワーク接続、IBC対応
+  スマートコントラクトなど。
 
-## Further Studies
+## ディープラーニング
 
-you can dig into our code and start writing your own contracts:
+あなたは私たちのコードを掘り下げて、あなた自身の契約を書き始めることができます:
 
-* [A set of example contracts](https://github.com/CosmWasm/cosmwasm-examples) for you to fork and experiment with
-* Rustdoc for the [core contract libs](https://docs.rs/cosmwasm-std/0.13.1/cosmwasm_std/)
-* Rustdoc for the [storage helpers](https://docs.rs/cosmwasm-storage/0.13.1/cosmwasm_storage/)
+* [契約例のセット](https://github.com/CosmWasm/cosmwasm-examples)フォークして実験する
+* [コアコントラクトライブラリ] Rustdoc(https://docs.rs/cosmwasm-std/0.13.1/cosmwasm_std/)
+* [ストレージアシスタント]のRustdoc(https://docs.rs/cosmwasm-storage/0.13.1/cosmwasm_storage/)
 
-There are quite a few [high level articles on medium](https://medium.com/confio) that explain the various components of
-our stack and where we are going.
+[メディアに関する高度な記事](https://medium.com/confio)の説明がたくさんあります
+私たちのスタックと私たちが行くところ。
 
-Many thanks to the [Interchain Foundation](https://interchain.io/) for funding most of the development work to bring
-CosmWasm to production.
+開発作業のほとんどに資金を提供してくれた[InterchainFoundation](https://interchain.io/)に感謝します
+CosmWasmから本番環境へ。

@@ -1,17 +1,16 @@
-# CW1 Whitelist
+# CW1 白名单
 
-[CW1 Whitelist](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw1-whitelist) may be the simplest implementation of CW1, a whitelist of addresses.
-It contains a set of admins that are defined upon creation.
-Any of those admins may `Execute` any message via the contract,
-per the CW1 spec.
+【CW1白名单】(https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw1-whitelist)可能是CW1最简单的实现，地址白名单。
+它包含一组在创建时定义的管理员。
+这些管理员中的任何一个都可以通过合同“执行”任何消息，
+根据 CW1 规范。
 
-To make this slighly less minimalistic, you can allow the admin set
-to be mutable or immutable. If it is mutable, then any admin may
-(a) change the admin set and (b) freeze it (making it immutable).
+为了使这稍微不那么简约，您可以允许管理集
+是可变的或不可变的。 如果它是可变的，那么任何管理员都可以
+(a) 更改管理集和 (b) 冻结它(使其不可变)。
 
-While largely an example contract for CW1, this has various real-world use-cases,
-such as a common account that is shared among multiple trusted devices,
-or trading an entire account (used as 1 of 1 mutable). Most of the time,
-this can be used as a framework to build your own,
-more advanced cw1 implementations.
-
+虽然主要是 CW1 的示例合约，但它具有各种实际用例，
+例如在多个受信任设备之间共享的公共帐户，
+或交易整个账户(用作 1 of 1 可变)。 大多数时候，
+这可以用作构建自己的框架，
+更高级的 cw1 实现。

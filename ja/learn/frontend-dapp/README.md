@@ -1,25 +1,25 @@
-# Introduction
+# 介绍
 
-In this tutorial you will learn how to build a [CosmJS](https://github.com/cosmos/cosmjs) based dApp. The example dApp will be a balance checker that will allow you to see your native tokens and the CW20 tokens of the contract with the address you enter.
+在本教程中，您将学习如何构建基于 [CosmJS](https://github.com/cosmos/cosmjs) 的 dApp。 示例 dApp 将是一个余额检查器，它允许您使用您输入的地址查看您的原生代币和合约的 CW20 代币。
 
-## Views
+## 视图
 
-It will look like this:
+它看起来像这样:
 
-### Login
-![image](../../.vuepress/public/assets/frontend-dapp/login.png)
+### 登录
+![图片](../../.vuepress/public/assets/frontend-dapp/login.png)
 
-### Native balance
-![image](../../.vuepress/public/assets/frontend-dapp/balance-native.png)
+### 本机平衡
+![图片](../../.vuepress/public/assets/frontend-dapp/balance-native.png)
 
-### Balance of a CW20 contract
-![image](../../.vuepress/public/assets/frontend-dapp/balance-cw20.png)
+### CW20 合约的余额
+![图片](../../.vuepress/public/assets/frontend-dapp/balance-cw20.png)
 
-### Error for address with no contract
-![image](../../.vuepress/public/assets/frontend-dapp/balance-error.png)
+### 没有合同的地址错误
+![图片](../../.vuepress/public/assets/frontend-dapp/balance-error.png)
 
-## Setup environment
+##设置环境
 
-We recommend to use [Visual Studio Code](https://code.visualstudio.com) but this tutorial should be easily followed with any other text editor.
+我们建议使用 [Visual Studio Code](https://code.visualstudio.com)，但使用任何其他文本编辑器应该可以轻松遵循本教程。
 
-You should download the latest release of the [`CosmWasm/dApps`](https://github.com/CosmWasm/dApps) monorepo using your preferred method.
+您应该使用您喜欢的方法下载最新版本的 [`CosmWasm/dApps`](https://github.com/CosmWasm/dApps) monorepo。

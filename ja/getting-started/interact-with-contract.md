@@ -1,13 +1,12 @@
-# Uploading and Interacting
+# アップロードとインタラクション
 
-We have the binary ready. Now it is time to see some wasm action. You can use [Go CLI](#go-cli) or
-[Node Console](#node-console) as you wish.
+バイナリファイルを用意しました。 いくつかのwasmアクションを見る時が来ました。 [Go CLI](#go-cli)または
+[ノードコンソール](#node-console)必要に応じて。
 
-## Run CLI
+## CLIに移動
 
-We generated a wasm binary executable in the previous chapter. Let's put it into use. Now, we will
-upload the code to the blockchain. Afterwards, you can download the bytecode to verify it is proper:
-
+前の章でwasmバイナリ実行可能ファイルを生成しました。 使ってみましょう。 今、私たちは
+コードをブロックチェーンにアップロードします。 その後、バイトコードをダウンロードして、それが正しいことを確認できます。
 ```shell
 # see how many codes we have now
 wasmd query wasm list-code $NODE
@@ -27,10 +26,10 @@ wasmd query wasm code $CODE_ID $NODE download.wasm
 diff contract.wasm download.wasm
 ```
 
-### Instantiating the Contract
+### 契約をインスタンス化する
 
-We can now create an instance of this wasm contract. Here the verifier will fund an escrow, that
-will allow fred to control payout and upon release, the funds go to bob.
+これで、このwasmコントラクトのインスタンスを作成できます。 ここで、バリデーターはエスクローに資金を提供します。
+フレッドが支出を管理できるようになり、リリース後、資金はボブになります。
 
 ```shell
 # instantiate contract and verify
@@ -92,16 +91,16 @@ wasmd query account $(wasmd keys show bob -a) $NODE
 wasmd query account $CONTRACT $NODE
 ```
 
-## Node Console
+## ノードコンソール
 
-If you set up the Node Console / REPL in the [client setup section](./setting-env#setup-node-repl), you can use
-that to deploy and execute your contract. I think you will find that JSON manipulation and parsing
-is a bit nicer in JavaScript than in Shell Script.
+[クライアント設定セクション](./setting-env#setup-node-repl)でノードコンソール/REPLを設定している場合は、以下を使用できます。
+契約を展開して実行します。 JSONの操作と構文解析が見つかると思います
+シェルスクリプトよりもJavaScriptの方が優れています。
 
-First, go to the cli directory and start up your console:
+まず、cliディレクトリに入り、コンソールを起動します。
 
-::: warning
-The command below is obsolete and updated soon.
+::: 暖かい
+次のコマンドは廃止され、まもなく更新されます。
 :::
 
 ```shell
@@ -114,8 +113,8 @@ Now, we make all the keys and initialize clients:
 const fredSeed = loadOrCreateMnemonic("fred.key");
 const {address: fredAddr, client: fredClient} = await connect(fredSeed, {});
 
-// bob doesn't have a client here as we will not
-// submit any tx with this account, just query balance
+//bob doesn't have a client here as we will not
+//submit any tx with this account, just query balance
 const bobSeed = loadOrCreateMnemonic("bob.key");
 const bobAddr = await mnemonicToAddress("muffin fix provide project obtain......", bobSeed);
 
@@ -130,29 +129,29 @@ Hit the faucet it needed for fred, so he has tokens to submit transactions:
 
 ```js
 fredClient.getAccount();
-// if "undefined", do the following
+//if "undefined", do the following
 hitFaucet(defaultFaucetUrl, fredAddr, "umayo")
 fredClient.getAccount();
 
 thiefClient.getAccount();
-// if "undefined", do the following
+//if "undefined", do the following
 hitFaucet(defaultFaucetUrl, thiefAddr, "umayo")
 thiefClient.getAccount();
 
-// check bobAddr has no funds
+//check bobAddr has no funds
 fredClient.getAccount(bobAddr);
 
-// get the working directory (needed later)
+//get the working directory (needed later)
 process.cwd()
 ```
 
-### Uploading with JS
+### JSを使用してアップロード
 
-Now, we go back to the Node console and upload the contract and instantiate it:
+それでは、ノードコンソールに戻り、コントラクトをアップロードしてインスタンス化します。
 
 ```js
 const wasm = fs.readFileSync('contract.wasm');
-// you can add extra information to contract details such as source and builder.
+//you can add extra information to contract details such as source and builder.
 const up = await fredClient.upload(wasm, { source: "https://crates.io/api/v1/crates/cw-escrow/0.10.0/download", builder: "cosmwasm/rust-optimizer:0.10.7"});
 
 console.log(up);
@@ -161,33 +160,33 @@ const { codeId } = up;
 const initMsg = {arbiter: fredAddr, recipient: bobAddr};
 const { contractAddress } = await fredClient.instantiate(codeId, initMsg, "Escrow 1", { memo: "memo", transferAmount: [{denom: "umayo", amount: "50000"}]});
 
-// check the contract is set up properly
+//check the contract is set up properly
 console.log(contractAddress);
 fredClient.getContract(contractAddress);
 fredClient.getAccount(contractAddress);
 
-// make a raw query - key length prefixed "config"
+//make a raw query - key length prefixed "config"
 const key = new Uint8Array([0, 6, ...toAscii("config")]);
 const raw = await fredClient.queryContractRaw(contractAddress, key);
 JSON.parse(fromUtf8(raw))
-// note the addresses are stored in base64 internally, not bech32, but the data is there... this is why we often implement smart queries on real contracts
+//note the addresses are stored in base64 internally, not bech32, but the data is there... this is why we often implement smart queries on real contracts
 ```
 
-### Executing Contract with JS
+### JSとの契約を締結する
 
-Once we have properly configured the contract, let's show how to use it, both the proper "approve"
-command:
+契約を適切に構成したら、それを使用して正しく「承認」する方法を示しましょう。
+注文:
 
 ```js
 const approve = {approve: {quantity: [{amount: "50000", denom: "umayo"}]}};
 
-// thief cannot approve
+//thief cannot approve
 thiefClient.execute(contractAddress, approve)
 
-// but fred can (and moves money to bob)
+//but fred can (and moves money to bob)
 fredClient.execute(contractAddress, approve);
-// verify bob got the tokens
+//verify bob got the tokens
 fredClient.getAccount(bobAddr);
-// verify contract lost
+//verify contract lost
 fredClient.getAccount(contractAddress);
 ```

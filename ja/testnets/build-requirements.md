@@ -1,28 +1,23 @@
-# Build Requirements
+# インストール
 
-For minimum system requirements instances with 2 processor CPU and 4GB memory is recommended.
-Building code may require larger instances, especially if you want to build a static instance (recompile Rust code).
+ノード実行可能ファイルは、ネットワークによって異なる場合があります。[オプション1](#option-1-preferred-build-static-binary-using-docker-linux-only)
+古くなっている可能性があります。ネットワークの詳細、構成、および情報は、[CosmWasm/testnets](https://github.com/CosmWasm/testnets)にあります。ノードの設定を開始する前に、リポジトリに移動して探索してください。
 
-# Installation
+## 最も簡単
 
-Node executable may vary between networks, and [Option 1](#option-1-preferred-build-static-binary-using-docker-linux-only)
-might become obsolete. Network details, configuration and informations can be found on [CosmWasm/testnets](https://github.com/CosmWasm/testnets). Please head over to the repo and explore before starting setting up a node.
+Dockerイメージを使用するか、ローカルでビルドします: `https://github.com/CosmWasm/wasmd/#dockerized`。
 
-## Simplest
+## ベアメタル
 
-Use docker image, or build locally: `https://github.com/CosmWasm/wasmd/#dockerized`.
+### オプション1(推奨-dockerを使用して静的バイナリを構築する-Linuxのみ)
 
-## Bare Metal
+`wasmd`のビルドは、ビルド環境としてAlpine Linuxを使用し、Rustの依存関係を静的ライブラリに再コンパイルするというトリッキーなプロセスです。
+Dockerfileを使用することをお勧めします。
 
-### Option 1 (preferred - build static binary using docker - Linux only)
-
-Constructing a `wasmd` is a tricky process and involves using Alpine Linux as a build environment and recompiling the Rust dependencies as static libs.
-Using Dockerfile is suggested.
-
-1. Clone the project `git clone https://github.com/CosmWasm/wasmd.git && cd wasmd`
-2. Checkout to testnets version `git checkout vx.x.x`
-3. Build docker image `docker build . -t wasmd-docker`
-4. Extract the specific binaries from build environment:
+1.プロジェクトのクローンを作成します `git clone https://github.com/CosmWasm/wasmd.git && cd wasmd`
+2.テストネットバージョン `git checkoutvx.x.x`へのチェックアウト
+3.dockerイメージ `docker build .-twasmd-docker`をビルドします
+4.ビルド環境から特定のバイナリファイルを抽出します。
 
    ```shell
    id=$(docker create wasmd-docker)
@@ -30,11 +25,11 @@ Using Dockerfile is suggested.
    docker rm -v $id
    ```
 
-5. Use the static binaries on any bare metal Linux box
+5.ベアメタルLinuxマシンで静的バイナリを使用する
 
-### Option 2: (dev-style: dynamic binary - works on Linux and OSX)
+### オプション2 :(開発スタイル:動的バイナリファイル-LinuxおよびOSX用)
 
-1. `git clone https://github.com/CosmWasm/wasmd.git && cd wasmd`
-2. Checkout to testnets version `git checkout vx.x.x`
-3. Compile dev build: `make build`
-4. Move to binary to desired location
+1.`git clone https://github.com/CosmWasm/wasmd.git && cd wasmd`
+2.テストネットバージョン `git checkoutvx.x.x`へのチェックアウト
+3.開発ビルドをコンパイルします: `make build`
+4.バイナリに移動して目的の位置に移動します

@@ -1,19 +1,19 @@
-# Advanced REPL tips
+# 高度なREPLスキル
 
-::: danger
-You must read [cw20 tutorial](../cw20/03-cw20-base-tutorial.md) first. This section builds on
-top of it.
+::: 危険
+最初に[cw20チュートリアル](../cw20/03-cw20-base-tutorial.md)を読む必要があります。 このセクションは上に構築されています
+最も重要な。
 :::
 
-You got your hands dirty with Node REPL. Now let's dig in a bit deeper of some
-advanced functions you can use.
+Node REPLを使用して、手を汚します。 では、もう少し深く掘り下げましょう
+使用できる高度な機能。
 
-## Interactive Discovery
+## インタラクティブディスカバリー
 
-So far you have been cut-and-pasting commands in the tutorials when using
-node repl. But what else can you do with this contract? Luckily Javascript
-has some nice introspection. And, we added some extra bonuses there. Just type
-`mine` in the REPL and see the list of methods:
+これまでのところ、チュートリアルでコマンドを切り取って貼り付けたのは、
+ノードレプリケーションしかし、この契約で他に何ができるでしょうか？ 幸いなことにJavascript
+いくつかの良い内省があります。 そして、そこにいくつかの追加の報酬を追加しました。 入力するだけ
+REPLで `mine`を実行し、メソッドリストを表示します。
 
 ```
 >> mine
@@ -30,13 +30,13 @@ has some nice introspection. And, we added some extra bonuses there. Just type
   transferFrom: [AsyncFunction: transferFrom] }
 ```
 
-But how do I call them? What arguments do they take?
-You can always go look up the
-[original helper file on the web](https://github.com/CosmWasm/cosmwasm-plus/blob/master/contracts/cw20-base/helpers.ts#L151-L167)
-and see all the types defined there.
+しかし、どうすればそれらを呼び出すことができますか？ 彼らはどのような議論をしますか？
+いつでも確認できます
+[ネットワークの元のヘルプファイル](https://github.com/CosmWasm/cosmwasm-plus/blob/master/contracts/cw20-base/helpers.ts#L151-L167)
+そして、そこで定義されているすべてのタイプを見てください。
 
-But why switch to a browser and get distracted by something else?
-There is a great `.type` operator to show you this without ever leaving the REPL:
+しかし、なぜブラウザに切り替えて他のことに気を取られるのでしょうか。
+REPLを離れることなくこれを表示できる優れた `.type`演算子があります。
 
 ```
 >> const _i = mine.increaseAllowance
@@ -60,7 +60,7 @@ const mine: CW20Instance
 const mine: CW20Instance
 ```
 
-Armed with that knowledge, let's try to add an allowance and query it:
+この知識を身につけて、手当を追加してクエリを実行してみましょう
 
 ```js
 mine.increaseAllowance(other, "5000")
@@ -82,30 +82,30 @@ for yourself:
 ```js
 const { setup } = useOptions(hackatomOptions);
 .type setup
-// this gives:
+//this gives:
 const setup: (password: string, filename?: string) => Promise<SigningCosmWasmClient>
 ```
 
-Yup... it takes a second argument. You don't HAVE to store your keys in `~/.coral.key`. That's just
-a default. It also means we could make 2 clients using different key files.
+はい... 2番目のパラメータが必要です。 キーを `〜/.coral.key`に保存する必要はありません。 それだけです
+デフォルト。 これは、異なるキーファイルを使用して2つのクライアントを作成できることも意味します。
 
 ```js
 const client = await setup(YOUR_PASSWORD_HERE)
 const partner = await setup(OTHER_PASSWORD, "/home/user/.test2.key")
 
-// let's make sure they are unique
+//let's make sure they are unique
 client.getAccount()
 partner.getAccount()
 
-// and move some tokens around
+//and move some tokens around
 partner.sendTokens(client.senderAddress, [ { denom: 'ucosm', amount: '200000' }])
 
 client.getAccount()
 partner.getAccount()
 ```
 
-This let's us then try more complex use cases with the CW20 contract.
-Sending back and forth, `transferFrom`, `burnFrom`, etc
+これにより、CW20コントラクトを使用してより複雑なユースケースを試すことができます。
+`transferFrom`、` burnFrom`などを行ったり来たりします。
 
-That's enough hints from me.
-Time for you to go play with the contract on your own...
+私からのヒントで十分です。
+自分で契約を結ぶ時が来ました...

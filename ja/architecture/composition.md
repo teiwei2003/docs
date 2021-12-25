@@ -1,143 +1,143 @@
-# Contract Composition
+# 契約構成
 
-Given the [Actor model](./actor) of dispatching messages, and [synchronous queries](./query) implemented in CosmWasm v0.8, we have all the raw components
-to enable arbitrary composition of contracts with both other contracts and native modules. Here we will explain how the components fit together and how they can be extended.
+メッセージを送信する[Actormodel](./actor)と、CosmWasm v0.8に実装されている[synchronous query](./query)を考えると、元のコンポーネントはすべて揃っています。
+他のコントラクトおよびネイティブモジュールとのコントラクトの任意の組み合わせが可能です。ここでは、これらのコンポーネントをどのように組み合わせるか、およびそれらを拡張する方法について説明します。
 
-**Note** The text below applies to CosmWasm 0.8, release May 25, 2020. Please upgrade if you wish to take advantage of the power of composition.
+**注**次のテキストは、2020年5月25日にリリースされたCosmWasm0.8に適用されます。組み合わせの力を使いたい場合は、アップグレードしてください。
 
-## Terminology
+## 用語
 
-For the remainder of this article, I will make a key distinction between "Contracts" and "Native Modules". "Contracts" are CosmWasm code that is
-dynamically uploaded to the blockchain at a given address. This can be added after the fact and is not tied to any runtime implementation.
-"Native Modules" are basically Go Cosmos SDK modules, which are compiled into the blockchain binary. These are relatively static (requiring a
-soft or hard fork to be added or modified) and will differ between different blockchains running CosmWasm.
+この記事の残りの部分では、「コントラクト」と「ネイティブモジュール」を大きく区別します。 「コントラクト」はCosmWasmコードであり、
+特定のアドレスのブロックチェーンへの動的アップロード。これは事後に追加でき、ランタイム実装とは何の関係もありません。
+「ネイティブモジュール」は基本的にGoCosmos SDKモジュールであり、ブロックチェーンバイナリファイルにコンパイルされます。これらは比較的静的です(
+追加または変更されるソフトフォークまたはハードフォーク)であり、CosmWasmを実行している異なるブロックチェーン間で異なります。
 
-We support composition between both types, but we must look more deeply at the integration with "Native Modules", as using those can
-cause [Portability](#portability) issues. To minimize this issue, we provide some abstractions around "Modules"
+2つのタイプの組み合わせをサポートしますが、「ネイティブモジュール」を使用すると、それらを使用できるため、より深く統合を検討する必要があります。
+[portability](#portability)の問題が発生します。この問題を最小限に抑えるために、「モジュール」に関するいくつかの抽象化を提供します
 
-## Messages
+## 情報
 
-Both `init` and `handle` can return an arbitrary number of
+`init`と` handle`はどちらも、任意の数を返すことができます
 [`CosmosMsg`](https://github.com/CosmWasm/cosmwasm/blob/08717b4c589bbfe59f44bb8cccffb08f63696413/packages/std/src/init_handle.rs#L11-L31)
-objects, which will be re-dispatched in the same transaction (thus providing atomic success/rollback with the contract execution).
-There are 3 classes of messages:
+同じトランザクションで再スケジュールされるオブジェクト(したがって、コントラクト実行のアトミックな成功/ロールバックを提供します)。
+メッセージには次の3種類があります。
 
-* `Contract` - This will call a given contract address with a given message (provided in serialized form). It assumes the caller has access to the API format.
-* [Module interfaces](#modules) - These are standardized interfaces that can be supported by any chain to expose native modules under a *portable* interface.
-* [`Custom`](#customization) - This encapsulates a chain-dependent extension to the message types to call into custom native modules. Ideally they should be *immutable* on the same chain over time, but they make no portability guarantees.
+* `Contract`-これは、指定されたメッセージ(シリアル化された形式で提供)を使用して、指定された契約アドレスを呼び出します。呼び出し元がAPI形式にアクセスできることを前提としています。
+* [モジュールインターフェイス](#modules)-これらは、*ポータブル*インターフェイスでネイティブモジュールを公開するためにチェーンがサポートできる標準化されたインターフェイスです。
+* [`Custom`](#customization)-これは、カスタムネイティブモジュールを呼び出すためのメッセージタイプの依存関係チェーンの拡張をカプセル化します。理想的には、それらは時間の経過とともに同じチェーン上で*不変*である必要がありますが、移植性の保証は提供されません。
 
-## Queries
+## お問い合わせ
 
-As of CosmWasm v0.8, we now allow the contracts to make synchronous *read-only* queries to the surrounding runtime.
-As with [Messages](#messages), we have three fundamental types:
+CosmWasm v0.8以降、コントラクトが*読み取り専用*クエリを周囲のランタイムに同期できるようになりました。
+[メッセージ](#messages)と同様に、3つの基本的なタイプがあります。
 
-* `Contract` - This will query a given contract address with a given message (provided in serialized form). It assumes the caller has access to the API format.
-* [Module interfaces](#modules) - These are standardized interfaces that can be supported by any chain to expose native modules under a *portable* interface.
-* [`Custom`](#customization) - This encapsulates a chain-dependent extension to to query custom native modules. Ideally they should be *immutable* on the same chain over time, but they make no portability guarantees.
+* `Contract`-これは、指定されたメッセージ(シリアル化された形式で提供)を使用して、指定された契約アドレスを照会します。呼び出し元がAPI形式にアクセスできることを前提としています。
+* [モジュールインターフェイス](#modules)-これらは、*ポータブル*インターフェイスでネイティブモジュールを公開するためにチェーンがサポートできる標準化されたインターフェイスです。
+* [`Custom`](#customization)-これは、カスタムネイティブモジュールをクエリするための依存関係チェーンの拡張をカプセル化します。理想的には、それらは時間の経過とともに同じチェーン上で*不変*である必要がありますが、移植性の保証は提供されません。
 
-Cross-Contract queries take the address of the contract and a serialized `QueryMsg` in the contract-specific format, and synchronously get
-a binary serialized return value in the contract-specific format. It is up to the calling contract to understand the appropriate formats.
-In order to simplify this, we can provide some contract-specific type-safe wrappers, much in the way we provide a simple
+契約アドレスと契約固有の形式のシリアル化された `QueryMsg`を取得し、同期的に取得するための相互契約クエリ
+コントラクト固有の形式のバイナリシリアル化された戻り値。適切なフォーマットを理解するのは、呼び出し側の契約次第です。
+これを単純化するために、単純なものを提供するのと同じように、いくつかのコントラクト固有のタイプセーフラッパーを提供できます。
 [`query_balance`](https://github.com/CosmWasm/cosmwasm/blob/08717b4c589bbfe59f44bb8cccffb08f63696413/packages/std/src/traits.rs#L95-L105)
-method as a wrapper around the `query` implementation provided by the Trait.
+このメソッドは、Traitによって提供される `query`の実装のラッパーとして機能します。
 
-## Modules
+## モジュール
 
-In order to enable better integrations with the native blockchain, we are providing a set of standardized module interfaces
-that should work consistently among all CosmWasm chain. The most basic one
-is to the `Bank` module, which provides access to the underlying native tokens. This gives us `BankMsg::Send` as well as
-`BankQuery::Balance` and `BankQuery::AllBalances` to check balances and move tokens.
+ネイティブブロックチェーンとの統合を強化するために、標準化されたモジュールインターフェイスのセットを提供します
+これは、すべてのCosmWasmチェーンで一貫して機能するはずです。最も基本的なもの
+基盤となるネイティブトークンへのアクセスを提供する `Bank`モジュールへのアクセスです。これにより、 `BankMsg :: Send`と
+残高とモバイルトークンをチェックするための `BankQuery :: Balance`と` BankQuery :: AllBalances`。
 
-The second standardized module is `staking`, which provides some standardized messages for `Delegate`, `Undelegate`,
-`Redelegate` and `Withdraw`, as well as querying `Validators` and `Delegations`. These interfaces are designed to support
-most PoS systems and able to be supported on any PoS system, not just with the current staking module of the Cosmos SDK.
-(So, if you fork that for your chain, the contracts should still work).
+2番目の標準化されたモジュールは `stakeing`で、これは` Delegate`、 `Undelegate`、
+`Redelegate`と` Withdraw`、そして `Validators`と` Delegations`をクエリします。これらのインターフェースは、
+ほとんどのPoSシステムは、Cosmos SDKの現在のステーキングモジュールだけでなく、任意のPoSシステムでサポートできます。
+(したがって、チェーンをフォークした場合でも、契約は有効であるはずです)。
 
-This provides a clean design, where one can develop a contract that eg. issues staking derivatives using the `staking` module interface,
-and have confidence that that same contract will run on two different blockchains, even if they are both heavily customized and one is
-on Cosmos SDK 0.38 and the other on Cosmos SDK 0.39 (with many breaking changes). The downside here is that every module interface must
-be added to all layers of the stack, which provides some delay to supporting custom features, and we cannot easily add support for every custom
-module in every Cosmos SDK-based blockchain.
+これにより、たとえば契約を作成できるクリーンな設計が提供されます。 「ステーキング」モジュールインターフェースを使用して、ステーキングデリバティブ商品をリリースします。
+また、同じ契約が2つの異なるブロックチェーンで実行されると考えてください。両方とも高度にカスタマイズされており、一方が
+Cosmos SDK 0.38では、もう1つはCosmos SDK 0.39にあります(多くの重大な変更があります)。ここでの欠点は、すべてのモジュールインターフェイスが
+スタックのすべてのレイヤーに追加されます。これにより、カスタム機能をサポートするための遅延が発生します。各カスタマイズのサポートを簡単に追加することはできません。
+CosmosSDKに基づくブロックチェーンの各モジュール。
 
-That said, we highly recommend using the module interface when possible, and using [custom types](#customization) as a temporary measure
-to keep a fast release cycle. We are happy to work with projects with concrete use cases that can be re-used between many different chains
-to add new standardized module interfaces. Perhaps for governance, or for IBC/light client related features.
+つまり、モジュールインターフェイスを可能な限り使用し、一時的な手段として[custom type](#customization)を使用することを強くお勧めします。
+速いリリースサイクルを維持します。多くの異なるチェーンで再利用できる特定のユースケースのプロジェクトに喜んで取り組んでいます
+新しい標準化されたモジュールインターフェイスを追加します。おそらく、それはガバナンス、またはIBC/ライトクライアント関連の機能のためです。
 
-Note, that theoretically these module interfaces can also be implemented by contracts, not just native code.
-Eg. if we made a standard `swap` interface, and your blockchain has no native `swap` module, we could upload a UniSwap-inspired contract
-and register that somehow with the Go blockchain. Then the blockchain would know to take the swap message and dispatch it to this custom contract.
-(Note that this is not implemented at all, just an idea of future directions).
+理論的には、これらのモジュールインターフェイスは、ネイティブコードだけでなく、コントラクトを介して実装することもできることに注意してください。
+例えば。標準の「スワップ」インターフェースを作成し、ブロックチェーンにネイティブの「スワップ」モジュールがない場合は、UniSwapに触発されたコントラクトをアップロードできます。
+そして、どういうわけかGoブロックチェーンに登録します。次に、ブロックチェーンは交換メッセージを受信し、それをこのカスタムコントラクトに送信することを認識します。
+(これはまったく達成されていないことに注意してください、それは将来の方向性のアイデアにすぎません)。
 
-## Customization
+## カスタムメイド
 
-Many chains will want to allow contracts to execute with their custom go modules, without going through all the work to try to turn it into a standardized [Module Interface](#modules) and wait for a new CosmWasm release. For this case, we introduce the `Custom` variant on both `CosmosMsg` and `QueryRequest`.
-The idea here is that the contract can define the type to be include in the `Custom` variants, and it just needs to be agreed upon by the Cosmos SDK app
-(in Golang) on the other side. All the code between the contract and the blockchain codec treats it as opaque json bytes.
+多くのチェーンは、標準化された[モジュールインターフェイス](#modules)に変換して新しいCosmWasmバージョンを待つことなく、カスタムgoモジュールを使用してコントラクトを実行できるようにしたいと考えています。この状況のた​​めに、CosmosMsgとQueryRequestにカスタムバリアントを導入しました。
+ここでの考え方は、コントラクトが「カスタム」バリアントに含まれるタイプを定義でき、CosmosSDKアプリケーションが同意することだけを要求するということです。
+(Golangで)反対側。コントラクトとブロックチェーンコーデックの間のすべてのコードは、不透明なjsonバイトとして扱います。
 
-The demo "reflect" contract in the standard CosmWasm repo,
-[shows how to use `CustomMsg` and `CustomQuery`](https://github.com/CosmWasm/cosmwasm/blob/71f643f577184a23b2f1f122531c944f0de94c34/contracts/reflect/src/msg.rs#L30-L64). You can see how the contract [uses a `CustomQuery`](https://github.com/CosmWasm/cosmwasm/blob/master/contracts/reflect/src/contract.rs#L94-L101)
-to call out to some "runtime-provided" code. For unit tests, we can [mock out the runtime querier](https://github.com/CosmWasm/cosmwasm/blob/master/contracts/reflect/src/testing.rs#L20-L37), but in a deployed system, this should be provided by native Go code in your Cosmos SDK application.
+デモは、標準のCosmWasmリポジトリの契約を「反映」します。
+[`CustomMsg`と` CustomQuery`の使用方法を示します](https://github.com/CosmWasm/cosmwasm/blob/71f643f577184a23b2f1f122531c944f0de94c34/contracts/reflect/src/msg.rs6#L30)。契約が[`CustomQuery`を使用して]どのように行われるかを確認できます(https://github.com/CosmWasm/cosmwasm/blob/master/contracts/reflect/src/contract.rs#L94-L101)
+「実行時に提供される」コードを呼び出します。単体テストの場合、[ランタイムクエリャーをシミュレート](https://github.com/CosmWasm/cosmwasm/blob/master/contracts/reflect/src/testing.rs#L20-L37)できますが、システムにデプロイされています、これはCosmosSDKアプリケーションのネイティブGoコードによって提供される必要があります。
 
-Beyond trivial cases, we are working with Terra to expose their `swap`, `oracle` and `treasury` modules to CosmWasm contracts on their chains.
-These features need to be exposed in an immutable format that will work forever on their chain, but there is no need for portability.
-More interesting is the ability to quickly expose new features of their native modules to contracts on their chain. In fact, this concrete use
-case inspired all the refactoring to make sure custom messages and queries possible.
+些細な状況を除いて、Terraと協力して、 `swap`、` oracle`、および `treasury`モジュールをオンチェーンのCosmWasmコントラクトに公開しています。
+これらの関数は不変の形式で開示する必要があり、チェーン上で常に有効ですが、移植性は必須ではありません。
+さらに興味深いのは、ネイティブモジュールの新しい機能をチェーン上のコントラクトにすばやく公開する機能です。実際、この特定の使用法
+このケースは、カスタムメッセージとクエリが可能であることを保証するためにすべてのリファクタリングに影響を与えました。
 
-## Design Considerations
+## 設計上の考慮事項
 
-In producing a solid design, we want the API to fulfill all these requirements (or strike a good balance if truly impossible to achieve them all):
+信頼性の高い設計を作成する場合、APIがこれらすべての要件を満たすことを望んでいます(または、これらすべての要件を達成することが本当に不可能な場合は、バランスをとってください)。
 
-### Portability
+### 移植性
 
-The same contract should run on two distinct blockchains, with differing Golang modules, different versions of the Cosmos SDK, or ideally, even
-based on different frameworks (eg. running on Substrate). This should be possible when avoiding `Custom` messages, and checking the optional features one uses.
-The features are currently `staking`, which assumes a PoS system, and `iterator`, which assumes we can do prefix scans over the storage (ie. it is a Merkle **Tree**, not a Merkle **Trie**).
+同じコントラクトは、異なるGolangモジュール、異なるバージョンのCosmos SDKを使用して、2つの異なるブロックチェーンで実行する必要があります。理想的には、
+さまざまなフレームワークに基づいています(たとえば、Substrateで実行されています)。これは、「カスタム」メッセージを回避し、使用されているオプション機能を確認するときに可能になるはずです。
+現在の関数は、PoSシステムを想定した `stakeing`と、ストレージでプレフィックススキャンを実行できることを前提とした` iterator`です(つまり、Merkle ** Trie *ではなくMerkle ** Tree **です。 *)。
 
-### Immutability
+### 不変性
 
-Contracts are immutable and encode the query and message formats in their bytecode. If we allowed dispatching `sdk.Msg` in the native format
-(be it json, amino or protobuf), and the format of native messages change, then the contracts would break.
-This may mean that a staking module could never undelegate the tokens. If you think this is a theoretical issue, please note that every major
-update of the Cosmos SDK has produced such breaking changes and has migrations for them. Migrations that cannot be performed on immutable contracts.
-Thus, we need to ensure that our design provides an immutable API to a potentially mutable runtime, which is a primary design criteria when
-designing the standard [module interfaces](#modules).
+コントラクトは不変であり、クエリとメッセージの形式をバイトコードにエンコードします。ネイティブ形式での `sdk.Msg`の送信を許可する場合
+(json、amino、protobufのいずれであっても)ローカルメッセージの形式が変更されると、コントラクトは中断されます。
+これは、誓約モジュールがトークンを廃止できないことを意味する場合があります。これが理論的な質問だと思われる場合は、各専攻に注意してください。
+Cosmos SDKのアップデートにより、このような重要な変更が行われ、移行されました。不変の契約では実行できない移行。
+したがって、主要な設計基準である潜在的に可変のランタイムに対して、設計が不変のAPIを提供することを確認する必要があります。
+設計基準[モジュールインターフェース](#modules)。
 
-### Extensibility
+### スケーラビリティ
 
-We should be able to add new interfaces to a contract and blockchain without needing to update any of the intermediate layers. That is,
-if you are building a custom `superd` blockchain app, which imports `x/wasm` from `wasmd`, and want to develop contracts on it that
-call into your custom `superd` modules, then in an ideal world, you could add those message types to an additional `cw-superd` library
-that you can import in your contracts and add the callbacks to them in `superd` Go code. *Without any changes* in `cosmwasm-std`, `cosmwasm-vm`,
-`go-cosmwasm`, or `wasmd` repositories (which have a different release cycle than your app).
+中間層を更新せずに、コントラクトとブロックチェーンに新しいインターフェイスを追加できるはずです。あれは、
+カスタムの `superd`ブロックチェーンアプリケーションを構築している場合は、` wasmd`から `x/wasm`をインポートし、その上でコントラクトを開発する必要があります
+カスタムの `superd`モジュールを呼び出すと、理想的には、これらのメッセージタイプを追加の` cw-superd`ライブラリに追加できます。
+それらをコントラクトにインポートし、 `superd`Goコードでそれらにコールバックを追加できます。 * `cosmwasm-std`、` cosmwasm-vm`、
+`go-cosmwasm`または` wasmd`リポジトリ(アプリケーションとはリリースサイクルが異なります)。
 
-We provide the [`Custom`](#customization) variants to `CosmosMsg` and `QueryRequest` to enable such cases. They can provide immutability but not
-portability.
+この状況を有効にするために、 `CosmosMsg`および` QueryRequest`の[`Custom`](#customization)のバリアントを提供します。それらは不変性を提供できますが、できません
+移植性。
 
-## Usability
+## 可用性
 
-We also want to make it not just secure and *possible* to compose contracts into a larger whole, but make it simple from the developer's perspective.
-This applies to both the contract authors, as well as the blockchain developers integrating CosmWasm into their custom blockchain.
-And we want to make it easy to build client side applications using the contracts.
+また、契約の組み合わせを、安全で*可能*であるだけでなく、開発者の観点からも単純なものにしたいと考えています。
+これは、CosmWasmをカスタムブロックチェーンに統合する契約作成者およびブロックチェーン開発者に適用されます。
+コントラクトを使用して、クライアントアプリケーションを簡単に構築したいと考えています。
 
-We are using JSON encoding for the CosmWasm messages to make this simple and export [JSON schemas](https://github.com/CosmWasm/cosmwasm-examples/tree/master/erc20/schema) for every contract to allow auto-generation of client-side codecs. We also provide [CosmJS](https://github.com/CosmWasm/cosmjs)
-as a easy-to-use TypeScript client library allowing access to all contracts (and bank module) on a CosmWasm-based chain.
+このプロセスを簡素化するためにCosmWasmメッセージにJSONエンコーディングを使用し、契約ごとに[JSON Schema](https://github.com/CosmWasm/cosmwasm-examples/tree/master/erc20/schema)をエクスポートして、顧客の自動生成を可能にしますコーデックを終了します。 [CosmJS](https://github.com/CosmWasm/cosmjs)も提供しています
+使いやすいTypeScriptクライアントライブラリとして、CosmWasmベースのチェーン上のすべてのコントラクト(およびバンキングモジュール)にアクセスできます。
 
-### Checking for Support
+### サポートを確認する
 
-If we want to call some extensions, say to the `Staking` modules, we can compile our contract to handle that. But how do we detect if the blockchain
-can support it? We want to fail on upload or instantiation of a contract, and not discover some key functionality doesn't work on this chain,
-when there is value stored in the contract.
+「ステーキング」モジュールなどの一部の拡張機能を呼び出したい場合は、それを処理するためにコントラクトをコンパイルできます。しかし、どのようにしてブロックチェーンを検出しますか
+あなたはそれをサポートできますか？コントラクトをアップロードまたはインスタンス化するときに失敗することを望んでおり、特定の主要な機能がこのチェーンで機能しないことはわかりません。
+値が契約に保存されている場合。
 
-The design decision was to you use feature flags, exposed as wasm export functions, to configure which extra features are required by the contract.
-This lets the host chain inspect compatibility before allowing an upload. To do so, we make some "ghost" exports like
-`requires_staking()` or `requires_terra()`. This would only pass compatibility check if the runtime also exposed such features.
-When instantiating `x/wasm.NewKeeper()` you can specify which features are supported.
+設計上の決定は、wasmエクスポート機能として公開されている機能フラグを使用して、コントラクトに必要な追加機能を構成することです。
+これにより、メインチェーンはアップロードを許可する前に互換性を確認できます。この目的のために、次のようないくつかの「ゴースト」エクスポートを実行しました。
+`requires_staking()`または `requires_terra()`。これらの機能が実行時にも公開されている場合、これは互換性チェックにのみ合格します。
+`x/wasm.NewKeeper()`をインスタンス化するときに、サポートされる関数を指定できます。
 
-### Type-Safe Wrappers
+### タイプセーフラッパー
 
-When querying or calling into other contracts, we give up all the type-checks we get with native module interfaces.
-They require the caller to know the details of the caller. This is the same as Ethereum. However, we can provide some "interface"
-wrappers that a contract could export, such that other contracts can easily call into it.
+他のコントラクトを照会または呼び出すときに、ネイティブモジュールインターフェイスを使用して取得したすべての型チェックを放棄しました。
+彼らは発信者に発信者の詳細を知るように頼みます。これはイーサリアムと同じです。ただし、いくつかの「インターフェース」を提供することはできます
+他のコントラクトが簡単に呼び出すことができるように、コントラクトがエクスポートできるラッパー。
 
 For example:
 
@@ -145,17 +145,17 @@ For example:
 pub struct NameService(CanonicalAddr);
 
 impl NameService {
-    pub fn query_name(deps: &Extern, name: &str) -> CanonicalAddr { /* .. */ }
-    pub fn register(api: &Api, name: &str) -> CosmosMsg { /* .. */ }
+    pub fn query_name(deps: &Extern, name: &str) -> CanonicalAddr {/* .. */}
+    pub fn register(api: &Api, name: &str) -> CosmosMsg {/* .. */}
 }
 ```
 
-Rather than storing just the `CanonicalAddr` of the other contract in our configuration, we could store `NameService`, which is
-a zero-cost ["newtype"](https://doc.rust-lang.org/stable/rust-by-example/generics/new_types.html)
-over the original address, with the same serialization format. However, it would provide us
-some type-safe helpers to make queries against the contract, as well as produce `CosmosMsg` for registration.
+別のコントラクトのCanonicalAddrのみを構成に保存する代わりに、NameServiceを保存することもできます。
+ゼロコスト["newtype"](https://doc.rust-lang.org/stable/rust-by-example/generics/new_types.html)
+元のアドレスの上では、同じシリアル化形式になっています。 しかし、それは私たちに提供します
+契約を照会し、登録用の `CosmosMsg`を生成するタイプセーフアシスタント。
 
-Note that these type-safe wrappers are not tied to an *implementation* of a contract, but rather the contract's *interface*.
-Thus, we could create a small library with a list of standard/popular interfaces (like the ERCxxx specs) represented with such
-"newtypes". A contract creator could import one of these wrappers and then easily call the contract, regardless of implementation,
-as long as it supported the proper interface
+これらのタイプセーフラッパーは、コントラクトの*実装*とは関係ありませんが、コントラクトの*インターフェース*に関連していることに注意してください。
+したがって、このクラスで表される一連の標準/人気のあるインターフェイス(ERCxxx仕様など)を含む小さなライブラリを作成できます。
+"新しいタイプ"。 コントラクトの作成者は、これらのラッパーの1つをインポートして、実装に関係なく、コントラクトを簡単に呼び出すことができます。
+正しいインターフェースをサポートしている限り

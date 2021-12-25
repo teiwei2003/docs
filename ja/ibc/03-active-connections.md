@@ -1,3 +1,3 @@
-# Active IBC connections
+# アクティブなIBC接続
 
-Here is the list of active IBC connections that you can use to test applications. Contact us for adding new channels.
+以下は、アプリケーションのテストに使用できるアクティブなIBC接続のリストです。 新しいチャンネルを追加するには、お問い合わせください。

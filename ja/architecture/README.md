@@ -1,116 +1,116 @@
-## Comparison with Solidity Contracts
+## Solidity契約との比較
 
-First of all, the deploy-execute process consists of 3 steps rather than 2. While Ethereum was built around the concept of many unique contracts, each possibly custom-made for any bilateral agreement, the reality seems to show that writing a bug-free contract is harder than originally thought, and a majority are copies of standard templates like OpenZepellin. With that in mind, and conscious of the overhead of uploading and validating wasm code, we define the following 3 phases of a contract:
+まず、展開-実行プロセスは、2つのステップではなく3つのステップで構成されます。イーサリアムは多くのユニークな契約の概念に基づいて構築されていますが、各契約は任意の二国間契約に合わせてカスタマイズできますが、現実には、エラーなしで契約を書くことは当初考えられていたよりも難しく、それらのほとんどは標準です。 OpenZepellinなどのテンプレート。これを念頭に置き、wasmコードのアップロードと検証のオーバーヘッドを認識して、契約の次の3つのフェーズを定義しました。
 
-* Upload Code - Upload some optimized wasm code, no state nor contract address (example Standard ERC20 contract)
-* Instantiate Contract - Instantiate a code reference with some initial state, creates new address (example set token name, max issuance, etc for *my* ERC20 token)
-* Execute Contract - This may support many different calls, but they are all unprivileged usage of a previously instantiated contract, depends on the contract design (example: Send ERC20 token, grant approval to other contract)
+*コードのアップロード-州と契約アドレスのない最適化されたwasmコードをアップロードします(例:標準のERC20契約)
+*コントラクトをインスタンス化します-初期状態を使用してコード参照をインスタンス化し、新しいアドレスを作成します(たとえば、* my * ERC20トークンのトークン名、最大発行量などを設定します)。
+*実行コントラクト-これは多くの異なる呼び出しをサポートする可能性がありますが、コントラクトの設計に応じて、以前にインスタンス化されたコントラクトの非特権的な使用です(たとえば、ERC20トークンの送信、他のコントラクトの承認の付与)
 
-Just like ethereum, contract instantiation and execution is metered and requires gas. Furthermore, both instantiation and execution allow the signer to send some tokens to the contract along with the message. Two key differences are that sending tokens directly to a contract, eg. via `SendMsg`, while possible, *does not trigger any contract code*. This is a clear design decision to reduce possible attack vectors. It doesn't make anything impossible,  but requires all execution of the contract to be *explicitly requested*.
+イーサリアムと同様に、契約のインスタンス化と実行は計測され、ガスが必要です。さらに、インスタンス化と実行の両方により、署名者はメッセージと一緒にいくつかのトークンをコントラクトに送信できます。たとえば、2つの主な違いは、トークンをコントラクトに直接送信することです。 `SendMsg`を使用すると、可能ではありますが、*コントラクトコードはトリガーされません*。これは、考えられる攻撃ベクトルを減らすことができる明確な設計上の決定です。不可能なことは何もありませんが、すべての契約の履行が*明らかに必要*である必要があります。
 
-## Avoiding Reentrancy Attacks
+## 再突入攻撃を回避する
 
-Another big difference is that we avoid all reentrancy attacks by design. This point deserves an article by itself, but in short [a large class of exploits in Ethereum is based on this trick](https://consensys.github.io/smart-contract-best-practices/known_attacks/). The idea is that in the middle of execution of a function on Contract A, it calls a second contract (explicitly or implicitly via send).  This transfers control to contract B, which can now execute code, and call into Contract A again.  Now there are two copies of Contract A running, and unless you are very, very careful about managing state before executing any remote contract or make very strict gas limits in sub-calls, this can trigger undefined behavior in Contract A, and a clever hacker can reentrancy this as a basis for exploits, such as the DAO hack.
+もう1つの大きな違いは、設計上、すべての再入可能な攻撃を回避することです。これは別の記事を書く価値がありますが、要するに[イーサリアムの脆弱性の大規模なクラスはこの手法に基づいています](https://consensys.github.io/smart-contract-best-practices/known_attacks/)。アイデアは、コントラクトAで関数を実行しているときに、2番目のコントラクトを(明示的または暗黙的に送信することによって)呼び出すというものです。これにより、制御がコントラクトBに移り、コントラクトBはコードを実行して、コントラクトAを再度呼び出すことができます。現在、2つのコントラクトAが実行されています。リモートコントラクトを実行する前に、状態を非常に注意深く管理するか、サブコールで非常に厳しいガス制限を設定しない限り、コントラクトAで未定義の動作がトリガーされる可能性があり、スマートハッカーはDAOハッキングなどのエクスプロイトの基礎としての再入国。
 
-Cosmwasm avoids this completely by preventing any contract from calling another one directly. Clearly we want to allow composition, but inline function calls to malicious code creates a security nightmare. The approach taken with CosmWasm is to allow any contract to *return* a list of messages *to be executed in the same transaction*. This means that a contract can request a send to happen after it is finished (eg. release escrow), or call into other contract. If the future messages fail, then the entire transaction reverts, including updates to the contract's state. This allows to atomic composition and quite a few security guarantees, with the only real downside that you cannot view the results of executing another contract, rather you can just do "revert on error".
+Cosmwasmは、契約が別の契約を直接呼び出すことを防ぐことにより、この状況を完全に回避します。明らかに、合成を許可したいのですが、悪意のあるコードへのインライン関数呼び出しは、セキュリティの悪夢を引き起こします。 CosmWasmで採用されている方法は、すべてのコントラクトがメッセージのリストを*同じトランザクションで*実行*できるようにすることです。これは、契約が完了後に配信を要求する(たとえば、エスクローを解放する)か、他の契約を呼び出すことができることを意味します。今後のメッセージが失敗した場合、契約ステータスの更新を含むトランザクション全体が再開されます。これにより、アトミックな組み合わせとかなりのセキュリティ保証が可能になります。唯一の本当の欠点は、別のコントラクトの実行結果を表示できず、「エラー回復」しか実行できないことです。
 
-Sometimes we will need information from another contract, and with the 0.8 release, we added synchronous queries to other contracts or underlying Cosmos SDK modules. These Queries only have access to a read-only database snapshot and be unable to modify state or send messages to other modules, thus avoiding any possible reentrancy concerns.
+別のコントラクトからの情報が必要になる場合があります。バージョン0.8では、他のコントラクトまたは基盤となるCosmosSDKモジュールに同期クエリを追加しました。これらのクエリは、読み取り専用のデータベーススナップショットにのみアクセスでき、状態を変更したり、他のモジュールにメッセージを送信したりできないため、再入可能性の問題を回避できます。
 
-## Resource Limits
+## リソース制限
 
-Beyond exploits (such as the reentrancy attack), another attack vector for smart contracts is denial of service attacks. A malicious actor could upload a contract that ran an infinite loop to halt the chain or write tons of data to fill up the disk. Web Assembly provides a tight sandbox with no default access to the OS, so we only need to worry about providing tight resource limits for the smart contracts. All developers should be aware of these limits.
+エクスプロイト(再突入攻撃など)に加えて、スマートコントラクトの別の攻撃ベクトルはサービス拒否攻撃です。悪意のある攻撃者は、無限ループを実行するコントラクトをアップロードしてチェーンを停止したり、ディスクをいっぱいにするために大量のデータを書き込んだりする可能性があります。 Web Assemblyは、オペレーティングシステムへのデフォルトアクセスのないタイトなサンドボックスを提供するため、スマートコントラクトに厳格なリソース制限を提供することだけを心配する必要があります。すべての開発者は、これらの制限に注意する必要があります。
 
-*Memory Usage* - When instantiating a Wasm VM, it is provided by 32MB of RAM by default. This is to store the byte code as well as all memory used by running the process (stack and heap). This should be plenty large for almost any contract, but maybe some complex zero knowledge circuits would hit limits there. It is also small enough to ensure that contracts have minimal impact of memory usage of the blockchain.
+*メモリ使用量* -WasmVMがインスタンス化されると、デフォルトで32MBのRAMによって提供されます。これは、実行中のプロセス(スタックとヒープ)によって使用されるバイトコードとすべてのメモリを格納するためのものです。ほとんどすべての契約では、これは十分な大きさである必要がありますが、一部の複雑なゼロ知識回路はそこで限界に達する可能性があります。また、コントラクトがブロックチェーンのメモリ使用量に与える影響を最小限に抑えるのに十分な大きさです。
 
-*CPU Usage* - The [Wasmer Runtime](https://github.com/wasmerio/wasmer) that we use, has ability to inject metering logic into the wasm code. It calculates prices for various operations and charges and checks limits before every jump statement (loop, function call, etc), to produce a deterministic gas price regardless of cpu speed, platform, etc. Before executing a contract, a wasm gas limit is set based on remaining Cosmos SDK gas, and gas deducted at the end of the contract (there is a constant multiplier to convert, currently 100 wasm gas to 1 sdk gas). This puts a hard limit on any CPU computations as you must pay for the cycles used.
+* CPU使用率*-[Wasmerランタイム](https://github.com/wasmerio/wasmer)を使用して、計測ロジックをwasmコードに挿入します。さまざまな操作と料金の価格を計算し、各ジャンプステートメント(ループ、関数呼び出しなど)の前に制限をチェックして、CPU速度、プラットフォームなどに関係なく、決定論的なガス価格を生成します。契約を実行する前に、残りのCosmos SDKガスに基づいてwasmガス制限が設定され、契約の終了時にガスが差し引かれます(現在、100wasmガスを1sdkガスに変換する定数乗数があります)。これにより、使用したサイクルの料金を支払う必要があるため、CPUの計算に厳しい制限が課せられます。
 
-*Disk Usage* - All disk access is via reads and writes on the KVStore. The Cosmos SDK already [enforces gas payments for KVStore access](https://github.com/cosmos/cosmos-sdk/blob/4ffabb65a5c07dbb7010da397535d10927d298c1/store/types/gas.go#L154-L162). Since all disk access in the contracts is made via callbacks into the SDK, this is charged there. If one were to integrate CosmWasm in another runtime, you would have to make sure to charge for access there as well.
+*ディスク使用量*-すべてのディスクアクセスは、KVStoreでの読み取りと書き込みによって行われます。 Cosmos SDKには[KVStoreアクセスの必須ガス支払い](https://github.com/cosmos/cosmos-sdk/blob/4ffabb65a5c07dbb7010da397535d10927d298c1/store/types/gas.go#L154-L162)があります。コントラクト内のすべてのディスクアクセスはSDKへのコールバックを介して行われるため、そこには料金がかかります。 CosmWasmを別のランタイムに統合する場合は、そこへのアクセスに対して課金されていることも確認する必要があります。
 
-## Lessons Learned from Ethereum
+## イーサリアムから学んだ教訓
 
-Ethereum is the grandfather of all blockchain smart contract platforms and has far more usage and real world experience than any other platform. We cannot discount this knowledge, but instead learn from their successes and failures to produce a more robust smart contract platform.
+イーサリアムは、すべてのブロックチェーンスマートコントラクトプラットフォームの祖父であり、他のどのプラットフォームよりも多くの使用法と実際の経験を持っています。この知識を過小評価することはできませんが、彼らの成功と失敗から学び、より強力なスマートコントラクトプラットフォームを作成します。
 
-They have compiled a list of [all known ethereum attack vectors](https://github.com/sigp/solidity-security-blog) along with mitigation strategies. We shall compare Cosmwasm against this list to see how much of this applies here. Many of these attack vectors are closed by design. A number remain and a section is planned on avoiding the remaining such issues.
+彼らは[すべての既知のイーサリアム攻撃ベクトル](https://github.com/sigp/solidity-security-blog)と緩和戦略のリストをまとめました。 Cosmwasmをこのリストと比較して、どれだけの数がこれに当てはまるかを確認します。これらの攻撃ベクトルの多くは、設計により閉じられています。まだいくつかの問題があり、そのような問題を残さないようにする計画があります。
 
-### :heavy_check_mark: [Reentrancy](https://github.com/sigp/solidity-security-blog#reentrancy)
+### :heavy_check_mark:[再入可能](https://github.com/sigp/solidity-security-blog#reentrancy)
 
-In cosmwasm, we return messages to execute other contracts, in the same atomic operation, but *after* the contract has finished. This is based on the actor model and avoid the possibility of reentrancy attacks - there is never volatile state when a contract is called.
+cosmwasmでは、他のコントラクトを実行するために同じアトミック操作でメッセージを返しますが、*コントラクトが完了した後です。これは参加者モデルに基づいており、リエントラント攻撃の可能性を回避します。コントラクトが呼び出されたときに不安定な状態になることはありません。
 
-### :heavy_check_mark: [Arithmetic under/overflows](https://github.com/sigp/solidity-security-blog#ouflow)
+### :heavy_check_mark:[算術アンダー/オーバーフロー](https://github.com/sigp/solidity-security-blog#ouflow)
 
-Rust allows you to simply set `overflow-checks = true` in the [Cargo manifest](https://doc.rust-lang.org/cargo/reference/manifest.html#the-profile-sections) to abort the program if any overflow is detected. No way to opt-out of safe math.
+Rustを使用すると、[貨物マニフェスト](https://doc.rust-lang.org/cargo/reference/manifest.html#the-profile-sections)で `overflow-checks = true`を設定するだけで、プログラムを中止できます。オーバーフローが検出されました。安全な数学をオプトアウトできません。
 
-### :warning: [Unexpected Ether](https://github.com/sigp/solidity-security-blog#ether)
+###:警告:[予期しないEther](https://github.com/sigp/solidity-security-blog#ether)
 
-**Bad design pattern**
+**悪いデザインパターン**
 
-This involves a contract depending on complete control of it's balance. A design pattern that should be avoided in any contract system. In CosmWasm, contracts are not called when tokens are sent to them, but they can query their current balance when they are called. You can note that the [sample escrow contract](https://github.com/CosmWasm/cosmwasm-examples/blob/escrow-0.4.0/escrow/src/contract.rs) doesn't record how much was sent to it during initialization, but rather [releases the current balance](https://github.com/CosmWasm/cosmwasm-examples/blob/escrow-0.4.0/escrow/src/contract.rs#L83-L92) when a paying out or refunding the amount. This ensures no tokens get stuck.
+これには、残高の完全な管理に依存する契約が含まれます。契約システムで避けるべきデザインパターン。 CosmWasmでは、トークンをコントラクトに送信するときにコントラクトは呼び出されませんが、呼び出されると、現在の残高を照会できます。 [サンプルホスティングコントラクト](https://github.com/CosmWasm/cosmwasm-examples/blob/escrow-0.4.0/escrow/src/contract.rs)の初期化中に、レコードが送信されなかったことがわかります。はい[現在の残高を解放します](https://github.com/CosmWasm/cosmwasm-examples/blob/escrow-0.4.0/escrow/src/contract.rs#L83-L92)金額を引き出すか払い戻します。これにより、トークンがスタックしなくなります。
 
-### :heavy_check_mark: [Delegate Call](https://github.com/sigp/solidity-security-blog#delegatecall)
+### :heavy_check_mark:[Delegate Call](https://github.com/sigp/solidity-security-blog#delegatecall)
 
-We don't have such Delegate Call logic in CosmWasm. You can import modules, but they are linked together at compile time, which allows them to be tested as a whole, and no subtle entry points inside of a contract's logic.
+CosmWasmにはそのようなデリゲート呼び出しロジックはありません。モジュールをインポートすることはできますが、コンパイル時に相互にリンクされるため、モジュール全体をテストでき、コントラクトロジックに微妙なエントリポイントはありません。
 
-### :heavy_check_mark: [Default Visibilities](https://github.com/sigp/solidity-security-blog#visibility)
+### :heavy_check_mark:[デフォルトの可視性](https://github.com/sigp/solidity-security-blog#visibility)
 
-Rather than auto-generating entry points for every function/method in your code (and worse yet, assuming public if not specified), the developer must clearly define a list of messages to be handled and dispatch them to the proper functions. It is impossible to accidentally expose a function this way.
+開発者は、コード内の各関数/メソッドのエントリポイントを自動的に生成するのではなく(さらに悪いことに、指定されていない場合はパブリックと見なされます)、処理するメッセージのリストを明確に定義して、適切な関数にディスパッチする必要があります。このように誤って関数を公開することは不可能です。
 
-### :warning: [Entropy Illusion](https://github.com/sigp/solidity-security-blog#entropy)
+### :警告:[エントロピーイリュージョン](https://github.com/sigp/solidity-security-blog#entropy)
 
-**Planned Fix**
+**計画された修正**
 
-The block hashes (and last digits of timestamps) are even more easily manipulated by block proposers in Tendermint, than with miners in Ethereum. They should definitely not be used for randomness. There is work planned to provide a secure random beacon, and expose this secure source of entropy to smart contracts.
+イーサリアムの鉱夫と比較して、テンダーミントのブロック提案者は、ブロックハッシュ(およびタイムスタンプの最後の桁)を操作するのが簡単です。それらはランダム性のために決して使用されるべきではありません。安全なランダムビーコンを提供し、この安全なエントロピーのソースをスマートコントラクトに公開する計画があります。
 
-### :heavy_check_mark: [External Contract Referencing](https://github.com/sigp/solidity-security-blog#contract-reference)
+### :heavy_check_mark:[外部契約リファレンス](https://github.com/sigp/solidity-security-blog#contract-reference)
 
-**Planned Mitigation**
+**計画の救済**
 
-If you call a contract with a given `HandleMsg`, this just requires the contract has the specified API, but says nothing of the code there. I could upload malicious code with the same API as a desired contract (or a superset of the API), and ask you to call it - either directly or from a contract. This can be used to steal funds, and in fact we [demo this in the tutorial](../learn/hijack-escrow/hack-contract.md).
+特定の `HandleMsg`を使用してコントラクトを呼び出す場合、コントラクトに必要なのは指定されたAPIのみですが、そこにはコードの説明はありません。必要なコントラクト(またはAPIのスーパーセット)と同じAPIを使用して悪意のあるコードをアップロードし、直接呼び出すか、コントラクトから呼び出すように依頼できます。これは資金を盗むために使用できます。実際、[チュートリアルで示されています](../learn/hijack-escrow/hack-contract.md)。
 
-There are two mitigations here. The first is that in CosmWasm, you don't need to call out to solidity libraries at runtime to deal with size limits, but are encouraged to link all the needed code into one wasm blob. This alone removes most usage of the external contract references.
+2つの緩和策があります。 1つ目は、CosmWasmでは、サイズ制限を処理するために実行時にSolidityライブラリを呼び出す必要はありませんが、必要なすべてのコードをwasmblobにリンクすることをお勧めします。これだけで、外部契約参照の使用のほとんどが排除されます。
 
-The other mitigation is allowing users to quickly find verified rust source behind the wasm contract on the chain. This approach is [used by etherscan](https://medium.com/coinmonks/how-to-verify-and-publish-on-etherscan-52cf25312945#bc72), where developers can publish the original source code, and it will compile the code. If the same bytecode is on chain, we know can prove it came from this rust source. We have built the deterministic build system for rust wasm, and
-have [simple tooling to validate the original source code](https://medium.com/confio/dont-trust-cosmwasm-verify-db1caac2d335).
-We also [released a code explorer](https://demonet.wasm.glass/codes) that allows you to browse contracts and locally
-verify the source code in one command.
+もう1つの緩和策は、ユーザーがチェーンのwasm契約の背後にある確認済みの錆の原因をすばやく見つけられるようにすることです。このメソッドは[etherscan](https://medium.com/coinmonks/how-to-verify-and-publish-on-etherscan-52cf25312945#bc72)で使用され、開発者は元のソースコードを公開できます。コンパイルされます。同じバイトコードがチェーン上にある場合、それがこの錆の発生源からのものであることを証明できることがわかります。さびワスムの決定論的ビルドシステムを構築しました。
+[元のソースコードを検証するための簡単なツール](https://medium.com/confio/dont-trust-cosmwasm-verify-db1caac2d335)を用意します。
+また、[コードブラウザをリリース](https://demonet.wasm.glass/codes)して、契約やローカルを閲覧できるようにしました
+1つのコマンドでソースコードを確認します。
 
-### :heavy_check_mark: [Short Address/Parameter Attack](https://github.com/sigp/solidity-security-blog#short-address)
+### :heavy_check_mark:[短いアドレス/パラメータ攻撃](https://github.com/sigp/solidity-security-blog#short-address)
 
-This is an exploit that takes advantage of the RLP encoding mechanism and fixed 32-byte stack size. It does not apply to our type-checking json parser.
+これは、RLPエンコーディングメカニズムと固定の32バイトスタックサイズを悪用する脆弱性です。タイプチェックのjsonパーサーには適用されません。
 
-### :heavy_check_mark: [Unchecked CALL Return Values](https://github.com/sigp/solidity-security-blog#unchecked-calls)
+### :heavy_check_mark:[チェックされていない呼び出しの戻り値](https://github.com/sigp/solidity-security-blog#unchecked-calls)
 
-CosmWasm does not allow calling other contracts directly, but rather returning message to later be dispatched by a router. The router will check the result of all messages, and if **any** message in the chain returns an error, the entire transaction is aborted, and state changed rolled back. This allows you to safely focus on the success case when scheduling calls to other contracts, knowing all state will be rolled back if it does not go as planned.
+CosmWasmは他のコントラクトへの直接呼び出しを許可しませんが、リターンメッセージは後でルーターによってディスパッチされます。ルーターはすべてのメッセージの結果をチェックします。チェーン内の**いずれかの**メッセージがエラーを返した場合、トランザクション全体が中止され、状態の変更がロールバックされます。これにより、他の契約への呼び出しをスケジュールするときに成功事例に安全に集中でき、計画どおりに進まない場合はすべての状態がロールバックされることがわかります。
 
-### :warning: [Race Conditions/Front Running](https://github.com/sigp/solidity-security-blog#race-conditions)
+### :警告:[競合状態/先行実行](https://github.com/sigp/solidity-security-blog#race-conditions)
 
-This is a general problem with all blockchains. The signed message is gossiped among all nodes before a block is formed. A key miner/validator could create another transaction and insert it before yours (maybe delaying yours). This is often not an issue, but shows up quite a bit in distributed exchanges. If there is a standing sell order at 90 and I place a buy order at 100, it would normally just match at 90. However, a miner could insert two transactions between, one to buy at 90, then other to sell at 100, then delay your transaction to the end. You would end up accepting their offer at 100 and they would make a profit of 10 tokens just for doing arbitrage.
+これは、すべてのブロックチェーンに共通の問題です。ブロックを形成する前に、署名されたメッセージはすべてのノード間で伝播されます。キーマイナー/検証者は、別のトランザクションを作成し、トランザクションの前に挿入できます(トランザクションが遅延する可能性があります)。これは通常問題ではありませんが、分散型取引所で多く発生します。 90で長期の売り注文があり、100で買い注文をした場合、通常は90でしか一致しません。ただし、マイナーは2つの間に2つのトランザクションを挿入できます。1つは90で購入し、もう1つは100で販売し、トランザクションを最後まで遅らせます。あなたは最終的に100の価格で彼らの申し出を受け入れるでしょう、そして彼らは裁定取引のために10トークンの利益を得るだけです。
 
-This is also an issue in high-frequency trading and any system that relies on ordering between clients to determine the outcome, just more pronounced in blockchain as the delays are on the order of seconds, not microseconds. For most applications this is not an issue, and for decentralized exchanges, there are designs with eg. batch auctions that eliminate the potential of front running.
+これは、高頻度取引や、結果を決定するために顧客間の注文に依存するシステムでも問題であり、遅延がマイクロ秒ではなく数秒であるため、ブロックチェーンでより顕著になります。ほとんどのアプリケーションでは、これは問題ではありません。分散型取引所では、たとえば、いくつかの設計があります。バッチオークションは、プリエンプションの可能性を排除します。
 
-### :warning: [Denial of Service](https://github.com/sigp/solidity-security-blog#dos)
+### :警告:[サービス拒否](https://github.com/sigp/solidity-security-blog#dos)
 
-**limited circumstances**
+**限られた状況**
 
-The idea is that if the contract relies on some external user-defined input, it could be set up in a way that it would run out of gas processing it. Many of the cases there should not effect CosmWasm, especially as wasm runs much faster and cpu gas limits allow huge amounts of processing in one transaction (including ed25519 signature verification in wasm without a precompile). However, looping over an user-controlled number of keys in the storage will run out of gas quickly.
+契約が外部のユーザー定義の入力に依存している場合、それを処理するためにガスが不足するように設定できるという考え方です。多くの状況でCosmWasmに影響を与えることはありません。特に、wasmの実行速度が速く、CPUのガス制限により、1つのトランザクションで多くの処理が可能になるためです(wasmでのed25519署名検証を含み、事前コンパイルは不要です)。ただし、ストレージ内のユーザー制御のキーの数を繰り返すと、すぐにガスが不足します。
 
-### :heavy_check_mark: [Block Timestamp Manipulation](https://github.com/sigp/solidity-security-blog#block-timestamp)
+### :heavy_check_mark:[タイムスタンプのブロック操作](https://github.com/sigp/solidity-security-blog#block-timestamp)
 
-Tendermint provides [BFT Timestamps](https://github.com/tendermint/tendermint/blob/master/docs/spec/blockchain/blockchain.md#time-1) in all the blockchain headers. This means that you need a majority of the validators to collude to manipulate the timestamp, and it can be as trusted as the blockchain itself. (That same majority could halt the chain or work on a fork)
+Tendermintは、すべてのブロックチェーンヘッダーに[BFTタイムスタンプ](https://github.com/tendermint/tendermint/blob/master/docs/spec/blockchain/blockchain.md#time-1)を提供します。これは、タイムスタンプを操作するためにほとんどのバリデーターが共謀する必要があることを意味し、ブロックチェーン自体のように信頼できます。 (同じほとんどの人がチェーンを止めたり、フォークで作業したりできます)
 
-### :heavy_check_mark: [Constructors with Care](https://github.com/sigp/solidity-security-blog#constructors)
+### :heavy_check_mark:[Constructors with Care](https://github.com/sigp/solidity-security-blog#constructors)
 
-This is an idiosyncrasy of the solidity language with constructor naming. It is highly unlikely you would ever rename `init` in cosmwasm, and if you did, it would fail to compile rather than producing a backdoor.
+これは、コンストラクターの命名を伴うSolidity言語の機能です。 cosmwasmで `init`の名前を変更する可能性は非常に低く、名前を変更すると、バックドアを生成する代わりにコンパイルに失敗します。
 
-### :heavy_check_mark: [Uninitialised Storage Pointers](https://github.com/sigp/solidity-security-blog#storage)
+### :heavy_check_mark:[初期化されていないストレージポインター](https://github.com/sigp/solidity-security-blog#storage)
 
-CosmWasm doesn't automatically fill in variables, you must explicitly load them from storage. And rust does not allow uninitialized variables anywhere (unless you start writing `unsafe` blocks, and make a special call to access uninitialized memory... but then you are asking for trouble). Making storage explicit rather than implicit removes this class of failures.
+CosmWasmは変数を自動的に入力しないため、ストレージから明示的にロードする必要があります。そして、rustは、初期化されていない変数をどこでも使用することを許可しません( `unsafe`ブロックを書き始め、初期化されていないメモリにアクセスするために特別な呼び出しを行わない限り...しかし、問題を求めます)。ストレージを暗黙的ではなく明示的にすることで、このような障害を排除できます。
 
-### :heavy_check_mark: [Floating Points and Precision](https://github.com/sigp/solidity-security-blog#precision)
+### :heavy_check_mark:[浮動小数点と精度](https://github.com/sigp/solidity-security-blog#precision)
 
-Both Solidity and CosmWasm have no support for floating point operations, due to possible non-determinism in rounding (which is CPU dependent). Solidity has no alternative to do integer math and many devs hand-roll integer approximations to decimal numbers, which may introduce rounding errors.
+SolidityもCosmWasmも、丸めの不確実性(CPUによって異なります)のため、浮動小数点演算をサポートしていません。 Solidityは、整数の数学演算を実行する以外に選択肢はありません。多くの開発者は、整数を10進数に手動で近似するため、丸め誤差が発生する可能性があります。
 
-In CosmWasm, You can import any rust package, and simply pick an appropriate package and use it internally. Like [rust_decimal](https://docs.rs/rust_decimal/1.0.3/rust_decimal/), "a Decimal implementation written in pure Rust suitable for financial calculations that require significant integral and fractional digits with no round-off errors.". Or [fixed](https://docs.rs/fixed/0.5.0/fixed/) to provide fixed-point decimal math. It supports up to 128-bit numbers, which is enough for 18 digits before the decimal and 18 afterwards, which should be enough for any use case.
+CosmWasmでは、任意のRustパッケージをインポートでき、適切なパッケージを選択して内部で使用するだけです。 [rust_decimal](https://docs.rs/rust_decimal/1.0.3/rust_decimal/)のように、「純粋なRustで記述された小数点以下の実装は、丸め誤差のない重要な整数と小数点以下の桁数を必要とする財務計算に適しています。」。または[ fixed](https://docs.rs/fixed/0.5.0/fixed/)は、固定小数点の小数演算を提供します。最大128桁をサポートします。これは、小数点の前後18桁で十分であり、あらゆるユースケースで十分です。
 
-### :heavy_check_mark: [Tx.Origin Authentication](https://github.com/sigp/solidity-security-blog#tx-origin)
+### :heavy_check_mark:[Tx.Origin認定](https://github.com/sigp/solidity-security-blog#tx-origin)
 
-CosmWasm doesn't expose `tx.origin`, but only the contract or user directly calling the contract as `params.message.signer`. This means it is impossible to rely on the wrong authentication, as there is only one value to compare.
+CosmWasmは `tx.origin`を公開しませんが、コントラクトを公開するか、ユーザーがコントラクトを` params.message.signer`として直接呼び出します。これは、比較する値が1つしかないため、誤った認証に依存することは不可能であることを意味します。

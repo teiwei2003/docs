@@ -1,25 +1,24 @@
-# Using Big Dipper
+# 北斗七星を使う
 
-For exploring the testnets, you can use big-dipper instances:
-- gaia-flex: [https://bigdipper.gaia-flex.cosmwasm.com](https://bigdipper.gaia-flex.cosmwasm.com)
-- heldernet: [https://bigdipper.heldernet.cosmwasm.com](https://bigdipper.heldernet.cosmwasm.com)
+テストネットを探索するために、BigDipperインスタンスを使用できます。
+-gaia-flex:[https://bigdipper.gaia-flex.cosmwasm.com](https://bigdipper.gaia-flex.cosmwasm.com)
+-ホルダーネット:[https://bigdipper.heldernet.cosmwasm.com](https://bigdipper.heldernet.cosmwasm.com)
 
-Big-dipper provides almost complete ux for exploring the chain.
-Suit your self and take a look around the website. I am sure it will fulfull your needs.
+北斗七星は、ディスカバリーチェーンにほぼ完全なユーザーエクスペリエンスを提供します。
+自分に合ってウェブサイトを閲覧してください。私はそれがあなたのニーズを満たすと信じています。
 
-## Sending Transactions Using Big Dipper
+## 北斗七星を使用してトランザクションを送信する
 
-::: danger
-At the moment Big Dipper only supports ledger transaction signing.
+::: 危険
+現在、BigDipperはアカウントブックのトランザクション署名のみをサポートしています。
 :::
 
-1. First plug your ledger and open cosmos app.
-2. ![image](../.vuepress/public/assets/big-dipper-login.png)
-3. ![image](../.vuepress/public/assets/big-dipper-login-popup.png)
-4. ![image](../.vuepress/public/assets/big-dipper-go-to-acc.png)
-5. ![image](../.vuepress/public/assets/big-dipper-acc-tx.png)
-6. ![image](../.vuepress/public/assets/big-dipper-transfer.png)
-7. Press sign.
-8. Check and verify on ledger.
-9. Transaction will be broadcasted and hash will be prompted. You see the tx by clicking first link.
-
+1.最初に元帳を挿入し、Cosmosアプリケーションを開きます。
+2。！[画像](../。vuepress/public/assets/big-dipper-login.png)
+3。！[画像](../。vuepress/public/assets/big-dipper-login-popup.png)
+4。！[画像](../。vuepress/public/assets/big-dipper-go-to-acc.png)
+5。！[画像](../。vuepress/public/assets/big-dipper-acc-tx.png)
+6。！[画像](../。vuepress/public/assets/big-dipper-transfer.png)
+7.サインを押します。
+8.元帳を確認します。
+9.トランザクションがブロードキャストされ、ハッシュが要求されます。最初のリンクをクリックすると、txを表示できます。

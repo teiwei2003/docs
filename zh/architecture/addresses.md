@@ -22,7 +22,7 @@ Cosmos SDK 中的地址是 20 个字符长的字符串，并包含安全检查 -
 
 我们将 *Canonical Address* 定义为区块链内部使用的二进制表示。这是原生代币的索引依据，因此在帐户的生命周期内绝不能更改。这是可用于所有**存储查找**的表示(如果您使用地址的一部分作为存储中的键)。
 
-##命名
+## 命名
 
 越来越多，[human](https://app.ens.domains/about) [可读](https://docs.blockstack.org/core/naming/introduction.html) [names](https:// iov.one)在区块链[及其他]中越来越重要(https://hackernoon.com/everything-you-didnt-know-about-the-handshake-naming-system-how-this-blockchain-project-will- 483464309f33)。
 

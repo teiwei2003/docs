@@ -1,120 +1,120 @@
-# Videos and Workshops
+# ビデオとワークショップ
 
-Here are the videos, events, workshops that can feed your learning hunger for CosmWasm!
+CosmWasmへの学習への渇望を養うことができるビデオ、イベント、ワークショップがここにあります！
 
-## Beginner Level
+## ビギナーのレベル
 
-### Introduction to CosmWasm. CW1-subkeys Development, Deployment and Interaction
+### CosmWasmの紹介。 CW1-サブキーの開発、展開、および相互作用
 
-*Date: September 12, 2020*
+*日付:2020年9月12日*
 
-#### Basic Layout of Smart Contract
+#### スマートコントラクトの基本的なレイアウト
 
-<iframe src="https://player.vimeo.com/video/458554938" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+<iframe src = "https://player.vimeo.com/video/458554938" width = "640" height = "360" frameborder = "0" allow = "autoplay; fullscreen" allowfullscreen> </iframe>
 
-#### Contract development flow w/permissions to subkey contract
+#### サブキー契約への許可を伴う契約開発フロー
 
-<iframe src="https://player.vimeo.com/video/458607446" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+<iframe src = "https://player.vimeo.com/video/458607446" width = "640" height = "360" frameborder = "0" allow = "autoplay; fullscreen" allowfullscreen> </iframe>
 
-#### Contract interaction using CosmJS and smart contract helpers
+#### CosmJSとスマートコントラクトヘルパーを使用したコントラクトインタラクション
 
-<iframe src="https://player.vimeo.com/video/458690289" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+<iframe src = "https://player.vimeo.com/video/458690289" width = "640" height = "360" frameborder = "0" allow = "autoplay; fullscreen" allowfullscreen> </iframe>
 
-## Advanced Level
+## 上級レベル
 
-### Code With US
+### 米国とのコード
 
-*Date: June 29, 2020*
+*日付:2020年6月29日*
 
-Custom token workshop
+カスタムトークンワークショップ
 
-<iframe src="https://player.vimeo.com/video/436560781" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+<iframe src = "https://player.vimeo.com/video/436560781" width = "640" height = "360" frameborder = "0" allow = "autoplay; fullscreen" allowfullscreen> </iframe>
 
-### Contract Composition Workshop - August 26, 2020
+### 契約構成ワークショップ-2020年8月26日
 
-*Date: August 26, 2020*
+*日付:2020年8月26日*
 
-In this workshop, we chose the topic ¨Contract composition deep dive¨ as per our poll result.
+このワークショップでは、投票結果に従って「契約構成の詳細」というトピックを選択しました。
 
-1) We will show the basic staking derivative
-2) And demonstrate how to wrap it in a CW20 token
-3) Then we could use that token to interact with other contracts.
+1)基本的なステーキングデリバティブを示します
+2)そしてそれをCW20トークンでラップする方法を示します
+3)次に、そのトークンを使用して他のコントラクトと対話できます。
 
-#### Deep Dive Part 1 - CosmWasm template
-<iframe src="https://player.vimeo.com/video/453054456" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+####ディープダイブパート1-CosmWasmテンプレート
+<iframe src = "https://player.vimeo.com/video/453054456" width = "640" height = "360" frameborder = "0" allow = "autoplay; fullscreen" allowfullscreen> </iframe>
 
-#### Deep Dive Part 2 - CW1 Subkeys
-<iframe src="https://player.vimeo.com/video/453055011" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+#### ディープダイブパート2-CW1サブキー
+<iframe src = "https://player.vimeo.com/video/453055011" width = "640" height = "360" frameborder = "0" allow = "autoplay; fullscreen" allowfullscreen> </iframe>
 
-#### Deep Dive Part 3 - CW20 Staking features
-<iframe src="https://player.vimeo.com/video/453055461" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+#### ディープダイブパート3-CW20ステーキング機能
+<iframe src = "https://player.vimeo.com/video/453055461" width = "640" height = "360" frameborder = "0" allow = "autoplay; fullscreen" allowfullscreen> </iframe>
 
-### Building Multi-chain Smart-Contracts Using CosmWasm -  HackAtom V India Workshop
+### CosmWasmを使用したマルチチェーンスマートコントラクトの構築-HackAtomV India Workshop
 
-*Date: September 14, 2020*
+*日付:2020年9月14日*
 
-#### Intro
+#### イントロ
 
-<iframe src="https://player.vimeo.com/video/457486858" width="640" height="361" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+<iframe src = "https://player.vimeo.com/video/457486858" width = "640" height = "361" frameborder = "0" allow = "autoplay; fullscreen" allowfullscreen> </iframe>
 
-#### Setup Coding Environment
+#### コーディング環境のセットアップ
 
-<iframe src="https://player.vimeo.com/video/457712351" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+<iframe src = "https://player.vimeo.com/video/457712351" width = "640" height = "360" frameborder = "0" allow = "autoplay; fullscreen" allowfullscreen> </iframe>
 
-#### Smart Contract Components and Development
+#### スマートコントラクトのコンポーネントと開発
 
-<iframe src="https://player.vimeo.com/video/457702442" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+<iframe src = "https://player.vimeo.com/video/457702442" width = "640" height = "360" frameborder = "0" allow = "autoplay; fullscreen" allowfullscreen> </iframe>
 
-#### Smart Contract Testing
+#### スマートコントラクトテスト
 
-<iframe src="https://player.vimeo.com/video/457705991" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+<iframe src = "https://player.vimeo.com/video/457705991" width = "640" height = "360" frameborder = "0" allow = "autoplay; fullscreen" allowfullscreen> </iframe>
 
-### State modeling & Buckets
+### 状態モデリングとバケット
 
-*Date: September 29, 2020*
+*日付:2020年9月29日*
 
-#### Part 1
+#### パート1
 
-<iframe src="https://player.vimeo.com/video/463816459" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+<iframe src = "https://player.vimeo.com/video/463816459" width = "640" height = "360" frameborder = "0" allow = "autoplay; fullscreen" allowfullscreen> </iframe>
 
-#### Part 2
+#### パート2
 
-<iframe src="https://player.vimeo.com/video/463797451" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+<iframe src = "https://player.vimeo.com/video/463797451" width = "640" height = "360" frameborder = "0" allow = "autoplay; fullscreen" allowfullscreen> </iframe>
 
-### Quadratic Funding with CosmWasm
+### CosmWasmによる2次資金
 
-#### Part 1 QF concept & implementing logic
+#### パート1QFの概念と実装ロジック
 
-<iframe src="https://player.vimeo.com/video/492147547" width="640" height="360" frameborder="0" allow="autoplay;fullscreen" allowfullscreen ></iframe>
+<iframe src = "https://player.vimeo.com/video/492147547" width = "640" height = "360" frameborder = "0" allow = "autoplay; fullscreen" allowfullscreen> </iframe>
 
-#### Part 2 QF Smart Contract Helper& Execution
+#### パート2QFスマートコントラクトヘルパーと実行
 
-<iframe src="https://player.vimeo.com/video/493294008" width="640" height="360" frameborder="0" allow="autoplay;fullscreen" allowfullscreen ></iframe>
+<iframe src = "https://player.vimeo.com/video/493294008" width = "640" height = "360" frameborder = "0" allow = "autoplay; fullscreen" allowfullscreen> </iframe>
 
-### Path to IBC
+### IBCへのパス
 
-<iframe src="https://player.vimeo.com/video/502682471" width="640" height="360" frameborder="0" allow="autoplay;fullscreen" allowfullscreen ></iframe>
+<iframe src = "https://player.vimeo.com/video/502682471" width = "640" height = "360" frameborder = "0" allow = "autoplay; fullscreen" allowfullscreen> </iframe>
 
-### CosmWasm/CosmJS dApps - Zero to Hero
+### CosmWasm/CosmJSdApps-ゼロからヒーロー
 
-*Date: Oct 16, 2020*
+*日付:2020年10月16日*
 
-<iframe width="640" height="360" src="https://www.youtube.com/embed/YUsjneQptDQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width = "640" height = "360" src = "https://www.youtube.com/embed/YUsjneQptDQ" frameborder = "0" allow = "accelerometer; autoplay;クリップボード書き込み;暗号化メディア;ジャイロスコープ; picture-in-picture "allowfullscreen> </iframe>
 
-### Multi contract testing
+### マルチコントラクトテスト
 
-*Date: Feb 14, 2021*
+*日付:2021年2月14日*
 
-<iframe src="https://vimeo.com/512992499" width="640" height="360" frameborder="0" allow="autoplay;fullscreen" allowfullscreen ></iframe>
+<iframe src = "https://vimeo.com/512992499" width = "640" height = "360" frameborder = "0" allow = "autoplay; fullscreen" allowfullscreen> </iframe>
 
-### CosmWasm & IBC: Cross Chain Contracts
+### CosmWasm＆IBC:クロスチェーン契約
 
-*Date: Feb 24, 2021*
+*日付:2021年2月24日*
 
-<iframe width="640" height="360" src="https://www.youtube.com/embed/cG1lpAwK1sc" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width = "640" height = "360" src = "https://www.youtube.com/embed/cG1lpAwK1sc" frameborder = "0" allow = "accelerometer; autoplay;クリップボード書き込み;暗号化メディア;ジャイロスコープ; picture-in-picture "allowfullscreen> </iframe>
 
-## Presentations
+## プレゼンテーション
 
-### CosmWasm presentation at Cosmos Ecosystem Summit (15/01/21)
+### コスモスエコシステムサミットでのCosmWasmプレゼンテーション(15/01/21)
 
-<iframe width="640" height="360" src="https://player.bilibili.com/player.html?aid=628742117&bvid=BV12t4y1z74K&cid=284064909&page=1&t=101m45s" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
+<iframe width = "640" height = "360" src = "https://player.bilibili.com/player.html?aid=628742117&bvid=BV12t4y1z74K&cid=284064909&page=1&t=101m45s" scrolling = "no" border = "0 "frameborder =" no "framespacing =" 0 "allowfullscreen =" true "> </iframe>

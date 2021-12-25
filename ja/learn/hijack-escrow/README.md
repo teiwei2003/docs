@@ -1,21 +1,21 @@
-# Introduction
+# 導入する
 
-In [getting started section](../../getting-started/intro.md) we demonstrated the essential procedure that is required to use CosmWasm smart contracts: setup, compilation, development, and interacting. We will take it once step further and edit the escrow contract in a way that enables a thief to hijack the funds saved in the contract. Before starting, make sure you read and followed the steps in [getting started](../../getting-started/intro.md).
+[Getting Started](../../getting-started/intro.md)では、CosmWasmスマートコントラクトを使用するために必要な基本的なプロセス(セットアップ、コンパイル、開発、および対話)を示しました。さらに一歩進んで、泥棒が契約に保持されている資金を乗っ取ることができるようにエスクロー契約を編集します。始める前に、[はじめに](../../getting-started/intro.md)の手順を読み、それに従っていることを確認してください。
 
-## Setting up your IDE
+## IDEをセットアップする
 
-Now that you can compile and test the code, it is time to edit it. But before that, we will need a good editor to make those changes. I highly recommend plugins that help you learn syntax, especially when just starting rust. There are two free editor environments I can recommend, choose the one that is more familiar to you.
+これで、コードをコンパイルしてテストできるようになりました。次はコードを編集します。しかしその前に、これらの変更を行うための優れたエディターが必要です。特にRustを使い始めたばかりの場合は、構文の学習に役立つプラグインを強くお勧めします。 2つの無料のエディター環境をお勧めし、使い慣れたものを選択できます。
 
-If you use VSCode ([Download link](https://code.visualstudio.com/download)) you just need to add the rust plugin. This is the best supported environment for RLS (Rust Language Server) and uses the rust compiler to type-check all your code on save. This gives the same error messages as the actual compiler would and highlights along the line of the code, but it can be a bit slow to respond sometime (as it runs the compiler). It is quite good, and if you are used to VSCode, I highly recommend it:
+VSCode([ダウンロードリンク](https://code.visualstudio.com/download))を使用する場合は、rustプラグインを追加するだけで済みます。これはRLS(Rust Language Server)の最適なサポート環境であり、保存時にすべてのコードをタイプチェックするためにrustコンパイラーが使用されます。これにより、実際のコンパイラと同じエラーメッセージが表示され、コード行に沿って強調表示されますが、応答が少し遅くなる場合があります(コンパイラが実行されるため)。かなり良いです。VSCodeに慣れている場合は、次のことを強くお勧めします。
 
-[RLS for VSCode](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust)
+[VSCodeのRLS](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust)
 
-The other option I can recommend it Intellij IDEA Community Edition ([Download link](https://www.jetbrains.com/idea/download/)), along with the Rust Plugin. This has very nice and quick support for many language features directly inline. In particular, it shows the inferred types along variables, which can be very helpful, especially when working with (nested) generics. It catches most syntax errors very quickly, but not all of them. Which means sometimes you have to look at the compile failures to find the errors. If you are coming from another Intellij product (eg. Goland), I recommend this approach:
+別のオプションであるIntellijIDEA Community Edition([ダウンロードリンク](https://www.jetbrains.com/idea/download/))とRustプラグインをお勧めします。これは、直接インライン化されている多くの言語関数を非常に高速にサポートします。特に、変数に沿って推測された型を示します。これは、特に(ネストされた)ジェネリックを使用する場合に非常に役立ちます。ほとんどの文法エラーを非常に迅速にキャッチしますが、すべてではありません。これは、エラーを見つけるためにコンパイルの失敗を調べる必要がある場合があることを意味します。別のIntellij製品(Golandなど)を使用している場合は、次の方法をお勧めします。
 
-[RUST for Intellij](https://intellij-rust.github.io/)
+[IntellijのRUST](https://intellij-rust.github.io/)
 
-There are many more editors out there and some have varying degrees of rust support, at least syntax highlighting, but I would recommend trying one of the two above, especially if you are new to rust. Once you are confident in the language, you can always use another editor and customize it to your liking.
+Rustをサポートするレベルが異なり、少なくとも構文が強調表示されているエディターは他にもありますが、特にRustに慣れていない場合は、上記の2つのうちの1つを試してみることをお勧めします。言語に自信がついたら、いつでも他のエディターを使用して、好みに合わせてカスタマイズできます。
 
-### Setting Root Directory
+### ルートディレクトリを設定します
 
-Both of the above extensions look for a Cargo.toml file in the root directory of your workspace, and only parse rust code referenced by this Cargo.toml file (listed as a workspace, or imported by `src/lib.rs`). The [`cosmwasm-examples`](https://github.com/CosmWasm/cosmwasm-examples) repo does not have a `Cargo.toml` file, but rather one in each example sub-directory. To ensure proper IDE support when working on this example, you should open only the `escrow` directory. And in general, have one window open for one rust projects, rooted in the same directory as it's `Cargo.toml` file.
+上記の両方の拡張機能は、ワークスペースのルートディレクトリでCargo.tomlファイルを検索し、このCargo.tomlファイル(ワークスペースとしてリストされているか、 `src/lib.rs`によってインポートされている)によって参照されるrustコードのみを解析します。 。 [`cosmwasm-examples`](https://github.com/CosmWasm/cosmwasm-examples)リポジトリには` Cargo.toml`ファイルはありませんが、各exampleサブディレクトリに1つあります。この例で作業するときに適切なIDEサポートを確保するには、 `escrow`ディレクトリのみを開く必要があります。通常、rustプロジェクト用にウィンドウが開かれ、そのルートディレクトリはCargo.tomlファイルと同じです。

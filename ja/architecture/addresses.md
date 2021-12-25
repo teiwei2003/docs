@@ -1,40 +1,40 @@
-# Names and Addresses
+# 名前と住所
 
-Blockchains (almost?) all use addresses to identify external actors via a hash of a public key, and many newer ones extended this to identify on-chain "smart contracts" with unique addresses as well. On chain, addresses are represented by a use a concise, immutable binary format, typically 20 or 32 bytes long, often derived from a hashing function. However, there are many human-readable representations of these binary addresses, which are shown to clients. For example, [Bech32](https://en.bitcoin.it/wiki/Bech32) `bc1qc7slrfxkknqcq2jevvvkdgvrt8080852dfjewde450xdlk4ugp7szw5tk9`, hex `0x8617E340B3D01FA5F11F306F4090FD50E238070D` or [checksumned hex](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-55.md) `0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed`, and even [large integers](https://research.kudelskisecurity.com/2018/01/16/blockchains-how-to-steal-millions-in-264-operations/) `3040783849904107057L`.
+ブロックチェーン(ほぼ？)は、アドレスを使用して公開鍵のハッシュを介して外部参加者を識別します。多くの新しいブロックチェーンは、これを拡張して、一意のアドレスを持つチェーン上の「スマートコントラクト」を識別します。チェーン上では、アドレスは簡潔で不変のバイナリ形式で表され、通常は20バイトまたは32バイトの長さであり、通常はハッシュ関数から取得されます。ただし、これらのバイナリアドレスには、クライアントに表示される人間が読める形式の表現が多数あります。たとえば、[Bech32](https://en.bitcoin.it/wiki/Bech32) `bc1qc7slrfxkknqcq2jevvvkdgvrt8080852dfjewde450xdlk4ugp7szw5tk9`、https://en.bitcoin.it/wiki/Bech32)` bc1qc7sl .it/wiki/Bech32` EIPS/eip-55.md) `0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed`、さらに[大きな整数](https://research.kudelskisecurity.com/2018/01/16/blockchains-how-to-in-steal -6操作/) `3040783849904107057L`。
 
-## Addr
+## 住所
 
-Addresses in Cosmos SDK are 20 character long strings, and contain security checks - such as chain-prefix in Bech32, and checksums in Bech32 and checksummed hex (EIP55).
-Since CosmWasm is an extension of Cosmos SDK, it follows the same address rules; wallets, smart contracts, modules have an identifier address with defined prefix. `cosmos1...` for gaia, `wasm1...` for CosmWasm testnets.
+Cosmos SDKのアドレスは20文字の文字列であり、Bech32のチェーンプレフィックス、Bech32のチェックサム、16進数のチェックサム(EIP55)などのセキュリティチェックが含まれています。
+CosmWasmはCosmosSDKの拡張であるため、同じアドレスルールに従います。ウォレット、スマートコントラクト、モジュールはすべて、定義されたプレフィックスを持つ識別子アドレスを持っています。 `cosmos1 ...`はgaiaに使用され、 `wasm1 ...`はCosmWasmテストネットに使用されます。
 
-For passing address to contracts, pass it as string and then validate the input to an: **Addr**
-[Addr](https://github.com/CosmWasm/cosmwasm/blob/v0.14.0/packages/std/src/addresses.rs#L31) is just a wrapper around plain string that provides useful helper functions such as string validation to an address.
+アドレスをコントラクトに渡すには、それを文字列として渡し、入力を次の1つに確認します。** Addr **
+[Addr](https://github.com/CosmWasm/cosmwasm/blob/v0.14.0/packages/std/src/addresses.rs#L31)は単純な文字列のラッパーであり、文字などの便利な補助関数を提供します文字列はアドレスに対して検証されます。
 
-## Optional: Canonical Addresses
+## オプション:正規アドレス
 
-There is another representation of an address that tackles the case of change of human representation, but this is rare.
+人間の表現が変化する状況を解決できる別の種類の住所表現がありますが、これはまれです。
 
-For example Bitcoin [moved from Base58 to Bech32](https://en.bitcoin.it/wiki/BIP_0173) encoding along with SegWit, and Rise is also [moving from Lisk format to Bech32](https://medium.com/rise-vision/introducing-rise-v2-521a58e1e9de#41d5) in the v2 upgrade.
+たとえば、ビットコイン[Base58からBech32への移行](https://en.bitcoin.it/wiki/BIP_0173)はSegWitと一緒にコーディングされており、Riseも[Lisk形式からBech32への移行](https://Medium .com/rise-vision/introducing-rise-v2-521a58e1e9de#41d5)v2アップグレード。
 
-This means that if `message.signer` is always the string address that signed the transaction and I use it to look up your account balance, if this encoding ever changed, then you lose access to your account. We clearly need a stable identifier to work with internally.
+つまり、 `message.signer`が常にトランザクションに署名するための文字列アドレスであり、アカウントの残高を見つけるためにそれを使用する場合、このコードが変更されると、アカウントにアクセスできなくなります。明らかに、内部で使用するための安定した識別子が必要です。
 
-This is where we define a *Canonical Address*. This is defined to be stable and unique. That is, for one given account, there is only ever one canonical address (for the life of the blockchain). We define a *canonical address* format that potentially multiple string addresses can be converted to. It can be transformed back and forth without any changes
+ここで*正規アドレス*を定義します。これは、安定していて一意であると定義されています。つまり、特定のアカウントに対して、(ブロックチェーンのライフサイクル内で)正規のアドレスは1つだけです。複数の文字列アドレスをこの形式に変換できる*正規アドレス*形式を定義しました。変更なしで前後に変換できます
 
-We define the *Canonical Address* as the binary representation used internally in the blockchain. This is what the native tokens are indexed by and therefore must never change for the life of an account. This is the representation that can be used for all **storage lookups** (if you use part of an address as the key in the storage).
+*正規アドレス*は、ブロックチェーンの内部で使用されるバイナリ表現として定義されています。これはネイティブトークンのインデックスベースであるため、アカウントの存続期間中は変更しないでください。これは、すべての**ストレージルックアップ**に使用できる表現です(アドレスの一部をストレージのキーとして使用する場合)。
 
-## Naming
+## 名前
 
-More and more, [human](https://app.ens.domains/about) [readable](https://docs.blockstack.org/core/naming/introduction.html) [names](https://iov.one) are increasingly important in blockchains [and beyond](https://hackernoon.com/everything-you-didnt-know-about-the-handshake-naming-system-how-this-blockchain-project-will-483464309f33).
+ますます、[人間](https://app.ens.domains/about)[読み取り可能](https://docs.blockstack.org/core/naming/introduction.html)[名前](https://iov.one)は、ブロックチェーン[およびその他]でますます重要になっています(https://hackernoon.com/everything-you-didnt-know-about-the-handshake-naming-system-how-this-blockchain -project -will- 483464309f33)。
 
-At one point, we considered making names a first-class citizen of CosmWasm and using them everywhere in messages. Until we realized that accounts can have no name until initialized, and we need a permanently stable *Address*. However, we would still like names to be as central to the blockchain as possible. To this end, we can consider names as just another form of *Address* albeit one that requires a contract query (with storage access) to resolve, not just a call to a pure function.
+昔々、私たちはCosmWasmの第一級市民として名前を付け、メッセージのいたるところにそれらを使用することを検討しました。アカウントが初期化される前に名前を付けることができないことに気付くまで、永続的で安定した*アドレス*が必要です。ただし、その名前が可能な限りブロックチェーンのコアになることを願っています。この目的のために、名前を* Address *の別の形式と考えることができますが、解決するには、純粋関数の呼び出しだけでなく、(ストレージアクセス権を持つ)コントラクトクエリが必要です。
 
-This actual format and interfaces are still under discussion, and we are still working on a [tutorial version of a name service](../learn/name-service/intro). However, for sake of argument, imagine we agree every *Address* that begins with `:` is a name to lookup with the name service, and other ones can be resolved directly with the built-in blockchain resolution function. So when creating a transaction for an escrow, you could use either `{"arbiter": "cosmos1qqp837a4kvtgplm6uqhdge0zzu6efqgujllfst"}` or `{"arbiter": ":alice"}`, performing the resolution inside the contract rather than only in the client. Of course we would need a standard query format for name service, and the calling contract would need to somehow know the address of the canonical name service contract to resolve with, which is why this feature is still under discussion.
+実際のフォーマットとインターフェースはまだ議論中であり、私たちはまだ[ネームサービスのチュートリアルバージョン](../learn/name-service/intro)に取り組んでいます。ただし、議論のために、 `:`で始まる各* Address *はネームサービスによって検索される名前であり、他の* Address *は組み込みのブロックチェーン解決関数を使用して直接解決できることに同意するとします。したがって、エスクローのトランザクションを作成するときは、 `{" arbiter ":" cosmos1qqp837a4kvtgplm6uqhdge0zzu6efqgujllfst "}`または `{" arbiter ":":alice "}`を使用して、クライアント内だけでなく、コントラクト内で解析を実行できます。もちろん、ネームサービスには標準のクエリ形式が必要であり、呼び出し側のコントラクトは、何らかの方法で解決される正規のネームサービスコントラクトのアドレスを知っている必要があります。そのため、この機能についてはまだ検討中です。
 
-### DIDs
+### やりました
 
-*Note: it will likely be quite some time before this is fully implemented. It serves as design inspiration*
+*注:これは完全に実装するのに長い時間がかかる場合があります。デザインのインスピレーションとして機能します*
 
-Let's keep imagining what is possible with *Human Names*, once we develop a solution to the name service issue. We could not just use a reference to resolve a user address, but resolve a contract as well. Maybe we could dispatch a message to an "ERC20" token contract not by its name, but by its *uniquely registered token ticker*. We would soon need to use some way to distinguish the scope or context of a name. This is where [Decentralized Identifiers (DIDs)](https://www.w3.org/TR/did-core/) could come in. Imagine the following message format, that could be used either by a end-client or by a smart contract "actor":
+ネームサービスの問題の解決策を開発したら、*人間の名前*の可能性を想像し続けましょう。参照を使用してユーザーアドレスを解決できるだけでなく、契約も解決できます。たぶん、名前ではなく、*一意の登録済みトークンコード*で「ERC20」トークンコントラクトにメッセージを送信できます。名前のスコープまたはコンテキストを区別するために、まもなく何らかの方法を使用する必要があります。ここで、[分散識別子(DID)](https://www.w3.org/TR/did-core/)が役立ちます。次のメッセージ形式を想像してみてください。これは、ターミナルクライアントまたはスマートコントラクトによって「アクター」になる可能性があります。
 
 ```json
 {
@@ -49,4 +49,4 @@ Let's keep imagining what is possible with *Human Names*, once we develop a solu
 }
 ```
 
-This would not be some spec to be resolved client-side, but the actual interchange format used on the blockchain. So one smart contract could also dispatch such a message in the course of execution. Do you like this idea? Comments? [Please add your thoughts on github](https://github.com/CosmWasm/cosmwasm/issues/80).
+これは、クライアント側で解析される仕様ではなく、ブロックチェーンで使用される実際の交換形式です。 したがって、スマートコントラクトは実行中にそのようなメッセージを送信することもできます。 あなたはこの考えが好きですか？ コメント？ [githubについての考えを追加してください](https://github.com/CosmWasm/cosmwasm/issues/80)。

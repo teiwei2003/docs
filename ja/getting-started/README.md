@@ -1,44 +1,44 @@
-# Your First Contract
+# 最初の契約
 
-Buckle up, we will now get first-hand experience with CosmWasm, by starting up our own
-CosmWasm-enabled blockchain (just one node for now), modifying an existing contract, deploying it to
-our system, and executing it via the cli. If you are more *research first then get your hands dirty
-second* person, you should go ahead to [Architecture](../architecture/multichain.md) read it first
-and then head back here.
+シートベルトを締めて、独自のCosmWasmを作成して直接体験できるようになります
+CosmWasmのブロックチェーン(現在は1つのノードのみ)をサポートし、既存のコントラクトを変更して、
+私たちのシステムとCLIを介してそれを実行します。あなたが最初にもっと*研究をしてから手を汚すなら
+2人目は、[Architecture](../architecture/multichain.md)にアクセスして最初に読んでください。
+その後、ここに戻ってきます。
 
-We will not dive into smart contract development in this section to provide an easy to digest
-introduction. Also, you can follow the steps here to test out smart contracts live on a testnet
-without drowning in smart contract development details. We will demonstrate setting up environment,
-compiling, deploying, and interacting. Then to make things a bit more interesting, we will
-show modifying the example escrow contract by adding a backdoor to it in the [Hijack Escrow
-tutorial](../learn/hijack-escrow/intro.md). It exposes an identical API to the original one, but has
-one hidden command added. This also shows the importance of verifying the source code behind any
-contract you run.
+このセクションでは、ダイジェストを容易にするためのスマートコントラクトの開発については詳しく説明しません。
+導入する。さらに、ここの手順に従って、テストネットでスマートコントラクトをリアルタイムでテストできます
+スマートコントラクト開発の詳細に圧倒されることはありません。環境の設定を実演します。
+コンパイル、デプロイ、および対話します。次に、物事をより面白くするために、
+[ハイジャックされたホスティングで表示
+チュートリアル](../learn/hijack-escrow/intro.md)。元のAPIと同じAPIを公開しますが、
+非表示のコマンドを追加しました。また、背後にあるソースコードを検証することの重要性も示しています
+あなたが実行する契約。
 
-This is designed for programmers who are comfortable with the command-line and using Linux or MacOS.
-It is helpful to have a basic understanding of Rust and Go, but we will lead you through, so fast
-learners need no prior knowledge. The [next tutorial, name service](../learn/name-service/intro)
-will assume knowledge of these basics. And it will show all the development flow from 0 to
-production.
+これは、コマンドラインに精通していてLinuxまたはMacOSを使用しているプログラマー向けに設計されています。
+Rust and Goの基本的な理解は役に立ちますが、すぐにご案内します。
+学習者は事前の知識を必要としません。 [次のチュートリアル、名前サービス](../learn/name-service/intro)
+これらの基本的な知識を前提としています。 0から0までのすべての開発プロセスが表示されます
+製造。
 
-## Sections
+## 部
 
-[Installation](./installation) will show you how to setup the required software tooling for
-CosmWasm.
+[インストール](./install)は、必要なソフトウェアツールのセットアップ方法を示します
+宇宙。
 
-[Setting up Environment](./setting-env) will show you how to setup the client environment,
-interacting with faucet.
+[環境の設定](。/settings-env)は、クライアント環境の設定方法を示します。
+タップを操作します。
 
-[Downloading and Compiling Contract](./compile-contract) will demonstrate downloading and compiling
-smart contract code to wasm byte code.
+[契約書のダウンロードとコンパイル](./compile-contract)はデモをダウンロードしてコンパイルします
+スマートコントラクトコードからwasmバイトコードへ。
 
-[Interacting with Contracts](./interact-with-contract) will show deploying, initializing and
-executing smart contracts.
+[契約とのやり取り](./interact-with-contract)は、展開、初期化、および
+スマートコントラクトを実行します。
 
-[Next Steps](./next-steps.md) is the last part of the tutorial that wraps up and sails you to the
-next dock, meaning new learning resources.
+[次のステップ](./next-steps.md)はこのチュートリアルの最後の部分です。この部分は終了し、次の場所に移動します。
+Next Dockは、新しい学習リソースを意味します。
 
-## Video Version
+## ビデオバージョン
 
-The coding sections for smart contracts are also available as a [series of videos, leading you
-through the code structure](https://vimeo.com/showcase/6671477).
+スマートコントラクトのコーディング部分は、[あなたをガイドする一連のビデオとしても使用できます
+コード構造経由](https://vimeo.com/showcase/6671477)。

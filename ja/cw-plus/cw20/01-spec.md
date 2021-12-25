@@ -1,142 +1,142 @@
-# CW20 Spec: Fungible Tokens
+# CW20仕様:代替トークン
 
-cw20 package source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/packages/cw20](https://github.com/CosmWasm/cosmwasm-plus/tree/master/packages/cw20)
+cw20パッケージのソースコード:[https://github.com/CosmWasm/cosmwasm-plus/tree/master/packages/cw20](https://github.com/CosmWasm/cosmwasm-plus/tree/master/packages/cw20 )。
 
-CW20 is a specification for fungible tokens based on CosmWasm.
-The name and design is loosely based on Ethereum's ERC20 standard,
-but many changes have been made. The types in here can be imported by
-contracts that wish to implement this  spec, or by contracts that call
-to any standard cw20 contract.
+CW20は、CosmWasmに基づく代替トークン仕様です。
+名前とデザインは、イーサリアムのERC20標準に大まかに基づいています。
+しかし、多くの変更が加えられました。ここのタイプは渡すことができます
+この仕様の契約を実装することを望んでいる、または呼び出し契約を通じて
+標準のcw20契約。
 
-The specification is split into multiple sections, a contract may only
-implement some of this functionality, but must implement the base.
+仕様は複数の部分に分かれており、契約は
+これらの機能のいくつかは実現されていますが、基本は実現されなければなりません。
 
-::: tip
-This section contains CW20 spec implementation details.
-If you are around to play with the contract,
-skip this section and go to the [next page](03-cw20-base-tutorial.md)
+::: ヒント
+このセクションには、CW20仕様の実装の詳細が含まれています。
+契約をしている場合は、
+このセクションをスキップして、[次のページ](03-cw20-base-tutorial.md)に移動します
 :::
 
-## Base
+## によると
 
-This handles balances and transfers. Note that all amounts are
-handled as `Uint128` (128 bit integers with JSON string representation).
-Handling decimals is left to the UI and not interpreted
+これは、残高と送金を処理します。すべての金額が
+`Uint128`(JSON文字列表現を含む128ビット整数)として処理されます。
+小数の処理は、解釈ではなくユーザーインターフェイスに任されています
 
-### Messages
+### 情報
 
-`Transfer{recipient, amount}` - Moves `amount` tokens from the
-`env.sender` account to the `recipient` account. This is designed to
-send to an address controlled by a private key and *does not* trigger
-any actions on the recipient if it is a contract.
+`転送{受信者、金額}`-から
+`env.sender`アカウントから` recipient`アカウントへ。これがためのものです
+秘密鍵によって制御されているアドレスに送信され、トリガーされない
+契約の場合は、受信者に対する操作。
 
-`Send{contract, amount, msg}` - Moves `amount` tokens from the
-`env.sender` account to the `recipient` account. `contract` must be an
-address of a contract that implements the `Receiver` interface. The `msg`
-will be passed to the recipient contract, along with the amount.
+`Send {contract、amount、msg}` -from
+`env.sender`アカウントから` recipient`アカウントへ。 `契約`は
+「Receiver」インターフェースを実装する契約のアドレス。 `msg`
+金額と一緒に受取人の契約書に渡されます。
 
-`Burn{amount}` - Remove `amount` tokens from the balance of `env.sender`
-and reduce `total_supply` by the same amount.
+`Burn {amount}` -`env.sender`の残高から `amount`トークンを削除します
+そして、 `total_supply`を同じ量だけ減らします。
 
-### Queries
+###お問い合わせ
 
-`Balance{address}` - Returns the balance of the given address.
-Returns "0" if the address is unknown to the contract. Return type
-is `BalanceResponse{balance}`.
+`Balance {address}`-指定されたアドレスの残高を返します。
+アドレスが不明な場合は「0」を返します。リターンタイプ
+`BalanceResponse {balance}`です。
 
-`TokenInfo{}` - Returns the token info of the contract. Return type is
-`TokenInfoResponse{name, symbol, decimal, total_supply}`.
+`TokenInfo {}`-コントラクトのトークン情報を返します。戻りタイプは
+`TokenInfoResponse {name、symbol、decimal、total_supply}`。
 
-### Receiver
+###受信者
 
-The counter-part to `Send` is `Receive`, which must be implemented by
-any contract that wishes to manage CW20 tokens. This is generally *not*
-implemented by any CW20 contract.
+`Send`の対応する部分は` Receive`であり、
+CW20トークンの管理を希望する契約。これは通常*ではありません*
+CW20契約によって実装されます。
 
-`Receive{sender, amount, msg}` - This is designed to handle `Send`
-messages. The address of the contract is stored in `env.sender`
-so it cannot be faked. The contract should ensure the sender matches
-the token contract it expects to handle, and not allow arbitrary addresses.
+`Receive {sender、amount、msg}` -`Send`を処理するように設計されています
+情報。契約アドレスは `env.sender`に保存されます
+したがって、偽造することはできません。契約では、送信者が一致することを確認する必要があります
+トークンコントラクトを処理することを想定しており、任意のアドレスを許可しません。
 
-The `sender` is the original account requesting to move the tokens
-and `msg` is a `Binary` data that can be decoded into a contract-specific
-message. This can be empty if we have only one default action,
-or it may be a `ReceiveMsg` variant to clarify the intention. For example,
-if I send to a uniswap contract, I can specify which token I want to swap
-against using this field.
+`sender`は、モバイルトークンをリクエストした元のアカウントです
+また、 `msg`は` Binary`データであり、コントラクト固有のデータにデコードできます
+情報。デフォルトのアクションが1つしかない場合、これは空にすることができます。
+または、意図を明確にするための `ReceiveMsg`の変形である可能性があります。例えば、
+ユニスワップ契約に送ると、交換したいトークンを指定できます
+このフィールドの使用に反対します。
 
-## Allowances
+## 手当
 
-A contract may allow actors to delegate some of their balance to other
-accounts. This is not as essential as with ERC20 as we use `Send`/`Receive`
-to send tokens to a contract, not `Approve`/`TransferFrom`. But it
-is still a nice use-case, and you can see how the Cosmos SDK wants to add
-payment allowances to native tokens. This is mainly designed to provide
-access to other public-key-based accounts.
+契約により、参加者は自分の残高の一部を他の人に委任することができます
+アカウント。これはERC20ほど重要ではありません。これは、 `Send`/` Receive`を使用するためです。
+`Approve`/` TransferFrom`の代わりにトークンをコントラクトに送信します。しかしそれは
+それでも良いユースケースですが、CosmosSDKがどのように追加するかを見ることができます
+ネイティブトークンの支払い手当。これは主に提供することです
+他の公開鍵ベースのアカウントにアクセスします。
 
-There was an issue with race conditions in the original ERC20 approval spec.
-If you had an approval of 50 and I then want to reduce it to 20, I submit a
-Tx to set the allowance to 20. If you see that and immediately submit a tx
-using the entire 50, you then get access to the other 20. Not only did you quickly
-spend the 50 before I could reduce it, you get another 20 for free.
+元のERC20承認仕様には競合状態の問題があります。
+あなたが50の承認を得て、それを20に減らしたい場合は、コピーを提出します
+Txは許容値を20に設定します。表示してすぐに送信する場合tx
+50個すべてを使用すると、他の20個にアクセスできます。
+私がそれを減らすことができる前に50を使うと、あなたは無料で20を手に入れます。
 
-The solution discussed in the Ethereum community was an `IncreaseAllowance`
-and `DecreaseAllowance` operator (instead of `Approve`). To originally set
-an approval, use `IncreaseAllowance`, which works fine with no previous allowance.
-`DecreaseAllowance` is meant to be robust, that is if you decrease by more than
-the current allowance (eg. the user spent some in the middle), it will just round
-down to 0 and not make any underflow error.
+イーサリアムコミュニティで議論されている解決策は「IncreaseAllowance」です
+そして、 `DecreaseAllowance`演算子(` Approve`の代わりに)。当初設定
+`IncreaseAllowance`を使用して承認されたものは、以前の許可がなくても正常に機能します。
+`DecreaseAllowance`は堅牢です。つまり、
+現在の許容値(たとえば、ユーザーが途中で費やしたもの)は、四捨五入されます
+0に低下し、アンダーフローエラーは生成されません。
 
-### Messages
+### 情報
 
-`IncreaseAllowance{spender, amount, expires}` - Set or increase the allowance
-such that `spender` may access up to `amount + current_allowance` tokens
-from the `env.sender` account. This may optionally come with an `Expiration`
-time, which if set limits when the approval can be used (by time or height).
+`IncreaseAllowance {spender、amount、expires}`-許容値を設定または増加します
+このようにして、 `spender`は最大` amount + current_allowance`トークンにアクセスできます
+`env.sender`アカウントから。これはオプションで「期限切れ」にすることができます
+時間(設定されている場合)は、承認された制限(時間または高度による)を使用できます。
 
-`DecreaseAllowance{spender, amount, expires}` - Decrease or clear the allowance
-such that `spender` may access up to `current_allowance - amount` tokens
-from the `env.sender` account. This may optionally come with an `Expiration`
-time, which if set limits when the approval can be used (by time or height).
-If `amount >= current_allowance`, this will clear the allowance (delete it).
+`DecreaseAllowance {spender、amount、expires}`-許容量を減らすかクリアする
+このようにして、 `spender`は最大` current_allowance-amount`トークンにアクセスできます
+`env.sender`アカウントから。これはオプションで「期限切れ」にすることができます
+時間(設定されている場合)は、承認された制限(時間または高度による)を使用できます。
+`amount> = current_allowance`の場合、これによりクォータがクリアされます(削除されます)。
 
-`TransferFrom{owner, recipient, amount}` - This makes use of an allowance
-and if there was a valid, un-expired pre-approval for the `env.sender`,
-then we move `amount` tokens from `owner` to `recipient` and deduct it
-from the available allowance.
+`TransferFrom {owner、receiver、amount}`-これは手当を使用します
+`env.sender`に有効な、有効期限が切れていない事前承認がある場合、
+次に、 `amount`トークンを` owner`から `recipient`に移動し、それを差し引きます
+利用可能な手当から。
 
-`SendFrom{owner, contract, amount, msg}` - `SendFrom` is to `Send`, what
-`TransferFrom` is to `Transfer`. This allows a pre-approved account to
-not just transfer the tokens, but to send them to another contract
-to trigger a given action. **Note** `SendFrom` will set the `Receive{sender}`
-to be the `env.sender` (the account that triggered the transfer)
-rather than the `owner` account (the account the money is coming from).
-This is an open question whether we should switch this?
+`SendFrom {owner、contract、amount、msg}` -`SendFrom`から `Send`、何
+`TransferFrom`は` Transfer`になります。これにより、事前に承認されたアカウントが可能になります
+トークンを転送するだけでなく、別の契約に送信します
+指定されたアクションをトリガーします。 **注** `SendFrom`は` Receive {sender} `を設定します
+`env.sender`(転送をトリガーするアカウント)になります
+「所有者」アカウント(資金が由来するアカウント)ではなく。
+これは未解決の質問ですが、切り替える必要がありますか？
 
-`BurnFrom{owner, amount}` - This works like `TransferFrom`, but burns
-the tokens instead of transfering them. This will reduce the owner's
-balance, `total_supply` and the caller's allowance.
+`BurnFrom {owner、amount}`-これは `TransferFrom`に似ていますが、書き込みます
+トークンを転送する代わりに。これにより、所有者の
+残高、 `total_supply`および発信者の手当。
 
-### Queries
+### お問い合わせ
 
-`Allowance{owner, spender}` - This returns the available allowance
-that `spender` can access from the `owner`'s account, along with the
-expiration info. Return type is `AllowanceResponse{balance, expiration}`.
+`Allowance {owner、spender}`-これは利用可能な手当を返します
+`spender`は` owner`のアカウントからアクセスできます。
+有効期限情報。戻りタイプは「AllowanceResponse {balance、expire}」です。
 
-## Mintable
+## ミンテーブル
 
-This allows another contract to mint new tokens, possibly with a cap.
-There is only one minter specified here, if you want more complex
-access management, please use a multisig or other contract as the
-minter address and handle updating the ACL there.
+これにより、別のコントラクトが、おそらく上限を使用して、新しいトークンを作成できるようになります。
+もっと複雑にしたい場合は、ここで指定されているミントは1つだけです。
+アクセス管理、マルチ署名または他の契約を使用してください
+ミンターアドレスを指定し、そこで更新ACLを処理します。
 
-### Messages
+### 情報
 
-`Mint{recipient, amount}` - If the `env.sender` is the allowed minter,
-this will create `amount` new tokens (updating total supply) and
-add them to the balance of `recipient`.
+`Mint {recipient、amount}` -`env.sender`が許可されたミントである場合、
+これにより、新しい `amount`トークンが作成され(総供給量が更新されます)、
+それらを「受信者」の残高に追加します。
 
-### Queries
+### お問い合わせ
 
-`Minter{}` - Returns who and how much can be minted. Return type is
-`MinterResponse {minter, cap}`. Cap may be unset.
+`Minter {}`-ミントできる人とミントできる数を返します。戻りタイプは
+`MinterResponse {minter、cap}`。上限が設定されていない場合があります。

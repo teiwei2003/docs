@@ -1,73 +1,73 @@
-# CW20 Bonding curve
+# CW20結合曲線
 
-cw20-bonding-curve source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-bonding](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-bonding)
+cw20-bonding-curveソースコード:[https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-bonding](https://github.com/CosmWasm/cosmwasm-plus/tree/メイン/コントラクト/cw20-ボンディング)
 
-This builds on the [Basic CW20 interface](01-spec.md)
-as implemented in [`cw20-base`](02-cw20-base-spec.md)
+これは[基本的なCW20インターフェース](01-spec.md)に基づいています
+[`cw20-base`](02-cw20-base-spec.md)に実装されています
 
-This serves three purposes:
+これには3つの目的があります。
 
-* A usable and extensible contract for arbitrary bonding curves
-* A demonstration of how to extend `cw20-base` to add extra functionality
-* A demonstration of the [Receiver interface](01-spec.md#receiver)
+*あらゆるボンディングカーブで利用可能でスケーラブルな契約
+* `cw20-base`を拡張して機能を追加する方法を示します
+* [Receiver Interface](01-spec.md#receiver)のデモンストレーション
 
-## Design
+## 設計
 
-There are two variants - accepting native tokens and accepting cw20 tokens
-as the *reserve* token (this is the token that is input to the bonding curve).
+2つのバリエーションがあります-ネイティブトークンを受け入れるとcw20トークンを受け入れる
+*予約*トークンとして(これは結合曲線に入力されたトークンです)。
 
-Minting: When the input is sent to the contract (either via `HandleMsg::Buy{}`
-with native tokens, or via `HandleMsg::Receive{}` with cw20 tokens),
-those tokens remain on the contract and it issues it's own token to the
-sender's account (known as *supply* token).
+ミンティング:入力がコントラクトに送信されたとき( `HandleMsg :: Buy()`を介して
+ネイティブトークンを使用するか、 `HandleMsg :: Receive {}`)を介してcw20トークンを使用します。
+これらのトークンはコントラクトに保持され、コントラクトに独自のトークンを発行します
+送信者のアカウント(*供給*トークンと呼ばれます)。
 
-Burning: We override the burn function to not only burn the requested tokens,
-but also release a proper number of the input tokens to the account that burnt
-the custom token
+書き込み:要求されたトークンを書き込むだけでなく、書き込み機能についても説明しました。
+ただし、焼き付けられたアカウントに適切な量の入力トークンを解放する
+カスタムトークン
 
-Curves: `handle` specifies a bonding function, which is sent to parameterize
-`handle_fn` (which does all the work). The curve is set when compiling
-the contract. In fact many contracts can just wrap `cw20-bonding` and
-specify the custom curve parameter.
+曲線: `handle`は結合関数を指定し、それをパラメーター化に送信します
+`handle_fn`(すべての作業を完了します)。コンパイル時に曲線を設定する
+契約する。実際、多くの契約では、 `cw20-bonding`と
+カスタム曲線パラメータを指定します。
 
-Read more about [bonding curve math here](https://yos.io/2018/11/10/bonding-curves/)
+[結合曲線の数学はこちら](https://yos.io/2018/11/10/bonding-curves/)についてもっと読む
 
-Note: the first version only accepts native tokens as the
+注:最初のバージョンは、ネイティブトークンのみを受け入れます。
 
-### Math
+### 算数
 
-Given a price curve `f(x)` = price of the `x`th token, we want to figure out
-how to buy into and sell from the bonding curve. In fact we can look at
-the total supply issued. let `F(x)` be the integral of `f(x)`. We have issued
-`x` tokens for `F(x)` sent to the contract. Or, in reverse, if we send
-`x` tokens to the contract, it will mint `F^-1(x)` tokens.
+価格曲線f(x)= x番目のトークンの価格が与えられた場合、次のように計算します。
+債券カーブから売買する方法。実際に見てみることができます
+発行された総供給量。 `F(x)`を `f(x)`の積分とします。送りました
+コントラクトに送信された「F(x)」の「x」トークン。または、逆に、
+コントラクトへの `x`トークン、それは` F ^ -1(x) `トークンをミントします。
 
-From this we can create some formulas. Assume we currently have issued `S`
-tokens in exchange for `N = F(S)` input tokens. If someone sends us `x` tokens,
-how much will we issue?
+これから、いくつかの数式を作成できます。すでに `S`をリリースしたとしましょう
+トークンは「N = F(S)」入力トークンと交換されます。誰かが私たちに `x`トークンを送った場合、
+いくつ発行しますか？
 
-`F^-1(N+x) - F^-1(N)` = `F^-1(N+x) - S`
+`F ^ -1(N + x)-F ^ -1(N)` = `F ^ -1(N + x)-S`
 
-And if we sell `x` tokens, how much we will get out:
+`x`トークンを販売すると、いくら取得できますか。
 
-`F(S) - F(S-x)` = `N - F(S-x)`
+`F(S)-F(S-x)` = `N-F(S-x)`
 
-Just one calculation each side. To be safe, make sure to round down and
-always check against `F(S)` when using `F^-1(S)` to estimate how much
-should be issued. This will also safely give us how many tokens to return.
+両側で1つだけカウントされます。安全のため、必ず切り上げて
+`F ^ -1(S)`を使用して金額を見積もる場合は、常に `F(S)`を確認してください。
+発行する必要があります。これにより、トークンの数も安全に返されます。
 
-There is built in support for safely [raising i128 to an integer power](https://doc.rust-lang.org/std/primitive.i128.html#method.checked_pow).
-There is also a crate to [provide nth-root of for all integers](https://docs.rs/num-integer/0.1.43/num_integer/trait.Roots.html).
-With these two, we can handle most math except for logs/exponents.
+組み込みのサポートは安全に[i128を整数乗](https://doc.rust-lang.org/std/primitive.i128.html#method.checked_pow)。
+クレート[すべての整数にn個のルートを提供](https://docs.rs/num-integer/0.1.43/num_integer/trait.Roots.html)もあります。
+これらの2つを使用すると、対数/指数を除くほとんどの数学を処理できます。
 
-Compare this to [writing it all in solidity](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/7b7ff729b82ea73ea168e495d9c94cb901ae95ce/contracts/math/Power.sol)
+これを[信頼できる方法ですべてを書く](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/7b7ff729b82ea73ea168e495d9c94cb901ae95ce/contracts/math/Power.sol)と比較してください
 
-Examples:
+例:
 
-Price Constant: `f(x) = k` and `F(x) = kx` and `F^-1(x) = x/k`
+価格定数: `f(x)= k`および` F(x)= kx`および `F ^ -1(x)= x/k`
 
-Price Linear: `f(x) = kx` and `F(x) = kx^2/2` and `F^-1(x) = (2x/k)^(0.5)`
+価格の線形性: `f(x)= kx`および` F(x)= kx ^ 2/2`および `F ^ -1(x)=(2x/k)^(0.5)`
 
-Price Square Root: `f(x) = x^0.5` and `F(x) = x^1.5/1.5` and `F^-1(x) = (1.5*x)^(2/3)`
+価格の平方根: `f(x)= x ^ 0.5`および` F(x)= x ^ 1.5/1.5`および `F ^ -1(x)=(1.5 * x)^(2/3)`
 
-We will only implement these curves to start with, and leave it to others to import this with more complex curves,
+これらの曲線は最初にのみ実装し、他の人がより複雑な曲線を使用してインポートできるようにします。
