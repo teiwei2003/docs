@@ -1,31 +1,32 @@
-# Introduction
+# 導入する
 
-DeFi wave hit 2020 crypto scene with massive impact and brought excitement.
-High yields attracted everyone includes institutional player attention,
-but there is another feeling crypto twitter has along with excitement:
-Anxiety of a single error in an unaudited Solidity code can break the system with a domino effect.
-Not even mentioning the enormous fees paid to execute just one smart contract.
+DeFiの波は2020年に暗号通貨のシーンに打撃を与え、大きな影響と興奮をもたらします。
+高収量は、機関投資家を含むすべての人の注目を集めています、
+しかし、暗号化されたTwitterには別のエキサイティングな感覚があります。
+未監査のSolidityコードの単一のエラーについての不安は、ドミノ効果でシステムを混乱させる可能性があります。
+スマートコントラクトを実行するために支払われる莫大な料金についても言及していません。
 
-One of the prospects of CosmWasm is providing a solid base to DeFi dApps.
+CosmWasmの展望の1つは、DefidAppの強固な基盤を提供することです。
 
-To prove this bold claim and show CosmWasm is the right path, we will demonstrate a [simple option](https://en.wikipedia.org/wiki/Option_(finance)) contract and teach you along the way.
+この大胆な主張を証明し、CosmWasmが正しい道であることを示すために、[単純なオプション](https://en.wikipedia.org/wiki/Option_(finance))契約を示し、その過程で説明します。
 
-::: tip
-Options are financial derivatives that give buyers the right, but not the obligation, to buy or sell an underlying asset at an agreed-upon price and date.
+::: ヒント
+オプションは、合意された価格と日付で原資産を売買する権利を買い手に与える金融デリバティブですが、義務はありません。
 :::
 
-We demo-ed the contract for HackAtom V India participants in a workshop.
+セミナーでは、HackAtom VIndia参加者の契約を実演しました。
 
-<iframe src="https://player.vimeo.com/video/457486858" width="640" height="361" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+<iframe src = "https://player.vimeo.com/video/457486858" width = "640" height = "361" frameborder = "0" allow = "autoplay; fullscreen" allowfullscreen> </iframe>
 
-You can open the recordings of the workshop to the side and follow the written tutorial as a transcript. In the workshop we start from boiler plate code and build on top of it. In this tutorial you be walked through the finished version.
-We recommend you to launch a project from template and develop along Ethan's workshop video, you will learn such as development flow and possible errors which you can't learn just by reading a written tutorial.
+セミナーの記録を横に開いて、筆記録として書かれたチュートリアルに従うことができます。セミナーでは、ボイラープレートコードから始めて、それを基に構築します。このチュートリアルでは、完成したバージョンについて学習します。
+テンプレートからプロジェクトを開始し、イーサンのセミナービデオに従ってプロジェクトを開発することをお勧めします。作成されたチュートリアルを読むだけでは理解できない、開発プロセスと発生する可能性のあるエラーについて学習します。
 
-You can find the complete repo at [github/cosmwasm-examples](https://github.com/CosmWasm/cosmwasm-examples).
+完全なリポジトリは[github/cosmwasm-examples](https://github.com/CosmWasm/cosmwasm-examples)にあります。
 
-Pay attention to comments like below in code examples. The details about the code itself is in the comments.
+以下のコード例のコメントに注意してください。コード自体の詳細はコメントにあります。
 
-Also the video is recorded using and older version of cosmwasm, but tutorials have been updated to a recent version(0.13) so there could be minor differences.
+また、ビデオは古いバージョンのcosmwasmで録画されましたが、チュートリアルが最新バージョン(0.13)に更新されているため、若干の違いがある場合があります。
+
 ```
 /*
  *

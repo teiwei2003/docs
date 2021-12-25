@@ -1,12 +1,12 @@
-# Next Steps
+# 次のステップ
 
-We covered a lot of essentials of CosmWasm in this tutorial/workshop combo. We have more reading and learning resources for you:
+このチュートリアル/ワークショップの組み合わせでは、CosmWasmの多くの基本的な知識を紹介しました。 私たちはあなたにもっと多くの読書と学習のリソースを提供します:
 
-- [Getting Started](/getting-started/intro.md), best starter docs.
-- [Learn](/learn/), more tutorials.
-- [cosmwasm-examples](https://github.com/CosmWasm/cosmwasm-examples/), simple smart contract examples.
-- [cosmwasm-plus](/cw-plus/general/overview.md), production grade smart contracts.
+-[はじめに](/getting-started/intro.md)、最高の入門書。
+-[Learn](/learn/)、その他のチュートリアル。
+-[cosmwasm-examples](https://github.com/CosmWasm/cosmwasm-examples/)、シンプルなスマートコントラクトの例。
+-[cosmwasm-plus](/cw-plus/general/overview.md)、本番レベルのスマートコントラクト。
 
-And don't forget to join the [CosmWasm Discord](https://docs.cosmwasm.com/chat).
+また、[CosmWasm Discord](https://docs.cosmwasm.com/chat)に参加することを忘れないでください。
 
-Happy to answer all your questions and see deploy contract messages racing for to be the first in the transaction.
+すべての質問に答えて、展開契約のニューススクランブリングがトランザクションの最初になるのを見るのは素晴らしいことです。

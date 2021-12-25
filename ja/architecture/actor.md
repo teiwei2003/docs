@@ -1,6 +1,6 @@
-# Actor Model for Contract Calls
+# 契約によって呼び出されたアクターモデル
 
-The [actor model](https://en.wikipedia.org/wiki/Actor_model) is a design pattern, often used in to build reliable, distributed systems. The fundamental points, in my opinion, are that each `Actor` has exclusive access to its own internal state, and that `Actors` cannot call each other directly, only dispatch messages over some `Dispatcher` (that maintains the state of the system and can map addresses to code and storage). Fundamentally the `Actor` pattern can be encapsulated in such an interface:
+[アクターモデル](https://en.wikipedia.org/wiki/Actor_model)は、信頼性の高い分散システムを構築するためによく使用されるデザインパターンです。 私の意見では、基本的なポイントは、各 `Actor`は独自の内部状態に排他的にアクセスでき、` Actors`はいくつかの `Dispatcher`(システム状態を維持)を介してのみ相互に直接呼び出すことはできず、アドレスをコードにマップでき、ストレージ)。 基本的に、 `Actor`パターンは次のようなインターフェースにカプセル化できます。
 
 ```rust
 pub trait Actor {
@@ -13,51 +13,51 @@ pub struct Msg {
 }
 ```
 
-This is the basic model that was used to model contracts in CosmWasm. You can see the same influence in the function `pub fn handle<T: Storage>(store: &mut T, params: Params, msg: Vec<u8>) -> Result<Response>`. `Response` contains `Vec<Msg>` and a little metadata. `store` is access to the contract's internal state. And `params` is some global immutable context. So, just a little bit of syntax around the same design. From this basic design, a few other useful aspects can be derived:
+これは、CosmWasmでコントラクトをモデル化するために使用される基本モデルです。関数 `pub fn handle <T:Storage>(store:＆mut T、params:Params、msg:Vec <u8>)-> Result <Response>`でも同じ効果が見られます。 `Response`には` Vec <Msg> `といくつかのメタデータが含まれています。 `store`は、契約の内部状態へのアクセスです。 `params`は、グローバルに不変のコンテキストです。したがって、同じデザインの周りに必要な構文はごくわずかです。この基本的な設計から、他のいくつかの有用な側面を引き出すことができます。
 
-First, there is a **loose coupling** between Actors, limited to the format of the data packets (the recipient must support a superset of what you send). There is no complex API or function pointers to pass around. This is much like using REST or RPC calls as a boundary between services, which is a scalable way to compose systems from many vendors.
+まず、アクター間に**緩い結合**があります。これはパケットの形式に制限されます(受信者は送信したスーパーセットをサポートする必要があります)。複雑なAPIまたは関数ポインタを渡すことはできません。これは、サービス間の境界としてRESTまたはRPC呼び出しを使用するのとよく似ています。これは、多くのベンダーのシステムを組み合わせるスケーラブルな方法です。
 
-Secondly, each `Actor` can effectively run on its own thread, with its own queue. This both enables concurrency (which we don't make use of in CosmWasm... yet), and **serialized execution** within each actor (which we do rely upon). This means that it is impossible for the `Handle` method above to be executed in the middle of a previously executed `Handle` call. `Handle` is a synchronous call and returns before the `Actor` can process the next message. This feature is what [protects us from reentrancy by design](../architecture/smart-contracts#avoiding-reentrancy-attacks).
+次に、各 `Actor`は独自のスレッドで効果的に実行でき、独自のキューを持っています。これにより、同時実行性(CosmWasmでは使用していません...)と、各アクターでの**実行のシリアル化**(依存しています)の両方を実現できます。つまり、上記のHandleメソッドは、以前に実行されたHandle呼び出しの途中では実行できません。 `Handle`は同期呼び出しであり、` Actor`が次​​のメッセージを処理する前に戻ります。この機能は[設計による再突入から私たちを保護する](../architecture/smart-contracts#avoiding-reentrancy-attacks)です。
 
-Another important aspect related to CosmWasm is **locality**. That is, actors can only communicate with other actors **whose address they previously received**. We will go more into depth on [addresses and naming](./addresses) in the next page, but the key point is that for two actors to communicate, an external message (from the contract creator, or potentially a user) must be sent to the actor. This is a flexible way to set up topologies in a distributed manner. The only thing that must be hard-coded is the data format to pass to such addresses. Once some standard interfaces are established (like ERC20, ERC721, ENS, etc), then we can support composability between large classes of contracts, with different backing code, but sharing a common API.
+CosmWasmに関連するもう1つの重要な側面は、**局所性**です。つまり、アクターは他のアクターと**以前に受信したアドレス**とのみ通信できます。 [アドレスと名前](./addresss)については次のページで詳しく説明しますが、重要なのは2人の参加者が通信できるようにすることです。外部メッセージ(契約作成者または場合によってはユーザーから)を送信する必要があります。俳優に。これは、分散方式でトポロジを設定するための柔軟な方法です。ハードコーディングする必要があるのは、これらのアドレスに渡されるデータ形式だけです。いくつかの標準インターフェース(ERC20、ERC721、ENSなど)が確立されると、サポートコードは異なりますが、共通のAPIを共有して、主要なタイプのコントラクト間の構成をサポートできます。
 
-## Security Benefits
+## セキュリティ上の利点
 
-By enforcing **private internal state**, a given contract can guarantee all valid transitions in its internal state. This is in contrast to the capabilities model used in Cosmos SDK, where trusted modules are passed a `StoreKey` in their constructor, which allows *full read and write access to the other module's storage*. In the Cosmos SDK, we can audit the modules before calling them, and safely pass in such powerful set of rights at compile time. However, there are no compile time checks in a smart contract system and we need to produce stricter boundaries between contracts. This allows us to comprehensively reason over all possibles transitions in a contract's state (and use quick-check like methods to test it).
+**プライベート内部状態**を適用することにより、特定のコントラクトは、その内部状態でのすべての有効な遷移を保証できます。これは、トラステッドモジュールがコンストラクターで「StoreKey」を渡すCosmos SDKで使用される機能モデルとは対照的です。これにより、*別のモジュールのストレージへの完全な読み取りおよび書き込みアクセス*が可能になります。 Cosmos SDKでは、モジュールを呼び出す前にモジュールを監査し、コンパイル時にこのような強力な権限のセットを安全に渡すことができます。ただし、スマートコントラクトシステムにはコンパイル時のチェックがないため、コントラクト間にさらに厳密な境界を作成する必要があります。これにより、コントラクト状態で発生する可能性のあるすべての遷移について完全に推論できます(クイックチェックなどの方法を使用してテストできます)。
 
-As mentioned above, **serialized execution** prevents all concurrent execution of a contract's code. This is like an automatic mutex over the entire contract code. This is exactly the issue that one of the most common Ethereum attacks, reentrancy, makes use of. Contract A calls into contract B, which calls back into contract A. There may be local changes in memory in contract A from the first call (eg. deduct a balance), which are not yet persisted, so the second call can use the outdated state a second time (eg. authorize sending a balance twice). By enforcing serialized execution, the contract will write all changes to storage before exiting, and have a proper view when the next message is processed.
+上記のように、**シリアル化の実行**は、コントラクトコードのすべての同時実行を防ぎます。これは、契約コード全体の自動ミューテックスロックのようなものです。これは、最も一般的なイーサリアム攻撃、再入可能性、および悪用可能性の問題の1つです。コントラクトAはコントラクトBを呼び出し、コントラクトBはコントラクトAにコールバックします。最初の呼び出しでコントラクトAのメモリにローカルな変更があり(たとえば、残高を差し引く)、それが永続化されていないため、2番目の呼び出しで古い2番目のステートメントを使用できます(たとえば、残高の送信が許可されています)。 2回)。強制的なシリアル化の実行により、コントラクトは終了する前にすべての変更をストレージに書き込み、次のメッセージを処理するときに正しいビューを持ちます。
 
-## Atomic Execution
+## アトミック実行
 
-One problem with sending messages is atomically committing a state change over two contracts. There are many cases where we want to ensure that all returned messages were properly processed before committing our state. There are ideas like "three-phase-commit" used in distributed databases, but since in the normal case, all actors are living in the same binary, we can handle this in the `Keeper`. Before executing a Msg that came from an external transaction, we create a SavePoint of the global data store, and pass in a subset to the first contract. We then execute all returned messages inside the same sub-transaction. If all messages succeed, then we can commit the sub-transaction. If any fails (or we run out of gas), we abort execution and rollback the state to before the first contract was executed.
+メッセージの送信に関する1つの問題は、両方のコントラクトで状態の変更をアトミックにコミットすることです。多くの場合、ステータスを送信する前に、返されたすべてのメッセージが正しく処理されていることを確認する必要があります。 「3フェーズコミット」のようなアイデアは分散データベースで使用されますが、通常の状況ではすべての参加者が同じバイナリファイルに住んでいるため、この問題は「Keeper」で処理できます。外部トランザクションからメッセージを実行する前に、グローバルデータストレージのSavePointを作成し、サブセットを最初のコントラクトに渡します。次に、返されたすべてのメッセージを同じサブトランザクションで実行します。すべてのメッセージが成功した場合、サブトランザクションをコミットできます。障害が発生した場合(またはガスが不足した場合)、実行を中止し、最初の契約が実行される前の状態にロールバックします。
 
-This allows us to optimistically update code, relying on rollback for error handling. For example if an exchange matches a trade between two "ERC20" tokens, it can make the offer as fulfilled and return two messages to move token A to the buyer and token B to the seller. (ERC20 tokens use a concept of allowance, so the owner "allows" the exchange to move up to X tokens from their account). When executing the returned messages, it turns out the the buyer doesn't have sufficient token B (or provided an insufficient allowance). This message will fail, causing the entire sequence to be reverted. Transaction failed, the offer was not marked as fulfilled, and no tokens changed hands.
+これにより、エラー処理のロールバックに依存して、コードを楽観的に更新できます。たとえば、取引所が2つの「ERC20」トークン間のトランザクションと一致する場合、オファーを履行して2つのメッセージを返し、トークンAを購入者に転送し、トークンBを販売者に転送できます。 (ERC20トークンはクォータの概念を使用しているため、所有者は取引所が自分のアカウントから最大X個のトークンを転送することを「許可」します)。返されたメッセージを実行すると、購入者が十分なトークンBを持っていない(または提供されたクォータが不十分である)ことがわかります。このメッセージは失敗し、シーケンス全体が復元されます。トランザクションは失敗し、オファーは完了としてマークされず、トークンは変更されませんでした。
 
-While many developers may be more comfortable thinking about directly calling the other contract in their execution path and handling the errors, you can achieve almost all the same cases with such an *optimistic update and return* approach. And there is no room for making mistakes in the contract's error handling code.
+多くの開発者は、実行パスで別のコントラクトを直接呼び出してエラーを処理することを検討することを好むかもしれませんが、この*楽観的な更新とリターン*の方法を使用して、ほぼすべて同じ状況を実現できます。また、コントラクトのエラー処理コードにエラーの余地はありません。
 
-## Dynamically Linking Host Modules
+## ダイナミックリンクホストモジュール
 
-The aspects of **locality** and **loose coupling** mean that we don't even need to link to other CosmWasm contracts. We can send messages to anything the Dispatcher has an address for. For example, we can return a `SendMsg`, which will be processed by the native `x/supply` module in Cosmos SDK, moving native tokens. As we define standard interfaces for composability, we can define interfaces to call into core modules (bond and unbond your stake...), and then pass in the address to the native module in the contract constructor.
+**局所性**と**緩い結合**の側面は、他のCosmWasmコントラクトにリンクする必要さえないことを意味します。コーディネーターがアドレスを持っているものなら何にでもメッセージを送ることができます。たとえば、 `SendMsg`を返すことができます。これは、CosmosSDKのネイティブ` x/supply`モジュールによって処理されてネイティブトークンを移動します。構成可能性の標準インターフェースを定義するとき、コアモジュールを呼び出すインターフェースを定義し(共有のバインドとバインド解除...)、コントラクトコンストラクターのネイティブモジュールにアドレスを渡すことができます。
 
-## Inter Blockchain Messaging
+## ブロックチェーン間のメッセージ転送
 
-Since the Actor model doesn't attempt to make synchronous calls to another contract, but just returns a message "to be executed", it is a nice match for making cross-chain contract calls using [IBC](https://cosmos.network/ibc). The only caveat here is that the *atomic execution* guarantee we provided above no longer applies here. The other call will not be called by the same dispatcher, so we need to store an intermediate state in the contract itself. That means a state that cannot be changed until the result of the IBC call is known, then can be safely applied or reverted.
+アクターモデルは別のコントラクトへの同期呼び出しを試みず、「実行する」というメッセージのみを返すため、[IBC](https://cosmos.network/ibc)の使用に非常に適しています。ここでの唯一の注意点は、上記で提供した*アトミック実行*の保証がここでは適用されなくなることです。同じスケジューラーによって別の呼び出しが呼び出されることはないため、コントラクト自体に中間状態を格納する必要があります。これは、IBC呼び出しの結果がわかるまで変更できず、安全に適用または復元できる状態を意味します。
 
-For example, if we want to move tokens from chain A to chain B, we would first prepare a send:
+たとえば、トークンをチェーンAからチェーンBに移動する場合は、最初に以下を送信する準備をする必要があります。
 
-1. Contract A reduces token supply of sender
-2. Contract A creates a "escrow" of those tokens linked to IBC message id, sender and receiving chain.
-3. Contract A commits state and returns a message to initiate an IBC transaction to chain B.
-4. If the IBC send part fails, then the contract is atomically reverted as above.
+1.コントラクトAは送信者のトークン供給を減らします
+2.コントラクトAは、IBCメッセージID、送信者、および受信者チェーンにリンクされたトークンの「エスクロー」を作成します。
+3.コントラクトAはステータスを送信し、チェーンBへのIBCトランザクションを開始するためのメッセージを返します。
+4. IBC送信部分が失敗した場合、コントラクトは上記のようにアトミックに復元されます。
 
-After some time, a "success" or "error"/"timeout" message is returned from the IBC module to the token contract:
+一定期間後、「成功」または「エラー」/「タイムアウト」メッセージがIBCモジュールからトークンコントラクトに返されます。
 
-1. Contract A validates the message came from the IBC handler (authorization) and refers to a known IBC message ID it has in escrow.
-2. If it was a success, the escrow is deleted and the escrowed tokens are placed in an account for "Chain B" (meaning that only a future IBC message from Chain B may release them).
-3. If it was an error, the escrow is deleted and the escrowed tokens are returned to the account of the original sender.
+1.コントラクトAは、IBCハンドラー(許可)からのメッセージを検証し、エスクロー内の既知のIBCメッセージIDを参照します。
+2.成功した場合は、エスクローを削除し、エスクローされたトークンを「Bチェーン」アカウントに入れます(つまり、Bチェーンからの将来のIBCメッセージのみがそれらを解放する可能性があります)。
+3.エラーの場合、エスクローは削除され、エスクローされたトークンは元の送信者のアカウントに返されます。
 
-You can imagine a similar scenario working for cases like moving NFT ownership, cross-chain staking, etc. We will expand on these possibilities and provide tooling to help make proper design once the IBC code in Cosmos SDK is stabilized (and included in a release), but the contract design is made with this in mind.
+モバイルNFTの所有権、クロスチェーンの誓約などについても同様のシナリオを想像できます。 Cosmos SDKのIBCコードが安定したら(そしてバージョンに含まれるように)、これらの可能性を拡大し、適切な設計に役立つツールを提供します)が、契約設計ではこれを考慮に入れています。
 
-## Credits
+## クレジット
 
-Much thanks to [Aaron Craelius](https://github.com/aaronc), who came up with this design of using an Actor model to avoid reentrancy attacks.
+リエントラント攻撃を回避するためにアクターモデルを使用する設計を提案してくれた[AaronCraelius](https://github.com/aaronc)に感謝します。

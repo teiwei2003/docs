@@ -1,23 +1,23 @@
-# Serialization Formats
+# シリアル化形式
 
-One of the driving forces in developing CosmWasm, besides security by design, was to include a very nice Developer UX. Key to this is the ability to inspect and debug messages sent on the blockchain, and parse results without needing complex libraries. Also not requiring downloading custom schemas and ABIs just to make a method call.
+設計のセキュリティに加えて、CosmWasmの開発の原動力の1つは、開発者にとって非常に優れたユーザーエクスペリエンスを含めることです。重要なのは、ブロックチェーンで送信されたメッセージを検査およびデバッグし、複雑なライブラリを必要とせずに結果を解析できるようにすることです。また、メソッド呼び出しのためだけにカスタムパターンとABIをダウンロードする必要はありません。
 
 ## JSON
 
-The natural solution was to use JSON everywhere. It is self-describing, human-readable, and used in APIs everywhere. It does have some downsides, such as handling numbers over 2^53 (just use strings), no clear distinction between strings and base64-encoded binary, and no hard-coded schema. We auto-generate [JSON Schema](https://json-schema.org/) descriptors for the [public API of contracts](https://github.com/CosmWasm/cosmwasm-examples/tree/master/escrow/schema), which can be used to inspect the supported API and optionally used in client side tooling for auto-validation of messages.
+自然な解決策は、どこでもJSONを使用することです。自己記述型で、人間が読める形式であり、あらゆる場所のAPIで使用されます。 2 ^ 53を超える数値の処理(文字列のみを使用)、文字列とbase64でエンコードされたバイナリファイルの間に明らかな違いがない、ハードコーディングされたモードがないなど、いくつかの欠点があります。 [Contract’s Public API](https://github.com/CosmWasm/cosmwasm-examples/tree/master/escrow/)スキーマの[JSONスキーマ](https://json-schema.org/)記述子を自動的に生成します) 、サポートされているAPIを確認するために使用でき、オプションでクライアントツールで使用してメッセージを自動的に確認できます。
 
-The feedback when developing and debugging with this has been positive, and we are quite happy with the Developer UX with this. It is too early to tell if the message size and free-form schema will become a hinderance in production. However, please note that contracts define their own parsing logic for messages, the codec is not enforced by the framework. We provide first-class support for json through [`cosmwasm::serde`](https://github.com/CosmWasm/cosmwasm/blob/master/src/serde.rs) and [`cosmwasm-template`](https://github.com/CosmWasm/cosmwasm-template), but anyone can swap this out - provided they provide client support for the format.
+開発とデバッグに使用する際のフィードバックは肯定的であり、開発者のユーザーエクスペリエンスに非常に満足しています。メッセージサイズと自由形式モードが本番環境の障害になるかどうかを判断するにはまだ時期尚早です。ただし、コントラクトは独自のメッセージ解析ロジックを定義しており、コーデックはフレームワークによって強制されないことに注意してください。 [`cosmwasm :: serde`](https://github.com/CosmWasm/cosmwasm/blob/master/src/serde.rs)と[` cosmwasm-template`](https://github.com/CosmWasm/cosmwasm-template)ですが、フォーマットのクライアントサポートを提供していれば、誰でも置き換えることができます。
 
-It is helpful to have consistency to aid client development, as well as contract-contract calls.
+一貫性を維持することで、顧客の開拓と契約間の電話が容易になります。
 
-## Protobuf
+## プロトタイプバッファー
 
-Protobuf is a well-known and widely-supported binary format. It gives a stricter schema guarantees than JSON and more compact format. Protocol Buffers and GRPC support has been added with Cosmos SDK v0.39.0 upgrade.
+Protobufは、よく知られており、広くサポートされているバイナリ形式です。 JSONよりも厳密なスキーマ保証とよりコンパクトな形式を提供します。 Cosmos SDK v0.39.0のアップグレードで、プロトコルバッファとGRPCのサポートが追加されました。
 
 ## Cap'n Proto
 
-[Cap'n Proto](https://capnproto.org/) is a super-lean encoding format with zero-copy reads, and no parsing needed. This has been [suggested for use in CosmWasm](https://github.com/CosmWasm/cosmwasm/issues/78) as an optional addition. This may be considered as an opt-in format for contracts desiring such efficiency or strict schema, or possibly just used for encoding internal data structures (`Params`).
+[Cap'n Proto](https://capnproto.org/)は、コピーの読み取りがゼロの超リーンエンコーディング形式であり、解析する必要はありません。これは、オプションの追加として[CosmWasmでの使用をお勧めします](https://github.com/CosmWasm/cosmwasm/issues/78)されています。これは、この効率性または厳密なモードを必要とするコントラクト、またはおそらく内部データ構造( `Params`)のエンコードにのみ選択されるフォーマットと見なすことができます。
 
-## Credits
+## クレジット
 
-Much thanks to [Jehan Tremback](https://github.com/jtremback), who insisted on a universal, human-readable format for all messages.
+[Jehan Tremback](https://github.com/jtremback)に感謝します。彼は、すべてのメッセージに共通の人間が読める形式を使用することを主張しています。

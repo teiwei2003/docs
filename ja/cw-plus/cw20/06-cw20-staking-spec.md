@@ -1,26 +1,26 @@
-# CW20 Staking Derivates
+# CW20誓約された派生物
 
-cw20-staking source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-staking](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-staking)
-This is a sample contract that releases a minimal form of staking derivatives.
-This is to be used for integration tests and as a foundation for other to build
-more complex logic upon.
+cw20-ステーキングソースコード:[https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-staking](https://github.com/CosmWasm/cosmwasm-plus/tree/master/契約/cw20ステーキング)
+これは、最小限の形式の担保デリバティブを公開するサンプル契約です。
+これは、統合テストおよび他のビルドの基礎として使用されます
+より複雑なロジック。
 
-## Functionality
+## 特徴
 
-On one side, this acts as a CW20 token, holding a list of
-balances for multiple addresses, and exposing queries and transfers (no
-allowances and "transfer from" to focus the logic on the staking stuff).
-However, it has no initial balance. Instead, it mints and burns them based on
-delegations.
+一方では、これはCW20トークンとして機能し、リストを保持します
+複数の住所の残高、および公的な問い合わせと転送(
+ロジックを賭けに集中させるための手当と「転送」)。
+ただし、初期バランスはありません。代わりに、それはに基づいてそれらをキャストして燃やします
+委任。
 
-For such a "bonding curve" we expose two additional message types. A "bond"
-message sends native staking tokens to the contract to be bonded to a validator
-and credits the user with the appropriate amount of derivative tokens. Likewise
-you can burn some of your derivative tokens, and the contract will unbond the
-proportional amount of stake to the user's account (after typical 21-day
-unbonding period).
+このような「結合曲線」について、2つの追加のメッセージタイプを開示しました。 「束縛」
+メッセージは、ネイティブの誓約トークンをコントラクトに送信して、バリデーターにバインドします
+そして、適切な量の派生トークンがユーザーにクレジットされます。同様に
+派生トークンの一部を燃やすことができ、契約は無制限になります
+ユーザーアカウントの比例配分(通常21日後)
+拘束力のない期間)。
 
-To show an example of charging for such a service, we allow the contract owner
-to take a small exit tax, thus maybe 98% of the tokens will be unbonded and sent
-to the original account, and 2% of the tokens are not unbonded, but rather
-transferred to the owners account. (The ownership can also be transferred).
+そのようなサービスの課金の例を示すために、契約所有者に許可します
+少額の出口税が課せられるため、トークンの98％がバインド解除されて送信される可能性があります
+元のアカウントに、トークンの2％はバインドされていませんが、
+所有者のアカウントに転送します。 (所有権を譲渡することもできます)。

@@ -1,50 +1,49 @@
-# Cw721 Basic
+# Cw721ベーシック
 
-cw721-basic source code: [https://github.com/CosmWasm/cosmwasm-plus/blob/master/contracts/cw721-base/README.md](https://github.com/CosmWasm/cosmwasm-plus/blob/master/contracts/cw721-base/README.md)
+cw721-基本的なソースコード:[https://github.com/CosmWasm/cosmwasm-plus/blob/master/contracts/cw721-base/README.md](https://github.com/CosmWasm/cosmwasm-plus/blob/master/Contracts/cw721-base/README.md)
 
-This is a basic implementation of a cw721 NFT contract. It implements
-the [CW721 spec](01-spec.md) and is designed to
-be deployed as is, or imported into other contracts to easily build
-cw721-compatible NFTs with custom logic.
+これは、cw721NFT契約の基本的な実現です。それは達成します
+【CW721仕様】(01-spec.md)の目的
+そのまま展開するか、他のコントラクトをインポートして簡単に構築できます
+カスタムロジックを備えたcw721はNFTと互換性があります。
 
-Implements:
+達成:
 
-- [x] CW721 Base
-- [x] Metadata extension
-- [ ] Enumerable extension (AllTokens done, but not Tokens - requires [#81](https://github.com/CosmWasm/cosmwasm-plus/issues/81))
+-[x] CW721ベース
+-[x]メタデータ拡張
+-[]列挙可能な拡張機能(AllTokensは完了しましたが、Tokensは完了していません-[#81](https://github.com/CosmWasm/cosmwasm-plus/issues/81)が必要です)
 
-## Implementation
+## 埋め込む
 
-The `HandleMsg` and `QueryMsg` implementations follow the [CW721 spec](01-spec.md) and are described there.
-Beyond that, we make a few additions:
+`HandleMsg`と` QueryMsg`の実装は、[CW721仕様](01-spec.md)に従い、そこで説明されています。
+さらに、いくつかの追加を行いました。
 
-* `InitMsg` takes name and symbol (for metadata), as well as a **Minter** address. This is a special address that has full
-  power to mint new NFTs (but not modify existing ones)
-* `HandleMsg::Mint{token_id, owner, name, description, image}` - creates a new token with given owner and metadata. It can only be called by
-  the Minter set in `init`.
-* `QueryMsg::Minter{}` - returns the minter address for this contract.
+* `InitMsg`は、名前と記号(メタデータ用)、および** Minter **アドレスを使用します。これは完全な特別なアドレスです
+  新しいNFTを偽造する力(ただし、既存のNFTを変更することはできません)
+* `HandleMsg :: Mint {token_id、owner、name、description、image}`-指定された所有者とメタデータを使用して新しいトークンを作成します。呼び出すことしかできません
+  ミンターは `init`に設定されています。
+* `QueryMsg :: Minter {}`-このコントラクトのミントアドレスを返します。
 
-It requires all tokens to have defined metadata in the standard format (with no extensions). For generic NFTs this may
-often be enough.
+標準形式(拡張子なし)でメタデータを定義するには、すべてのトークンが必要です。汎用NFTの場合、これは
+多くの場合、十分です。
 
-The *Minter* can either be an external actor (eg. web server, using PubKey) or another contract. If you just want to customize
-the minting behavior but not other functionality, you could extend this contract (importing code and wiring it together)
-or just create a custom contract as the owner and use that contract to Mint.
+* Minter *は、外部参加者(PubKeyを使用するWebサーバーなど)またはその他の契約にすることができます。カスタマイズしたいだけなら
+他の関数の代わりに動作をキャストすると、このコントラクトを拡張できます(コードをインポートして相互に接続します)
+または、所有者としてカスタムコントラクトを作成し、そのコントラクトをMintに使用します。
 
-## Importing this contract
+## この契約をインポートする
 
-You can also import much of the logic of this contract to build another
-CW721-compliant contract, such as tradable names, crypto kitties,
-or tokenized real estate.
+このコントラクトのロジックのほとんどをインポートして、別のコントラクトを構築することもできます
+取引可能な名前、暗号キットなど、CW721に準拠する契約
+またはトークン化された不動産。
 
-Basically, you just need to write your handle function and import
-`cw721_base::contract::handle_transfer`, etc and dispatch to them.
-This allows you to use custom `HandleMsg` and `QueryMsg` with your additional
-calls, but then use the underlying implementation for the standard cw721
-messages you want to support. The same with `QueryMsg`. You will most
-likely want to write a custom, domain-specific `init`.
+基本的には、ハンドル関数を記述してインポートするだけです。
+`cw721_base :: Contract :: handle_transfer`を待って、それらに割り当てます。
+これにより、カスタムの `HandleMsg`と` QueryMsg`を追加で使用できます
+呼び出してから、標準cw721の基盤となる実装を使用します
+サポートしたいメッセージ。 `QueryMsg`と同じです。あなたが一番になります
+カスタムのドメイン固有の `init`を作成することをお勧めします。
 
-For now, you can look at [`cw20-staking`](../cw20/06-cw20-staking-spec.md)
-for an example of how to "inherit" cw20 functionality and combine it with custom logic.
-The process is similar for cw721.
-
+これで、[`cw20-staking`](../cw20/06-cw20-staking-spec.md)を見ることができます。
+cw20機能を「継承」し、それをカスタムロジックと組み合わせる方法の例。
+cw721のプロセスも同様です。

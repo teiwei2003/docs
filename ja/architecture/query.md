@@ -1,42 +1,42 @@
-# Querying Contract State
+# 契約状況を問い合わせる
 
-There are many cases where you want to view the state of a contract. Both as an external client (using the cli), but also while executing a contract. For example, we discussed resolving names like "Alice" or "Bob" in the last section, which would require a query to another contract. We will first cover the two types of queries - raw and custom - then look at the semantics of querying via an *external client*, as well an *internal client* (another contract). We will pay special attention not only to how it works practically, but also the design and security issues of executing queries from one contract to another.
+多くの場合、契約のステータスを確認する必要があります。これは、外部クライアントとして(cliを使用して)またはコントラクトを実行するときに使用できます。たとえば、前のセクションで「Alice」や「Bob」などの名前の解析について説明しましたが、これには別のコントラクトをクエリする必要があります。最初に、元のクエリとカスタムクエリの2種類のクエリを紹介し、次に*外部クライアント*と*内部クライアント*(別のコントラクト)を介したクエリのセマンティクスを確認します。実際の動作に特別な注意を払うだけでなく、あるコントラクトから別のコントラクトへのクエリ実行の設計とセキュリティにも特別な注意を払います。
 
-**Note** This has been updated for CosmWasm 0.8 with full support for cross-contract queries.
+**注**これはCosmWasm0.8用に更新されており、クロスコントラクトクエリを完全にサポートしています。
 
-## Raw Queries
+## 元のクエリ
 
-The simplest query to implement is just raw read access to the key-value store.  If the caller (either external client, or other contract) passes in the raw binary key that is used in the contract's storage, we can easily return the raw binary value. The benefit of this approach is that it is very easy to implement and universal. The downside is that it links the caller to the *implementation* of the storage and requires knowledge of the exact contract being executed.
+実装する最も簡単なクエリは、Key-Valueストアへの生の読み取りアクセスです。呼び出し元(外部クライアントまたは他のコントラクト)がコントラクトストレージで使用されている元のバイナリキーを渡すと、元のバイナリ値を簡単に返すことができます。この方法の利点は、実装が非常に簡単で、普遍的であるということです。欠点は、呼び出し元を保存された*実装*にリンクし、実行されている正確なコントラクトを知る必要があることです。
 
-This is implemented inside the `wasmd` runtime and circumvents the VM. As a consequence it requires no support from the CosmWasm contract and all contract state is visible. Such a `query_raw` function is exposed to all callers (external and internal).
+これは `wasmd`ランタイムに実装され、VMをバイパスします。したがって、CosmWasmコントラクトのサポートは必要なく、すべてのコントラクト状態が表示されます。このような `query_raw`関数は、すべての呼び出し元(外部および内部)に公開されます。
 
-## Custom Queries
+## カスタムクエリ
 
-There are many cases where it is undesirable to couple tightly to *implementation*, and we would rather depend on an *interface*. For example, we will define a standard for "ERC20" `HandleMsg` for calling the contract and we would want to define such a standard for a `QueryMsg`. For example, query balance by address, query allowance via granter + grantee, query token info (ticker, decimals, etc). By defining a standard *interface*, we allow many implementations, including complex contracts, where the "ERC20" interface is only a small subset of their functionality.
+多くの場合、*実装*との緊密な結合はお勧めできません。むしろ*インターフェース*に依存したいと思います。たとえば、呼び出し側コントラクトの「ERC20」 `HandleMsg`の標準を定義し、` QueryMsg`のそのような標準を定義します。たとえば、住所で残高を照会し、付与者+被付与者を介して手当を照会し、トークン情報(コード、10進数など)を照会します。標準の*インターフェース*を定義することにより、複雑なコントラクトを含む多くの実装が可能になりますが、その「ERC20」インターフェースはその機能のごく一部にすぎません。
 
-To enable custom queries, we allow each contract to expose a `query` function, that can access its data store in read-only mode. It can load any data it wishes and even perform calculations on it. This method is exposed as `query_custom` to call callers (external and internal). The data format (both query and response) is anything the contract desires, and should be documented in the public schema, along with `HandleMsg` and `InitMsg`.
+カスタムクエリを有効にするために、各コントラクトが読み取り専用モードでデータストレージにアクセスできる `query`関数を公開できるようにします。必要なデータをロードし、計算することもできます。このメソッドは、呼び出し元(外部および内部)を呼び出すための `query_custom`として公開されます。データ形式(クエリと応答)は、コントラクトに必要な任意の形式であり、 `HandleMsg`および` InitMsg`とともにパブリックモードで記録する必要があります。
 
-Note that executing a contract may consume an unbounded amount gas. Whereas `query_raw` will read one key and has a small, mostly fixed cost, we need to enforce a gas limit on these queries. This is done differently for external and internal calls and discussed below.
+契約を締結すると、無制限の量のガスを消費する可能性があることに注意してください。 `query_raw`はキーを読み取り、コストは小さく、ほとんどが固定されていますが、これらのクエリにはガス制限を適用する必要があります。これは、外部呼び出しと内部呼び出しで異なる方法で処理されます。これについては、以下で説明します。
 
-## External Queries
+## 外部クエリ
 
-External queries are the typical way all web and cli clients work with the blockchain. They call Tendermint RPC, which calls into `abci_query` in the Cosmos SDK, which delegates down to the module to handle it. As far as I know, there is an infinite gas limit on queries, as they are only executed on one node, and cannot slow down the entire blockchain. This functionality is generally not exposed on validating nodes. The query functionality exposed in the current SDK is hard coded, and has execution time limits designed by the developers. This limits abuse. But what about someone uploading a wasm contract with an infinite loop, and then using that to DoS any public RPC node that exposes querying?
+外部クエリは、すべてのWebクライアントとCLIクライアントがブロックチェーンを使用するための一般的な方法です。彼らはTendermintRPCを呼び出し、Cosmos SDKで「abci_query」を呼び出します。これは、モジュールに委任して処理します。私の知る限り、クエリは1つのノードでのみ実行され、ブロックチェーン全体の速度を低下させることはできないため、ガス制限は無制限です。この機能は通常、検証ノードでは公開されません。現在のSDKで公開されているクエリ関数はハードコーディングされており、開発者が設計した実行時間制限があります。これは乱用を制限します。しかし、誰かが無限ループのwasmコントラクトをアップロードし、それを使用して、パブリックにクエリされたパブリックRPCノードをDoSした場合はどうなるでしょうか。
 
-To avoid such issues, we need to define some fixed gas limit for all `query_custom` transaction called externally. This will not charge a fee, but is used to limit abuse. However, it is difficult to define a standard value, for a free public node would prefer a small amount, but I may want to sync my own archive node and perform complex queries. Thus, a gas limit for all `query_custom` calls can be defined in an app-specific configuration file, which can be customized by each node operator, with a sensible default limit. This will allow public nodes to protect themselves from complex queries, while still allowing optional queries to perform large aggregation over all contract data in specially-configured nodes.
+このような問題を回避するには、外部で呼び出されるすべての `query_custom`トランザクションに対していくつかの固定ガス制限を定義する必要があります。これは料金を請求しませんが、乱用を制限するために使用されます。ただし、無料のパブリックノードは少量を好むため、標準値を定義することは困難ですが、自分のアーカイブノードを同期して複雑なクエリを実行したい場合があります。したがって、すべての `query_custom`呼び出しのガス制限は、アプリケーション固有の構成ファイルで定義でき、各ノードオペレーターはファイルをカスタマイズして、適切なデフォルト制限を設定できます。これにより、パブリックノードは複雑なクエリから自身を保護しながら、オプションのクエリで特別に構成されたノード内のすべてのコントラクトデータの大規模な集計を実行できます。
 
-Note that the `abci_query` call never reads the current "in-progress" state of the modules, but uses a read-only snapshot of the state after the last committed block.
+`abci_query`呼び出しは、モジュールの現在の「進行中」の状態を読み取ることはなく、代わりに、最後にコミットされたブロックの後の状態の読み取り専用スナップショットを使用することに注意してください。
 
-## Internal Queries
+## 内部クエリ
 
-While many interactions between contracts can easily be modelled by sending messages, there are some cases where we would like to synchronously query other modules, without altering their state. For example, if I want to resolve a name to a [Canonical Address](./addresses#canonical-addresses), or if I want to check KYC status of some account (in another contract) before enabling some action. One could model this as a series of messages, but it is quite complex and makes such simple use-cases almost unusable in the system.
+コントラクト間の多くの相互作用はメッセージを送信することで簡単にモデル化できますが、場合によっては、状態を変更せずに他のモジュールを同期的にクエリする必要があります。たとえば、名前を[canonical-addresses](./addresses#canonical-addresses)に解決したい場合、または特定の操作を有効にする前に(別の契約の)アカウントのKYCステータスを確認したい場合です。一連のメッセージとしてモデル化できますが、非常に複雑であり、この単純なユースケースはシステムでほとんど使用できません。
 
-However, this design violates one of the basic principles of the [actor model](./actor), namely that each contract has exclusive access to its own internal state. (Both `query_raw` and `query_custom` fail in this regard). Far from just being a theoretical issue, this may lead to concurrency and reentrancy issues if not handled correctly. We do not want to push such safety critical reasoning into the laps of the contract developers, but rather provide these security guarantees in the platform. However, providing old data also leads to many possible errors and bugs, especially since we use the same `Querier` interface
-to interact with the native SDK modules, *including querying the contract's own balance*.
+ただし、この設計は[アクターモデル](./actor)の基本原則の1つに違反します。つまり、各コントラクトは独自の内部状態に排他的にアクセスできます。 (この点で、 `query_raw`と` query_custom`の両方が失敗しました)。これは単なる理論上の問題ではありません。適切に処理しないと、同時実行性と再入可能性の問題が発生する可能性があります。このセーフティクリティカルな推論を契約開発者の輪に押し込みたくはありませんが、プラットフォームでこれらの安全保証を提供します。ただし、特に同じ `Querier`インターフェースを使用しているため、古いデータを提供すると、多くのエラーやエラーが発生する可能性があります。
+ネイティブSDKモジュールと対話します。*契約自体の残高のクエリを含みます*。
 
-As such, we provide the `Querier` with read-only access to the state snapshot *right before execution of the current CosmWasm message*. Since we take a
-snapshot and both the executing contract and the queried contract have read-only access to the data *before the contract execution*, this is still
-safe with Rust's borrowing rules (as a placeholder for secure design). The current contract only writes to a cache, which is flushed afterwards on success.
+したがって、現在のCosmWasmメッセージ*を実行する前に、状態スナップショットへの読み取り専用アクセスを「クエリア」に提供します。私たちが取るので
+スナップショット、および実行中のコントラクトとクエリ対象のコントラクトはどちらも、*コントラクトが実行される前のデータへの読み取り専用アクセス権を持っています。
+Rustの借用ルールを(安全な設計のプレースホルダーとして)使用しても安全です。現在のコントラクトはキャッシュにのみ書き込まれ、成功後に更新されます。
 
-Another issue is to avoid reentrancy. Since these queries are called synchronously, they can call back into the calling contract and possibly cause issues. Since queries only have read-only access and cannot have side-effects, this is not nearly as dangerous as executing a remote contract synchronously, but still may be an issue to consider. Notably, it will only have access to the state before the current execution. I cannot see a place where this could cause more errors than a query function intentionally returning false data, but it is a place to investigate more.
+もう1つの問題は、再入可能性を回避することです。これらのクエリは同期的に呼び出されるため、呼び出し元のコントラクトにコールバックされる可能性があり、問題が発生する可能性があります。クエリには読み取り専用アクセスのみがあり、副作用はないため、これはリモートコントラクトを同期的に実行するほど危険ではありませんが、それでも考慮すべき問題である可能性があります。現在の実行前の状態にしかアクセスできないことに注意してください。クエリ関数が意図的に間違ったデータを返す場所でエラーが増えるかどうかはわかりませんが、これはさらに調査を行うことができる場所です。
 
-Since all queries are performed as part of a transaction, that already has a strongly enforced gas limit, we don't need extra work here. All storage reads and data processing performed as part of a query are deducted from the same gas meter as the rest of the transaction, and thus limit processing time. We consider adding explicit guards against re-entrancy or max query depth, but have not enforced them yet in `wasmd`. As more work on cross-contract queries comes to fruition, this is another place to investigate.
+すべてのクエリはトランザクションの一部として実行されるため、これにはすでに厳密に強制されたガス制限があり、ここで追加の作業を行う必要はありません。クエリの一部として実行されるすべてのストレージ読み取りとデータ処理は、トランザクションの残りの部分と同じガスメーターから差し引かれるため、処理時間が制限されます。再入可能性または最大クエリ深度を防ぐために明示的な保護を追加することを検討しましたが、 `wasmd`ではまだ適用されていません。クロスコントラクトクエリでさらに作業を行うと結果が得られるため、これは調査が必要なもう1つの領域です。

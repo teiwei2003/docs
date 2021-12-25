@@ -1,124 +1,124 @@
-# CW721 Spec: Non Fungible Tokens
+# CW721仕様:非代替トークン
 
-cw721 package source code: [https://github.com/CosmWasm/cosmwasm-plus/blob/master/packages/cw721/README.md](https://github.com/CosmWasm/cosmwasm-plus/blob/master/packages/cw721/README.md)
+cw721パッケージのソースコード:[https://github.com/CosmWasm/cosmwasm-plus/blob/master/packages/cw721/README.md](https://github.com/CosmWasm/cosmwasm-plus/blob/master/packages/cw721/README.md)
 
-CW721 is a specification for non-fungible tokens based on CosmWasm.
-The name and design is based on Ethereum's ERC721 standard,
-with some enhancements. The types in here can be imported by
-contracts that wish to implement this  spec, or by contracts that call
-to any standard cw721 contract.
+CW721は、CosmWasmに基づく不均一なトークン仕様です。
+名前とデザインは、イーサリアムのERC721標準に基づいています。
+いくつかの改善があります。ここのタイプは渡すことができます
+この仕様の契約を実装することを望んでいる、または呼び出し契約を通じて
+標準のcw721契約。
 
-The specification is split into multiple sections, a contract may only
-implement some of this functionality, but must implement the base.
+仕様は複数の部分に分かれており、契約は
+これらの機能のいくつかは実現されていますが、基本は実現されなければなりません。
 
-## Base
+## によると
 
-This handles ownership, transfers, and allowances. These must be supported
-as is by all CW721 contracts. Note that all tokens must have an owner,
-as well as an ID. The ID is an arbitrary string, unique within the contract.
+これは、所有権、譲渡、および割り当てを扱います。これらはサポートする必要があります
+すべてのCW721契約と同じように。すべてのトークンには所有者が必要であることに注意してください。
+そしてIDカード。 IDは任意の文字列であり、コントラクト内で一意です。
 
-### Messages
+### 情報
 
-`TransferNft{recipient, token_id}` -
-This transfers ownership of the token to `recipient` account. This is
-designed to send to an address controlled by a private key and *does not*
-trigger any actions on the recipient if it is a contract.
+`TransferNft {recipient、token_id}`-
+これにより、トークンの所有権が「受信者」アカウントに譲渡されます。これは
+秘密鍵によって制御されるアドレスに送信されることを意図しており、*送信されない*
+コントラクトの場合、受信者に対するアクションがトリガーされます。
 
-Requires `token_id` to point to a valid token, and `env.sender` to be
-the owner of it, or have an allowance to transfer it.
+有効なトークンを指すには `token_id`が必要であり、` env.sender`は
+その所有者はそれを譲渡するための手当を持っているかもしれません。
 
-`SendNft{contract, token_id, msg}` -
-This transfers ownership of the token to `contract` account. `contract`
-must be an address controlled by a smart contract, which implements
-the CW721Receiver interface. The `msg` will be passed to the recipient
-contract, along with the token_id.
+`SendNft {contract、token_id、msg}`-
+これにより、トークンの所有権が「契約」アカウントに譲渡されます。 `契約`
+スマートコントラクトによって制御されるアドレスである必要があり、それは実現します
+CW721レシーバーインターフェイス。 `msg`は受信者に渡されます
+コントラクト、およびtoken_id。
 
-Requires `token_id` to point to a valid token, and `env.sender` to be
-the owner of it, or have an allowance to transfer it.
+有効なトークンを指すには `token_id`が必要であり、` env.sender`は
+その所有者はそれを譲渡するための手当を持っているかもしれません。
 
-`Approve{spender, token_id, expires}` - Grants permission to `spender` to
-transfer or send the given token. This can only be performed when
-`env.sender` is the owner of the given `token_id` or an `operator`.
-There can multiple spender accounts per token, and they are cleared once
-the token is transfered or sent.
+`承認{spender、token_id、expires}` -`spender`権限を付与します
+指定されたトークンを転送または送信します。これは、次の条件下でのみ実行できます
+`env.sender`は、指定された` token_id`または `operator`の所有者です。
+各トークンは複数の消費者アカウントを持つことができ、それらは一度クリアされます
+トークンが転送または送信されます。
 
-`Revoke{spender, token_id}` - This revokes a previously granted permission
-to transfer the given `token_id`. This can only be granted when
-`env.sender` is the owner of the given `token_id` or an `operator`.
+`Revoke {spender、token_id}`-これにより、以前に付与された権限が取り消されます
+指定された `token_id`を転送します。これは、次の状況でのみ付与できます
+`env.sender`は、指定された` token_id`または `operator`の所有者です。
 
-`ApproveAll{operator, expires}` - Grant `operator` permission to transfer or send
-all tokens owned by `env.sender`. This approval is tied to the owner, not the
-tokens and applies to any future token that the owner receives as well.
+`ApproveAll {operator、expires}` -`operator`に送信または送信許可を付与します
+`env.sender`が所有するすべてのトークン。この承認は所有者に関するものであり、
+トークンは、将来所有者が受け取るトークンには適用されません。
 
-`RevokeAll{operator}` - Revoke a previous `ApproveAll` permission granted
-to the given `operator`.
+`RevokeAll {operator}`-以前に付与された `ApproveAll`権限を取り消します
+与えられた `オペレーター`に。
 
-### Queries
+### お問い合わせ
 
-`OwnerOf{token_id}` - Returns the owner of the given token,
-as well as anyone with approval on this particular token.
-If the token is unknown, returns an error. Return type is
-`OwnerResponse{owner}`.
+`OwnerOf {token_id}`-指定されたトークンの所有者を返します。
+そして、誰もがこの特定のトークンを承認しました。
+トークンが不明な場合は、エラーが返されます。戻りタイプは
+`所有者の応答{所有者}`。
 
-`ApprovedForAll{owner, include_expired}` - List all operators that can
-access all of  the owner's tokens. Return type is `ApprovedForAllResponse`.
-If `include_expired` is set, show expired owners in the results, otherwise,
-ignore them.
+`ApprovedForAll {owner、include_expired}`-利用可能なすべてのリスト
+すべての所有者のトークンにアクセスします。戻りタイプは「ApprovedForAllResponse」です。
+`include_expired`が設定されている場合は、期限切れの所有者が結果に表示されます。それ以外の場合は、
+それらを無視します。
 
-`NumTokens{}` - Total number of tokens issued
+`NumTokens {}`-発行されたトークンの総数
 
-### Receiver
+### 受信者
 
-The counter-part to `SendNft` is `ReceiveNft`, which must be implemented by
-any contract that wishes to manage CW721 tokens. This is generally *not*
-implemented by any CW721 contract.
+`SendNft`の対応する部分は` ReceiveNft`であり、
+CW721トークンの管理を希望する契約。これは通常*ではありません*
+CW721契約によって実装されます。
 
-`ReceiveNft{sender, token_id, msg}` - This is designed to handle `SendNft`
-messages. The address of the contract is stored in `env.sender`
-so it cannot be faked. The contract should ensure the sender matches
-the token contract it expects to handle, and not allow arbitrary addresses.
+`ReceiveNft {sender、token_id、msg}` -`SendNft`を処理するように設計されています
+情報。契約アドレスは `env.sender`に保存されます
+したがって、偽造することはできません。契約では、送信者が一致することを確認する必要があります
+トークンコントラクトを処理することを想定しており、任意のアドレスを許可しません。
 
-The `sender` is the original account requesting to move the token
-and `msg` is a `Binary` data that can be decoded into a contract-specific
-message. This can be empty if we have only one default action,
-or it may be a `ReceiveMsg` variant to clarify the intention. For example,
-if I send to an exchange, I can specify the price I want to list the token
-for.
+`sender`は、モバイルトークンをリクエストした元のアカウントです
+また、 `msg`は` Binary`データであり、コントラクト固有のデータにデコードできます
+情報。デフォルトのアクションが1つしかない場合、これは空にすることができます。
+または、意図を明確にするための `ReceiveMsg`の変形である可能性があります。例えば、
+取引所に送る場合、リストしたいトークンの価格を指定できます
+にとって。
 
-## Metadata
+## メタデータ
 
-### Queries
+### クエリ
 
-`ContractInfo{}` - This returns top-level metadata about the contract.
-Namely, `name` and `symbol`.
+`ContractInfo {}`-コントラクトに関するトップレベルのメタデータを返します。
+つまり、 `name`と` symbol`です。
 
-`NftInfo{token_id}` - This returns metadata about one particular token.
-The return value is based on *ERC721 Metadata JSON Schema*, but directly
-from the contract, not as a Uri. Only the image link is a Uri.
+`NftInfo {token_id}`-特定のトークンに関するメタデータを返します。
+戻り値は* ERC721メタデータJSONスキーマ*に基づいていますが、直接
+契約から、ウリとしてではありません。画像リンクのみがウリです。
 
-`AllNftInfo{token_id}` - This returns the result of both `NftInfo`
-and `OwnerOf` as one query as an optimization for clients, which may
-want both info to display one NFT.
+`AllNftInfo {token_id}` -`NftInfo`の結果を返します
+そして、クライアントへの最適化としてのクエリとしての `OwnerOf`、これはかもしれません
+両方のメッセージにNFTが表示されることを願っています。
 
-## Enumerable
+## 列挙可能
 
-### Queries
+### お問い合わせ
 
-Pagination is acheived via `start_after` and `limit`. Limit is a request
-set by the client, if unset, the contract will automatically set it to
-`DefaultLimit` (suggested 10). If set, it will be used up to a `MaxLimit`
-value (suggested 30). Contracts can define other `DefaultLimit` and `MaxLimit`
-values without violating the CW721 spec, and clients should not rely on
-any particular values.
+ページングは​​ `start_after`と` limit`によって実現されます。制限はリクエストです
+クライアントによって設定され、設定されていない場合、契約は自動的にに設定されます
+`DefaultLimit`(10を推奨)。設定すると、 `MaxLimit`に使用されます
+値(推奨30)。コントラクトは他の `DefaultLimit`と` MaxLimit`を定義できます
+この値はCW721仕様に違反していないため、お客様は信頼しないでください。
+特定の値。
 
-If `start_after` is unset, the query returns the first results, ordered by
-lexogaphically by `token_id`. If `start_after` is set, then it returns the
-first `limit` tokens *after* the given one. This allows straight-forward
-pagination by taking the last result returned (a `token_id`) and using it
-as the `start_after` value in a future query.
+`start_after`が設定されていない場合、クエリは最初の結果を順番に返します
+字句的に `token_id`でソートされています。 `start_after`が設定されている場合は、
+最初の `limit`トークン*は指定されたトークンの後にあります。これにより、直接
+返された最後の結果( `token_id`)を取得し、それをページネーションに使用する
+将来のクエリの「start_after」値として。
 
-`Tokens{owner, start_after, limit}` - List all token_ids that belong to a given owner.
-Return type is `TokensResponse{tokens: Vec<token_id>}`.
+`Tokens {owner、start_after、limit}`-指定された所有者に属するすべてのtoken_idを一覧表示します。
+戻りタイプは `TokensResponse {tokens:Vec <token_id>}`です。
 
-`AllTokens{start_after, limit}` - Requires pagination. Lists all token_ids controlled by
-the contract.
+`AllTokens {start_after、limit}`-ページ付けが必要です。制御されているすべてのtoken_idを一覧表示します
+契約する。

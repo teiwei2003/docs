@@ -1,12 +1,12 @@
-# Develop dApp
+# dAppを開発する
 
-To showcase the previously explained utilities, we'll create the balance checker dApp from the template.
+前に説明したユーティリティを紹介するために、テンプレートからバランスチェッカーdAppを作成します。
 
-## Customize template
+## テンプレートをカスタマイズする
 
-To make the app your own, feel free to modify the `name` field in `package.json` and/or update the `README.md` file.
+アプリを独自のものにするには、 `package.json`の` name`フィールドを変更するか、 `README.md`ファイルを更新してください。
 
-Also modify the `routes/Login/index.tsx` file to look like this:
+また、 `routes/Login/index.tsx`ファイルを次のように変更します。
 
 ```jsx
 import { Login as LoginDesign } from "@cosmicdapp/design";
@@ -22,25 +22,25 @@ export function Login(): JSX.Element {
       appName="Balance checker"
       appLogo={cosmWasmLogo}
       config={config}
-    />
+   />
   );
 }
 
 ```
 
-## Add balance route
+## バランスルートを追加
 
-### Balance path
+### バランスパス
 
-Add the following to the `paths.ts` file:
+`paths.ts`ファイルに以下を追加します。
 
 ```typescript
 export const pathBalance = "/balance";
 ```
 
-### React component
+### Reactコンポーネント
 
-Inside `routes/`, add a `Balance` directory with the following files:
+`routes/`内に、次のファイルを含む `Balance`ディレクトリを追加します。
 
 - `index.tsx`
 
@@ -63,10 +63,10 @@ export function Balance(): JSX.Element {
     <PageLayout>
       <MainStack>
         <Title>Balance</Title>
-        <YourAccount hideTitle hideBalance />
-        <FormCheckBalance setContractAddress={setContractAddress} />
+        <YourAccount hideTitle hideBalance/>
+        <FormCheckBalance setContractAddress={setContractAddress}/>
         {error && <ErrorText>{error}</ErrorText>}
-        <TokenList contractAddress={contractAddress} />
+        <TokenList contractAddress={contractAddress}/>
       </MainStack>
     </PageLayout>
   );
@@ -101,34 +101,34 @@ export const ErrorText = styled(Text)`
 `;
 ```
 
-As you can see, this two files make use of `@cosmicdapp/logic`'s `useError` hook, and of `@cosmicdapp/design`'s `Stack`, `PageLayout`, and `YourAccount` components, so they should be familiar to you.
+ご覧のとおり、この2つのファイルは、 `@ cosmicdapp/logic`の` useError`フックと、 `@ cosmicdapp/design`の` Stack`、 `PageLayout`、および` YourAccount`コンポーネントを使用しているためです。 あなたに精通している必要があります。
 
-The `index.tsx` component's layout makes use of `MainStack` and `ErrorText`, which are Styled Components defined in `style.ts`, and also of `FormCheckBalance` and `TokenList` components, which are yet to be defined.
+`index.tsx`コンポーネントのレイアウトは、` style.ts`で定義されたスタイル付きコンポーネントである `MainStack`と` ErrorText`、およびまだ定義されていない `FormCheckBalance`と` TokenList`コンポーネントを利用します。
 
-The logic will work like this: the `TokenList` component will display the native tokens of the user, unless a contract address is entered in `FormCheckBalance`, which will make `TokenList` show the balance for that CW20 contract, or show an error if that address does not have an associated contract.
+ロジックは次のように機能します。コントラクトアドレスが `FormCheckBalance`に入力されていない限り、` TokenList`コンポーネントはユーザーのネイティブトークンを表示します。これにより、 `TokenList`はそのCW20コントラクトの残高を表示するか、エラーを表示します。 そのアドレスに関連する契約がない場合。
 
-### Add to ProtectedSwitch
+### ProtectedSwitchに追加
 
-Your `ProtectedSwitch` in `App/index.tsx` should look like this:
+`App/index.tsx`の` ProtectedSwitch`は次のようになります。
 
 ```jsx
 <ProtectedSwitch authPath={pathLogin}>
-  <Route exact path={pathBalance} component={Balance} />
+  <Route exact path={pathBalance} component={Balance}/>
 </ProtectedSwitch>
 ```
 
-Note that we remove `OperationResult`, both the route and the component, since we won't be making transactions in this dApp.
+このdAppではトランザクションを行わないため、ルートとコンポーネントの両方の `OperationResult`を削除することに注意してください。
 
-## Add FormCheckBalance component
+## FormCheckBalanceコンポーネントを追加します
 
-### Add Search component
+### 検索コンポーネントを追加
 
-For entering the address we'll use a custom `Search` component, it may seem hacky but does a good job integrating `formik` and `antd`, and is in fact inspired by `formik-antd` (but it's missing there as of now).
+アドレスを入力するために、カスタムの `Search`コンポーネントを使用します。これはハッキーに見えるかもしれませんが、` formik`と `antd`をうまく統合し、実際には` formik-antd`に触発されています(ただし、 今の)。
 
 `App/forms/Search.tsx`
 
 ```jsx
-// Search form not present in form-antd: https://github.com/jannikbuschke/formik-antd/blob/master/src/input/index.tsx
+//Search form not present in form-antd: https://github.com/jannikbuschke/formik-antd/blob/master/src/input/index.tsx
 import { Input as BaseInput } from "antd";
 import { InputProps as BaseInputProps, SearchProps as BaseSearchProps } from "antd/lib/input";
 import { FieldProps } from "formik";
@@ -138,7 +138,7 @@ import Search from "antd/lib/input/Search";
 
 interface FormikFieldProps {
   name: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+ //eslint-disable-next-line @typescript-eslint/no-explicit-any
   validate?: (value: any) => undefined | string | Promise<any>;
   fast?: boolean;
 }
@@ -149,16 +149,16 @@ interface InputType
   extends React.ForwardRefExoticComponent<
     FormikFieldProps & BaseInputProps & React.RefAttributes<BaseInput>
   > {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
+ //eslint-disable-next-line @typescript-eslint/ban-ts-comment
+ //@ts-expect-error
   Search: React.ForwardRefExoticComponent<FormikFieldProps & BaseSearchProps & React.RefAttributes<Search>>;
 }
 
-// eslint-disable-next-line react/display-name
+//eslint-disable-next-line react/display-name
 const Input = React.forwardRef((
   { name, validate, fast, onChange: $onChange, onBlur: $onBlur, ...restProps }: InputProps,
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
+ //eslint-disable-next-line @typescript-eslint/ban-ts-comment
+ //@ts-expect-error
   ref: React.Ref<Search>,
 ) => (
   <Field name={name} validate={validate} fast={fast}>
@@ -176,7 +176,7 @@ const Input = React.forwardRef((
           $onBlur && $onBlur(event);
         }}
         {...restProps}
-      />
+     />
     )}
   </Field>
 ));
@@ -184,7 +184,7 @@ const Input = React.forwardRef((
 const TypedInput = (Input as unknown) as InputType;
 type SearchProps = FormikFieldProps & BaseSearchProps;
 
-// eslint-disable-next-line react/display-name
+//eslint-disable-next-line react/display-name
 TypedInput.Search = React.forwardRef(
   (
     { name, validate, fast, onChange: $onChange, onBlur: $onBlur, ...restProps }: SearchProps,
@@ -205,7 +205,7 @@ TypedInput.Search = React.forwardRef(
             $onBlur && $onBlur(event);
           }}
           {...restProps}
-        />
+       />
       )}
     </Field>
   ),
@@ -214,9 +214,9 @@ TypedInput.Search = React.forwardRef(
 export default TypedInput.Search;
 ```
 
-### Add contract address validation schema
+### 契約アドレス検証スキーマを追加する
 
-The `formik` package we'll be using for building `FormCheckBalance` has great integration with `yup`, which allows us to use it to build validation schemas like the one we need for the contract address:
+`FormCheckBalance`の構築に使用する` formik`パッケージは、 `yup`との優れた統合により、契約アドレスに必要なもののような検証スキーマを構築するために使用できます。
 
 `App/forms/validationSchemas.ts`
 
@@ -267,7 +267,7 @@ export function FormCheckBalance({ setContractAddress }: FormCheckBalanceProps):
               placeholder="Enter contract address"
               enterButton
               onSearch={formikProps.submitForm}
-            />
+           />
           </FormItem>
         </Form>
       )}
@@ -276,23 +276,23 @@ export function FormCheckBalance({ setContractAddress }: FormCheckBalanceProps):
 }
 ```
 
-It uses the address validation schema defined before, and has a `setContractAddress` param to update the state of the `Balance` route.
+以前に定義されたアドレス検証スキーマを使用し、 `setContractAddress`パラメータを使用して` Balance`ルートの状態を更新します。
 
-## Add TokenList component
+## TokenListコンポーネントを追加します
 
-With `FormCheckBalance` working, we just need to implement `TokenList`.
+`FormCheckBalance`が機能しているので、` TokenList`を実装する必要があります。
 
-This component will:
+このコンポーネントは次のようになります。
 
-1. Check if there is a contract address:
-- If not, get the native balance from the `useAccount` hook.
-- If yes, load the balance and the number of decimals for the CW20 contract token.
-- If address has no contract, show error.
-2. Display the balance:
-- Use the local `getCoinToDisplay()` utility to get a user friendly format for balance, be it native or CW20.
-- Use the `showTokens` flag for conditional rendering to avoid display issues when waiting for async data to load.
+1.契約アドレスがあるかどうかを確認します。
+-そうでない場合は、 `useAccount`フックからネイティブ残高を取得します。
+-はいの場合、CW20コントラクトトークンの残高と小数点以下の桁数をロードします。
+-住所に契約がない場合は、エラーを表示します。
+2.残高を表示します。
+-ローカルの `getCoinToDisplay()`ユーティリティを使用して、ネイティブまたはCW20のバランスのためのユーザーフレンドリーなフォーマットを取得します。
+-非同期データのロードを待機する際の表示の問題を回避するために、条件付きレンダリングに `showTokens`フラグを使用します。
 
-The `TokenList` implementation for achieving this would be:
+これを実現するための `TokenList`の実装は次のようになります。
 
 `routes/Balance/components/TokenList/index.tsx`
 
@@ -371,7 +371,7 @@ export function TokenList({ contractAddress }: TokenListProps): JSX.Element {
 
           return (
             <React.Fragment key={token.denom}>
-              {index > 0 && <Divider />}
+              {index > 0 && <Divider/>}
               <TokenItem>
                 <Text>{denom}</Text>
                 <Text>{amount !== "0" ? amount : "No tokens"}</Text>
@@ -415,6 +415,6 @@ export const TokenItem = styled.div`
 `;
 ```
 
-## Finished!
+## 終了した！
 
-Now you can check your native balances and your balance for any CW20 contract, and most importantly, you now know how to build a CosmJS based dApp!
+これで、ネイティブ残高とCW20契約の残高を確認できます。最も重要なことは、CosmJSベースのdAppを構築する方法を理解したことです。

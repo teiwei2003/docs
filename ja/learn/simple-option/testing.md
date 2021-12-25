@@ -1,10 +1,10 @@
-# Testing
+# テスト
 
-<iframe src="https://player.vimeo.com/video/457705991" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+<iframe src = "https://player.vimeo.com/video/457705991" width = "640" height = "360" frameborder = "0" allow = "autoplay; fullscreen" allowfullscreen> </iframe>
 
-At this point your code should be compiling, although we did not test if it works.
-You can deploy the code to the chain everytime when you make a change. But come on, your time is more valuable than that.
-Also, good to keep the contract break-free and tested for future changes.
+コードはこの時点でコンパイルされているはずですが、機能するかどうかはテストされていません。
+変更を加えるたびに、コードをチェーンにデプロイできます。 しかし、さあ、あなたの時間はそれよりも貴重です。
+さらに、契約を乱さないようにし、将来の変更をテストするのが最善です。
 
 ```rust
 #[cfg(test)]
@@ -14,8 +14,8 @@ mod tests {
     use cosmwasm_std::{attr, coins, CosmosMsg};
 ```
 
-This is how testing in Rust begins. [Code reference](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/contract.rs).
-You can keep test and code in the same or separate files.
+これがRustでのテストの始まりです。 [コードリファレンス](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/contract.rs)。
+テストとコードを同じファイルまたは別々のファイルに保存できます。
 
 ## Test Initialization
 
@@ -23,7 +23,7 @@ You can keep test and code in the same or separate files.
 Timecode [https://vimeo.com/457705991#t=3m34s](https://vimeo.com/457705991#t=3m34s)
 :::
 
-For each test, test specific variables such as block time, state must be mocked. Write a function for easy setup.
+テストごとに、ブロック時間、状態などの特定の変数をモックする必要があります。 簡単に設定できる関数を作成します。
 
 ```rust
 #[test]
@@ -36,11 +36,11 @@ fn proper_initialization() {
     };
     let info = mock_info("creator", &coins(1, "BTC"));
 
-    // we can just call .unwrap() to assert this was a success
+   //we can just call .unwrap() to assert this was a success
     let res = init(deps.as_mut(), mock_env(), info, msg).unwrap();
     assert_eq!(0, res.messages.len());
 
-    // it worked, let's query the state
+   //it worked, let's query the state
     let res = query_config(deps.as_ref()).unwrap();
     assert_eq!(100_000, res.expires);
     assert_eq!("creator", res.owner.as_str());
@@ -50,16 +50,16 @@ fn proper_initialization() {
 }
 ```
 
-Good we now have a test environment initializer. This is a very simple one, you can pass in variables to the function and do different tweaks.
-Check cosmwasm-plus for more.
+これで、テスト環境の初期化プログラムができました。 これは非常に単純な方法であり、変数を関数に渡してさまざまな調整を行うことができます。
+詳細については、cosmwasm-plusを参照してください。
 
-### Mock Dependencies, Environment, and Message Info
+### 依存関係、環境、メッセージ情報をシミュレートする
 
-There are two three mocking tools we should improve on:
+2つの3つのシミュレーションツールを改善する必要があります。
 
 ```rust
-/// All external requirements that can be injected for unit tests.
-/// It sets the given balance for the contract itself, nothing else
+///All external requirements that can be injected for unit tests.
+///It sets the given balance for the contract itself, nothing else
 pub fn mock_dependencies(
     contract_balance: &[Coin],
 ) -> OwnedDeps<MockStorage, MockApi, MockQuerier> {
@@ -72,14 +72,14 @@ pub fn mock_dependencies(
 }
 ```
 
-This sets up dependencies for testing such as storage, api, and querier.
+これにより、ストレージ、API、クエリなどのテストの依存関係が設定されます。
 
 ```rust
-/// Returns a default enviroment with height, time, chain_id, and contract address
-/// You can submit as is to most contracts, or modify height/time if you want to
-/// test for expiration.
+///Returns a default enviroment with height, time, chain_id, and contract address
+///You can submit as is to most contracts, or modify height/time if you want to
+///test for expiration.
 ///
-/// This is intended for use in test code only.
+///This is intended for use in test code only.
 pub fn mock_env() -> Env {
     Env {
         block: BlockInfo {
@@ -98,8 +98,8 @@ pub fn mock_env() -> Env {
 `mock_env` is for mocking block, and contract environment.
 
 ```rust
-/// Just set sender and sent funds for the message. The essential for
-/// This is intended for use in test code only.
+///Just set sender and sent funds for the message. The essential for
+///This is intended for use in test code only.
 pub fn mock_info<U: Into<HumanAddr>>(sender: U, sent: &[Coin]) -> MessageInfo {
     MessageInfo {
         sender: sender.into(),
@@ -129,11 +129,11 @@ fn transfer() {
     };
     let info = mock_info("creator", &coins(1, "BTC"));
 
-    // we can just call .unwrap() to assert this was a success
+   //we can just call .unwrap() to assert this was a success
     let res = init(deps.as_mut(), mock_env(), info, msg).unwrap();
     assert_eq!(0, res.messages.len());
 
-    // random cannot transfer
+   //random cannot transfer
     let info = mock_info("anyone", &[]);
     let err = handle_transfer(deps.as_mut(), mock_env(), info, HumanAddr::from("anyone"))
         .unwrap_err();
@@ -142,14 +142,14 @@ fn transfer() {
         e => panic!("unexpected error: {}", e),
     }
 
-    // owner can transfer
+   //owner can transfer
     let info = mock_info("creator", &[]);
     let res =
         handle_transfer(deps.as_mut(), mock_env(), info, HumanAddr::from("someone")).unwrap();
     assert_eq!(res.attributes.len(), 2);
     assert_eq!(res.attributes[0], attr("action", "transfer"));
 
-    // check updated properly
+   //check updated properly
     let res = query_config(deps.as_ref()).unwrap();
     assert_eq!("someone", res.owner.as_str());
     assert_eq!("creator", res.creator.as_str());
@@ -176,14 +176,14 @@ fn execute() {
     };
     let info = mock_info("creator", &collateral);
 
-    // we can just call .unwrap() to assert this was a success
+   //we can just call .unwrap() to assert this was a success
     let _ = init(deps.as_mut(), mock_env(), info, msg).unwrap();
 
-    // set new owner
+   //set new owner
     let info = mock_info("creator", &[]);
     let _ = handle_transfer(deps.as_mut(), mock_env(), info, HumanAddr::from("owner")).unwrap();
 
-    // random cannot execute
+   //random cannot execute
     let info = mock_info("creator", &amount);
     let err = handle_execute(deps.as_mut(), mock_env(), info).unwrap_err();
     match err {
@@ -191,7 +191,7 @@ fn execute() {
         e => panic!("unexpected error: {}", e),
     }
 
-    // expired cannot execute
+   //expired cannot execute
     let info = mock_info("owner", &amount);
     let mut env = mock_env();
     env.block.height = 200_000;
@@ -201,7 +201,7 @@ fn execute() {
         e => panic!("unexpected error: {}", e),
     }
 
-    // bad counter_offer cannot execute
+   //bad counter_offer cannot execute
     let msg_offer = coins(39, "ETH");
     let info = mock_info("owner", &msg_offer);
     let err = handle_execute(deps.as_mut(), mock_env(), info).unwrap_err();
@@ -216,7 +216,7 @@ fn execute() {
         e => panic!("unexpected error: {}", e),
     }
 
-    // proper execution
+   //proper execution
     let info = mock_info("owner", &amount);
     let res = handle_execute(deps.as_mut(), mock_env(), info).unwrap();
     assert_eq!(res.messages.len(), 2);
@@ -237,7 +237,7 @@ fn execute() {
         })
     );
 
-    // check deleted
+   //check deleted
     let _ = query_config(deps.as_ref()).unwrap_err();
 }
 ```
@@ -248,4 +248,4 @@ Now run the tests:
 cargo test
 ```
 
-If all green, the code will run work on chain.
+すべてが緑色の場合、コードはチェーン上で機能します。

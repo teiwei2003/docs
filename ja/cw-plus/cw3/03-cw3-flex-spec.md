@@ -1,66 +1,66 @@
-# CW3 Flexible Multisig
+# CW3柔軟なマルチシグニチャ
 
-cw3-flex-multisig source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw3-flex-multisig](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw3-flex-multisig)
+cw3-flex-multisigソースコード:[https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw3-flex-multisig](https://github.com/CosmWasm/cosmwasm-plus/ツリー/メイン/コントラクト/cw3-flex-multisig)
 
-This builds on [cw3-fixed-multisig](02-cw3-fixed-spec.md) with a more
-powerful implementation of the [cw3 spec](01-spec.md).
-It is a multisig contract that is backed by a
-[cw4 (group)](../cw4/01-spec.md) contract, which independently
-maintains the voter set.
+これは[cw3-fixed-multisig](02-cw3-fixed-spec.md)に基づいています
+[cw3仕様](01-spec.md)の強力な実装。
+これは、
+[cw4(グループ)](../cw4/01-spec.md)契約、独立
+投票者セットを維持します。
 
-This provides 2 main advantages:
+これには2つの主な利点があります。
 
-* You can create two different multisigs with different voting thresholds
-  backed by the same group. Thus, you can have a 50% vote, and a 67% vote
-  that always use the same voter set, but can take other actions.
-* TODO: It allows dynamic multisig groups. Since the group can change,
-  we can set one of the multisigs as the admin of the group contract,
-  and the
+*投票しきい値が異なる2つの異なるマルチ署名を作成できます
+  同じグループのサポートを受けてください。つまり、投票の50％と67％を獲得できます。
+  同じ投票者のセットが常に使用されますが、他のアクションを実行できます。
+* TODO:動的なマルチシグニチャグループを許可します。グループを変更できるので、
+  マルチシグの1つを結合契約の管理者として設定できます。
+  と
 
-In addition to the dynamic voting set, the main difference with the native
-Cosmos SDK multisig, is that it aggregates the signatures on chain, with
-visible proposals (like `x/gov` in the Cosmos SDK), rather than requiring
-signers to share signatures off chain.
+動的投票セットに加えて、ネイティブとの主な違い
+Cosmos SDK multisigは、アグリゲーションチェーンの署名です。
+要件ではなく、目に見える提案(CosmosSDKの「x/gov」など)
+署名者は署名をオフチェーンで共有します。
 
-## Init
+## 中身
 
-The first step to create such a multisig is to instantiate a cw4 contract
-with the desired member set. For now, this only is supported by
-[cw4-group](../cw4/02-cw4-group-spec.md), but we will add a token-weighted group contract
-(TODO).
+このマルチシグニチャを作成する最初のステップは、cw4コントラクトをインスタンス化することです
+必要なメンバーのセットを用意します。現在、これはサポートされているだけです
+[cw4-group](../cw4/02-cw4-group-spec.md)ですが、トークン加重グループ契約を追加します
+(やれ)。
 
-If you create a `cw4-group` contract and want a multisig to be able
-to modify its own group, do the following in multiple transactions:
+「cw4-group」契約を作成し、マルチシグニチャができることを期待する場合
+独自のグループを変更するには、複数のトランザクションで次の手順を実行します。
 
-* init cw4-group, with your personal key as admin
-* init a multisig pointing to the group
-* `AddHook{multisig}` on the group contract
-* `UpdateAdmin{multisig}` on the group contract
+* init cw4-group、管理者として個人キーを使用します
+*グループを指すマルチシグニチャを初期化します
+* `AddHook {multisig}`は結合された予定にあります
+*結合された予定の `UpdateAdmin {multisig}`
 
-This is the current practice to create such circular dependencies,
-and depends on an external driver (hard to impossible to script such a
-self-deploying contract on-chain). (TODO: document better).
+これは、このような循環依存関係を作成する現在の慣行です。
+そして、外部ドライバーに依存します(そのようなスクリプトを書くことは困難または不可能ですらあります
+チェーン上の自己展開契約)。 (TODO:より良い記録)。
 
-When creating the multisig, you must set the required weight to pass a vote
-as well as the max/default voting period. (TODO: allow more threshold types)
+マルチシグニチャを作成するときは、投票に合格するために必要な重みを設定する必要があります
+そして、最大/デフォルトの投票期間。 (TODO:より多くのしきい値タイプを許可します)
 
-## Handle Process
+## 処理
 
-First, a registered voter must submit a proposal. This also includes the
-first "Yes" vote on the proposal by the proposer. The proposer can set
-an expiration time for the voting process, or it defaults to the limit
-provided when creating the contract (so proposals can be closed after several
-days).
+まず、登録済みの有権者は提案を提出する必要があります。これには、
+スポンサーは最初に提案に「はい」と投票しました。提案者は設定できます
+投票プロセスの有効期限、またはデフォルトの制限
+契約が作成されたときに提供されます(したがって、プロポーザルは数回後に閉じることができます
+空)。
 
-Before the proposal has expired, any voter with non-zero weight can add their
-vote. Only "Yes" votes are tallied. If enough "Yes" votes were submitted before
-the proposal expiration date, the status is set to "Passed".
+提案の有効期限が切れる前に、重みがゼロ以外の有権者は、
+投票。 「はい」の投票のみがカウントされます。以前に十分な「はい」の投票が提出されている場合
+提案の期日であり、ステータスは「承認済み」に設定されます。
 
-Once a proposal is "Passed", anyone may submit an "Execute" message. This will
-trigger the proposal to send all stored messages from the proposal and update
-it's state to "Executed", so it cannot run again. (Note if the execution fails
-for any reason - out of gas, insufficient funds, etc - the state update will
-be reverted, and it will remain "Passed", so you can try again).
+提案が「合格」すると、誰でも「実行」メッセージを送信できます。この意志
+プロポーザルをトリガーして、プロポーザルに保存されているすべてのメッセージを送信し、更新します
+ステータスは「実行済み」であるため、再度実行することはできません。 (実行が失敗した場合は注意してください
+何らかの理由で-燃料不足、資金不足など-ステータスの更新は
+復元された場合、「合格」のままになるため、再試行できます)。
 
-Once a proposal has expired without passing, anyone can submit a "Close"
-message to mark it closed. This has no effect beyond cleaning up the UI/database.
+提案の有効期限が切れて合格しなかった場合、誰でも「閉じる」ために提案を送信できます
+閉じたメッセージとしてマークします。 UI/データベースのクリーンアップを除けば、これは効果がありません。

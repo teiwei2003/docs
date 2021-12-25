@@ -1,54 +1,54 @@
-# Hall of Fame
+# 栄誉殿堂
 
-_**Here we present yout the CosmWasm hall of fame! Kudos the contributors for their effort in making these amazing projects!**_
-Let's give them the visibility and fame they deserve:
+_ **ここでは、CosmWasmの殿堂を紹介します。これらの素晴らしいプロジェクトの作成に尽力してくれた貢献者に感謝します！ ** _
+彼らにふさわしい人気と評判を与えましょう:
 
-## NFT Marketplace by BlockScape
+## BlockScapeによるNFTマーケットプレイス
 
-Article: [https://devpost.com/software/nft-marketplace](https://devpost.com/software/nft-marketplace)
+記事:[https://devpost.com/software/nft-marketplace](https://devpost.com/software/nft-marketplace)
 
-Won **1st place in Galileo Awards**(Most creative dAppchain using Cosmos SDK & Tendermint, with option to use IBC) and 3rd place in Gringotts Awards.
-![](../.vuepress/public/assets/nft_marketplace.jpeg)
-The NFT marketplace provides a generic platform for selling and buying CW721 tokens with CW20 tokens. People can put their tokens up for sale and buy tokens from other sellers.
-We have already seen a couple of example implementations of trading NFTs between two accounts, but all of them were on a per-contract basis. That means that for each trade, there was a separate contract which made it hard to know which tokens were actually up for sale and which token was used. This leads us to the idea of providing one central place to put tokens up for sale for maximum visibility of token sales.
-The project demonstrates CosmWasm contract interaction very well by using 3 deployed contracts on the chain. You can see how the team implemented a custom cw721 contract here. The team contributed to the NFT contract by developing a typescript helper client. Also, the project has Keplr wallet integrated.
+ガリレオアワード(Cosmos SDKとTendermintを使用した最もクリエイティブなdAppchain、IBCの使用を選択できます)で1位、Gringottsアワードで3位を獲得しました。
+！[](../。vuepress/public/assets/nft_marketplace.jpeg)
+NFT市場は、CW20トークンを使用してCW721トークンを売買するための共通のプラットフォームを提供します。人々は自分のトークンを販売し、他の売り手からトークンを購入することができます。
+2つのアカウント間でNFTを取引する実装例をいくつか見てきましたが、それらはすべて各契約に基づいています。つまり、トランザクションごとに個別の契約があり、実際に販売されているトークンと使用されているトークンを知ることが困難になります。これにより、トークン販売の可視性を最大化するために、トークンを販売するための中央の場所を提供することを考えました。
+このプロジェクトは、チェーンにデプロイされた3つのコントラクトを使用して、CosmWasmコントラクトの相互作用をうまく示しています。チームがカスタムcw721コントラクトをどのように実装したかをここで確認できます。チームは、typescriptアシスタントクライアントを開発することにより、NFT契約に貢献しました。さらに、このプロジェクトではKeplrウォレットも統合されています。
 
-Demo: [https://hackatom.blockscape.network/home](https://hackatom.blockscape.network/home)
+デモ:[https://hackatom.blockscape.network/home](https://hackatom.blockscape.network/home)
 
-Repo: [https://github.com/BlockscapeNetwork/hackatom_v](https://github.com/BlockscapeNetwork/hackatom_v)
+再購入:[https://github.com/BlockscapeNetwork/hackatom_v](https://github.com/BlockscapeNetwork/hackatom_v)
 
-## Clawback Account
+## リベートアカウント
 
-Article: [https://devpost.com/software/clawback-account-in-cosmwasm](https://devpost.com/software/clawback-account-in-cosmwasm)
+記事:[https://devpost.com/software/clawback-account-in-cosmwasm](https://devpost.com/software/clawback-account-in-cosmwasm)
 
-Won the **1st place in Gaia Awards**(Best go-to-market project for Cosmos Hub)
-Inspired by Bitcoin Vaults.
-The code quality of this project is top-tier. This was evidenced by very extensive contract unit tests.
-It’s a prototype contract code for “clawbacks” of native and CW20 tokens. A clawback works as follows:
-There is a “holder” key/account, a “backup” key/account, and a “clawback period” (which determines when the clawback expires).
-Within a “clawback period”, “holder” can transfer to “holders” / other clawbacks (provided their terms match the outgoing contract: they have the same “backup”, “clawback period” is at least as long, and they support the same tokens) or refresh the clawback duration. After the clawback period expires, the “holder” can withdraw the tokens.
-Within a “clawback period”, “backup” can transfer to another holder, refresh the clawback duration or burn the tokens / destroy the contract.
+**ガイア賞**(コスモスハブのベストリストプロジェクト)の最優秀賞を受賞
+ビットコインボールトに触発されました。
+このプロジェクトのコード品質は一流です。非常に広範な契約単体テストがこれを証明しています。
+これは、ネイティブトークンとCW20トークンの「リベート」のプロトタイプコントラクトコードです。コールバックの動作原理は次のとおりです。
+「所有者」キー/アカウント、「バックアップ」キー/アカウント、および「コールバック期間」(コールバックの有効期限を決定する)があります。
+「リベート期間」内で、「保有者」は「保有者」/他のリベートに移すことができます(条件が発信契約と一致する場合:それらは同じ「リベート」を持ち、「リベート期間」は少なくとも同じLong、それらは同じトークンをサポートします)またはコールバック期間を更新します。リベート期間が終了すると、「所有者」はトークンを引き出すことができます。
+「リベート期間」中に、「バックアップ」を別の所有者に転送したり、リベート期間を更新したり、トークンを破棄したり、契約を破棄したりできます。
 
-Presentation: [https://docs.google.com/presentation/d/13aEcVFhjQFKo9bGjHe0V9HiHnqbM7eGSHbDB27Psa24/edit?usp=sharing](https://docs.google.com/presentation/d/13aEcVFhjQFKo9bGjHe0V9HiHnqbM7eGSHbDB27Psa24/edit?usp=sharing)
+プレゼンテーション:[https://docs.google.com/presentation/d/13aEcVFhjQFKo9bGjHe0V9HiHnqbM7eGSHbDB27Psa24/edit?usp=sharing](https://docs.google.com/presentation/d/13aEcVFhjQFKo97bHjp2HjpHypFhjQ
 
-Repo: [https://github.com/tomtau/hackatom](https://docs.google.com/presentation/d/13aEcVFhjQFKo9bGjHe0V9HiHnqbM7eGSHbDB27Psa24/edit?usp=sharing)
+再購入:[https://github.com/tomtau/hackatom](https://docs.google.com/presentation/d/13aEcVFhjQFKo9bGjHe0V9HiHnqbM7eGSHbDB27Psa24/edit?usp=sharing)
 
-## Random Beacon
+## ランダムビーコン
 
-Article: [https://medium.com/confio/when-your-blockchain-needs-to-roll-the-dice-ed9da121f590](https://medium.com/confio/when-your-blockchain-needs-to-roll-the-dice-ed9da121f590)
+記事:[https://medium.com/confio/when-your-blockchain-needs-to-roll-the-dice-ed9da121f590](https://medium.com/confio/when-your-blockchain-needs-サイコロを振るed9da121f590)
 
-Distributed random number generator by Simon Warta.
+SimonWartaの分散乱数ジェネレーター。
 
-In drand, random beacons are distributed via HTTP, Gossipsub, Tor or Twitter. Such network sources cannot be accessed by a blockchain directly. However, we can create a CosmWasm smart contract which allows storing random beacons on chain. Using cross-contract queries, other contracts can then read those random values and use them in their logic.
+drandでは、ランダムビーコンは、HTTP、Gossipsub、Tor、またはTwitterを介して配信されます。ブロックチェーンは、そのようなネットワークリソースに直接アクセスすることはできません。ただし、ランダムビーコンをチェーンに保存できるCosmWasmスマートコントラクトを作成できます。クロスコントラクトクエリを使用すると、他のコントラクトはこれらのランダムな値を読み取り、ロジックで使用できます。
 
-Repo: [https://github.com/confio/rand](https://github.com/confio/rand)
+買い戻し:[https://github.com/confio/rand](https://github.com/confio/rand)
 
-## Sophon
+## 友子
 
-Article: [https://devpost.com/software/sophon](https://devpost.com/software/sophon)
+記事:[https://devpost.com/software/sophon](https://devpost.com/software/sophon)
 
-Won **3rd place on Gaia Award.**
-Just as [yearn.finance](https://yearn.finance/) on Ethereum can optimize DeFi’s operations, the team thought a smart contract on CosmWasm could optimize Staking’s operations.
-When funds are deposited into a contract, it will delegate the funds to the validator with the highest interest rate per Redelegate.
+**ガイア賞で3位を獲得しました。 ****
+イーサリアムの[yearn.finance](https://yearn.finance/)がDeFiの運用を最適化できるように、チームはCosmWasmのスマートコントラクトがステーキングの運用を最適化できると信じています。
+資金が契約に預け入れられると、再委任金利が最も高い各バリデーターに資金が委任されます。
 
-Repo: [https://github.com/Ninja-Chain/sophon](https://github.com/Ninja-Chain/sophon)
+買い戻し:[https://github.com/Ninja-Chain/sophon](https://github.com/Ninja-Chain/sophon)

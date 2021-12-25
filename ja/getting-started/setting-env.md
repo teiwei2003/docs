@@ -1,38 +1,38 @@
-# Setting Up Environment
+# 環境の設定
 
-You need an environment to run contracts. You can either run your node locally or connect to an
-existing network. For easy testing, musselnet network is online, you can use it to deploy and run your
-contracts. If you want to setup and run against a local blockchain, [click
-here](#run-local-node-optional)
+契約を実行するための環境が必要です。ノードをローカルで実行するか、に接続できます
+既存のネットワーク。テストを容易にするために、musclenetネットワークはオンラインです。これを使用して、
+契約する。ローカルブロックチェーンを設定して実行する場合は、[クリックしてください
+ここで)(#run-local-node-optional)
 
-To verify testnet is currently running, make sure the following URLs are all working for you:
+テストネットが現在実行されていることを確認するには、次のURLがすべて適切であることを確認してください。
 
-- [https://rpc.musselnet.cosmwasm.com/status](https://rpc.musselnet.cosmwasm.com/status)
-- [https://faucet.musselnet.cosmwasm.com/status](https://faucet.musselnet.cosmwasm.com/status)
-- [https://lcd.musselnet.cosmwasm.com/node_info](https://lcd.musselnet.cosmwasm.com/node_info)
+-[https://rpc.musselnet.cosmwasm.com/status](https://rpc.musselnet.cosmwasm.com/status)
+-[https://faucet.musselnet.cosmwasm.com/status](https://faucet.musselnet.cosmwasm.com/status)
+-[https://lcd.musselnet.cosmwasm.com/node_info](https://lcd.musselnet.cosmwasm.com/node_info)
 
-We have set up two native tokens - `FRITES` (`ufrites`) for becoming a validator and `MAYO` (`umayo`) for
-paying fees.
-Available frontends:
+バリデーターとなる `FRITES`(` urites`)と、
+料金を支払う。
+利用可能なフロントエンド:
 
-- [Block explorer](https://musselnet.cosmwasm.aneka.io/)
-- [Code explorer](https://code-explorer.musselnet.cosmwasm.com/)
+-[ブロックエクスプローラー](https://musselnet.cosmwasm.aneka.io/)
+-[コードブラウザ](https://code-explorer.musselnet.cosmwasm.com/)
 
-You can use these to explore txs, addresses, validators and contracts
-feel free to deploy one pointing to our rpc/lcd servers and we will list it.
+これらを使用して、トランザクション、アドレス、バリデーター、および契約を調べることができます
+私たちを指すrpc/lcdサーバーを自由にデプロイしてください。リストします。
 
-You can find more information about other testnets:
-[CosmWasm/testnets](https://github.com/CosmWasm/testnets) and [Testnet
-section](./../testnets/testnets.md).
+他のテストネットに関する詳細情報を見つけることができます:
+[CosmWasm/testnets](https://github.com/CosmWasm/testnets)および[Testnet
+パート](./../testnets/testnets.md)。
 
-When interacting with network, you can either use `wasmd` which is a Go client or Node REPL. Altough Node REPL is
-recommended for contract operations, since JSON manipulation is not intuitive with the Shell/Go client.
+ネットワークと対話するときは、GoクライアントまたはNodeREPLの `wasmd`を使用できます。ノードREPLは
+JSON操作はShell/Goクライアントにとって直感的ではないため、コントラクト操作に推奨されます。
 
-## Setup Go CLI
+## GoCLIを設定する
 
-Let's configure `wasmd` exec, point it to testnets, create wallet and ask tokens from faucet:
+`wasmd` execを構成し、それをテストネットにポイントし、ウォレットを作成して、蛇口からトークンを要求しましょう。
 
-First source the musselnet network configurations to the shell:
+まず、musselnetネットワーク構成をシェルに供給します。
 
 ```shell
 source <(curl -sSL https://raw.githubusercontent.com/CosmWasm/testnets/master/musselnet/defaults.env)
@@ -64,34 +64,34 @@ JSON=$(jq -n --arg addr $(wasmd keys show -a fred) '{"denom":"umayo","address":$
 JSON=$(jq -n --arg addr $(wasmd keys show -a thief) '{"denom":"umayo","address":$addr}') && curl -X POST --header "Content-Type: application/json" --data "$JSON" https://faucet.musselnet.cosmwasm.com/credit
 ```
 
-## Export wasmd Parameters
+## wasmdパラメータをエクスポートする
 
-If you intend to use wasmd as client, we recommend you to setup these variables.
-Otherwise You will have to define type in node, chain id and gas-prices details with every command you execute.
-Also for this tutorial we will use these variables. So make sure you export these before proceeding.
+wasmdをクライアントとして使用する場合は、これらの変数を設定することをお勧めします。
+それ以外の場合は、実行する各コマンドでノードタイプ、チェーンID、およびガス価格の詳細を定義する必要があります。
+また、このチュートリアルでは、これらの変数を使用します。 したがって、先に進む前に、必ずこれらをエクスポートしてください。
 
 ```bash
 export NODE=(--node "https://rpc.musselnet.cosmwasm.com:443")
 export TXFLAG=($NODE --chain-id ${CHAIN_ID} --gas-prices 0.01umayo --gas auto --gas-adjustment 1.3)
 ```
 
-## Setup Node REPL
+## ノードREPLを設定します
 
 
-Beyond the standard CLI tooling, we have also produced a flexible TypeScript library
-[CosmJS](https://github.com/CosmWasm/cosmjs), which runs in Node.js as well as in modern browsers
-and handles queries and submitting transactions. Along with this library, we produced
-[@cosmjs/cli](https://www.npmjs.com/package/@cosmjs/cli), which is a super-charged Node console. It
-supports `await`, does type checking for helpful error messages, and preloads many CosmJS utilities.
-If you are comfortable with the Node console, you will probably find this easier and more powerful
-than the CLI tooling.
+標準のCLIツールに加えて、柔軟なTypeScriptライブラリも作成しました
+[CosmJS](https://github.com/CosmWasm/cosmjs)、Node.jsと最新のブラウザーで実行されます
+そして、問い合わせを処理し、トランザクションを送信します。 このライブラリと一緒に、
+[@ cosmjs/cli](https://www.npmjs.com/package/@cosmjs/cli)、これはスーパーチャージされたノードコンソールです。 それ
+`await`をサポートし、有用なエラーメッセージの型チェックを実行し、多くのCosmJSユーティリティをプリロードします。
+Nodeコンソールに満足している場合は、よりシンプルで強力なものになっているかもしれません。
+CLIツールより。
 
-Full usage and installation [instructions are on the
-README](https://github.com/CosmWasm/cosmjs/tree/master/packages/cli), also here are the source codes prepacked with
-network configurations you can use on-the-fly:
+完全な使用とインストール[手順
+README](https://github.com/CosmWasm/cosmjs/tree/master/packages/cli)、これも事前にパッケージ化されたソースコードです
+すぐに使用できるネットワーク構成:
 
-::: warning
-The command below is obsolete and updated soon.
+::: 暖かい
+次のコマンドは廃止され、まもなく更新されます。
 :::
 
 ```shell
@@ -102,7 +102,7 @@ npx @cosmjs/cli@^0.23 --init https://raw.githubusercontent.com/CosmWasm/testnets
 Using the REPL:
 
 ```js
-// Create or load account
+//Create or load account
 const mnemonic = loadOrCreateMnemonic('fred.key')
 mnemonicToAddress(mnemonic)
 
@@ -110,16 +110,16 @@ const { address, client } = await connect(mnemonic, {})
 address
 
 client.getAccount()
-// if empty - this only works with CosmWasm
+//if empty - this only works with CosmWasm
 hitFaucet(defaultFaucetUrl, address, 'FRITES')
 client.getAccount()
 ```
 
 
-You need to put RPC endpoint and
-## Run Local Node (optional)
+RPCエンドポイントとを組み合わせる必要があります
+## ローカルノードを実行する(オプション)
 
-If you are interested in running your local network you can use the script below:
+ローカルネットワークの実行に関心がある場合は、次のスクリプトを使用できます。
 
 ```shell
 # default home is ~/.wasmd

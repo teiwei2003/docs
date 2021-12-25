@@ -1,133 +1,132 @@
-# CW3 Spec: MultiSig/Voting Contracts
+# CW3仕様:マルチ署名/投票契約
 
-[CW3](https://github.com/CosmWasm/cosmwasm-plus/tree/master/packages/cw3) is a specification for voting contracts based on CosmWasm.
-It is an extension of CW1 (which served as an immediate 1 of N multisig).
-In this case, no key can immediately execute, but only propose
-a set of messages for execution. The proposal, subsequent
-approvals, and signature aggregation all happen on chain.
+[CW3](https://github.com/CosmWasm/cosmwasm-plus/tree/master/packages/cw3)は、CosmWasmに基づく投票契約仕様です。
+これは、CW1の拡張です(N個のマルチシグニチャの直接1として)。
+この場合、キーをすぐに実行することはできませんが、
+実行に使用される一連のメッセージ。提案、その後
+承認と署名の集約の両方がチェーン上で行われます。
 
-There are at least 3 different cases we want to cover in this spec:
+この仕様では、少なくとも3つの異なる状況をカバーしたいと考えています。
 
-- K of N immutible multisig. One key proposes a set of messages,
-  after K-1 others approve it, it can be executed with the
-  multisig address.
-- K of N flexible, mutable multisig. Like above, but with
-  multiple contracts. One contract stores the group, which is
-  referenced from multiple multisig contracts (which in turn
-  implement cw3). One cw3 contracts is able to update the
-  group content (maybe needing 67% vote). Other cw3 contracts
-  may hold tokens, staking rights, etc with various execution
-  thresholds, all controlled by one group. (Group interface
-  and updating them will be defined in a future spec, likely cw4).
+-N不変のマルチシグニチャK。キーはメッセージのグループを表示します、
+  K-1他の人が承認した後、実行することができます
+  マルチシグニチャアドレス。
+-K ofNの柔軟で可変のマルチシグニチャ。上記と同じですが、
+  複数の契約。契約保管グループ、すなわち
+  複数のマルチシグニチャ契約から引用(順番に
+  cw3)を実装します。 cw3契約は更新できます
+  グループコンテンツ(投票の67％が必要な場合があります)。その他のcw3契約
+  実行されたさまざまなトークン、住宅ローンの権利などを保持する場合があります。
+  しきい値。すべてグループによって制御されます。 (グループインターフェース
+  それらを更新することは、将来の仕様、おそらくcw4で定義されるでしょう。
 
-This should fit in this interface (possibly with some
-extensions for pieces, but the usage should look the
-same externally):
+これはこのインターフェースに適合するはずです(いくつかあるかもしれません
+ファイル拡張子、ただし使用法は次のようになります
+外部的に同じ):
 
-- Token weighted voting. People lock tokens in a contract
-  for voting rights. There is a vote threshold to execute
-  messages. The voting set is dynamic. This has a similar
-  "propose, approve, execute" flow, but we will need to
-  support clear YES/NO votes and quora not just absolute
-  thresholds.
+-トークン加重投票。人々は契約でトークンをロックします
+  議決権について。強制する投票しきい値があります
+  情報。投票セットは動的です。これは似ています
+  「提案、承認、実行」プロセスですが、必要です
+  明確なYES/NO投票とクォーラのサポートは絶対以上のものです
+  しきい値。
 
-The common denominator is that they allow you to propose
-arbitrary `CosmosMsg` to a contract, and allow a series
-of votes/approvals to determine if it can be executed,
-as well as a final step to execute any approved proposal once.
+彼らに共通しているのは、あなたが提案できるということです
+契約への任意の `CosmosMsg`、およびシリーズを許可します
+実行可能かどうかを決定するための投票/承認、
+そして、承認された提案を実行する最後のステップ。
 
-## Base
+## によると
 
-The following interfaces must be implemented for all cw3
-contracts. Note that updating the members of the voting
-contract is not contained here (one approach is defined in cw4).
-Also, how to change the threshold rules (if at all) is not
-standardized. Those are considered admin tasks, and the common
-API is designed for standard usage, as that is where we can
-standardize the most tooling without limiting more complex
-governance controls.
+すべてのcw3は、次のインターフェイスを実装する必要があります
+契約する。投票メンバーの更新に注意してください
+コントラクトはここには含まれていません(メソッドはcw4で定義されています)。
+また、しきい値ルールを変更する方法(ある場合)はそうではありません
+標準化。これらは管理タスクと見なされ、一般的な
+APIは標準的な使用のために設計されています。これは、私たちができることだからです。
+より複雑なものを制限することなく、ほとんどのツールを標準化する
+ガバナンス制御。
 
-### Messages
+### 情報
 
-`Propose{title, description, msgs, earliest, latest}` - This accepts
-`Vec<CosmosMsg>` and creates a new proposal. This will return
-an auto-generated ID in the `Data` field (and the logs) that
-can be used to reference the proposal later.
+`提案{タイトル、説明、メッセージ、最も古い、最も新しい}`-これは受け入れられます
+`Vec <CosmosMsg>`そして新しい提案を作成します。これは戻ります
+「データ」フィールド(およびログ)に自動的に生成されたID
+後で提案を参照できます。
 
-If the Proposer is a valid voter on the proposal, this will imply a Yes vote by
-the Proposer for a faster workflow, especially useful in eg. 2 of 3
-or 3 of 5 multisig, we don't need to propose in one block, get result,
-and vote in another block.
+提案者が提案の有効な投票者である場合、それは肯定的な投票を意味します
+提案者はワークフローをスピードアップできます。たとえば、特に適しています。 2/3
+または、5つのマルチ署名のうち3つは、結果を得るためにブロックで提案する必要はありません。
+そして、別のブロックに投票します。
 
-Earliest and latest are optional and can request the first
-and last height/time that we can try `Execute`. For a vote,
-we may require at least 2 days to pass, but no more than 7.
-This is optional and even if set, may be modified by the contract
-(overriding or just enforcing min/max/default values).
+最も古いものと最も新しいものはオプションです。最初のものをリクエストできます
+そして、「実行」を試みることができる最後の高さ/時間。投票するために、
+通過するのに少なくとも2日かかる場合がありますが、7日以内です。
+これはオプションであり、設定されている場合でも、契約によって変更される可能性があります
+(最小値/最大値/デフォルト値をオーバーライドまたは強制します)。
 
-Many implementations will want to restrict who can propose.
-Maybe only people in the voting set. Maybe there is some
-deposit to be made along with the proposal. This is not
-in the spec but left open to the implementation.
+多くの実装では、提案できる人を制限したいと考えています。
+多分投票した人だけ。多分いくつか
+保証金は提案とともに預けられました。これではありません
+仕様ではありますが、実装は可能です。
 
-`Vote{proposal_id, vote}` - Given a proposal_id, you can
-vote yes, no, abstain or veto. Each signed may have a
-different "weight" in the voting and they apply their
-entire weight on the vote.
+`Vote {proposal_id、vote}` -proposal_idが与えられると、次のことができます
+はい、いいえ、棄権または拒否権に投票してください。各署名には1つあります
+投票におけるさまざまな「重み」、彼らは彼らの
+投票の全重量。
 
-Many contracts (like typical
-multisig with absolute threshold) may consider veto and
-abstain as no and just count yes votes. Contracts with quora
-may count abstain towards quora but not yes or no for threshold.
-Some contracts may give extra power to veto rather than a
-simple no, but this may just act like a normal no vote.
+多くの契約(典型的なものなど
+(絶対しきい値を使用したマルチ署名)拒否権と
+棄権はノーであり、賛成票のみです。クォーラとの契約
+クォーラ棄権としてカウントできますが、はいまたはいいえのしきい値ではありません。
+一部の契約では、追加の権限の代わりに拒否権が与えられる場合があります
+単にいいえ、しかしそれは通常の非投票のようかもしれません。
 
-`Execute{proposal_id}` - This will check if the voting
-conditions have passed for the given proposal. If it has
-succeeded, the proposal is marked as `Executed` and the
-messages are dispatched. If the messages fail (eg out of gas),
-this is all reverted and can be tried again later with
-more gas.
+`Execute {proposal_id}`-これは投票をチェックします
+与えられた提案の条件は過ぎました。もしあるなら
+成功すると、提案は「実行済み」としてマークされ、
+メッセージが送信されます。メッセージが失敗した場合(排気ガスなど)、
+これはすべて復元されます。後でもう一度試すことができます
+より多くのガス。
 
-`Close{proposal_id}` - This will check if the voting conditions
-have failed for the given proposal. If so (eg. time expired
-and insufficient votes), then the proposal is marked `Failed`.
-This is not strictly necessary, as it will only act when
-it is impossible the contract would ever be executed,
-but can be triggered to provide some better UI.
+`Close {proposal_id}`-これは投票条件をチェックします
+与えられた提案は失敗しました。もしそうなら(例えば、時間が経過した
+投票が不十分)、提案は「失敗」としてマークされます。
+これは絶対に必要というわけではありません。
+契約は決して実行できません、
+ただし、トリガーして、より優れたUIを提供することもできます。
 
-### Queries
+### お問い合わせ
 
-`Threshold{}` - This returns information on the rules needed
-to declare a contract a success. What percentage of the votes
-and how they are tallied.
+`Threshold {}`-必要なルールに関する情報を返します
+契約の成功を発表します。投票率はいくらですか
+そしてそれらがどのように計算されるか。
 
-`Proposal{proposal_id}` - Returns the information set when
-creating the proposal, along with the current status.
+`Proposal {proposal_id}`-情報セットを返します
+提案と現在のステータスを作成します。
 
-`ListProposals{start_after, limit}` - Returns the same info
-as `Proposal`, but for all proposals along with pagination.
-Starts at proposal_id 1 and accending.
+`ListProposals {start_after、limit}`-同じ情報を返します
+「提案」として、ただしすべての提案とページ付け。
+Suggestion_id 1から始めて、増やします。
 
-`ReverseProposals{start_before, limit}` - Returns the same info
-as `Proposal`, but for all proposals along with pagination.
-Starts at latest proposal_id and descending. (Often this
-is what you will want for a UI)
+`ReverseProposals {start_before、limit}`-同じ情報を返します
+「提案」として、ただしすべての提案とページ付け。
+最新のproposal_idから開始し、降順で降順を指定します。 (多くの場合、これ
+必要なUIですか)
 
-`Vote{proposal_id, voter}` - Returns how the given
-voter (HumanAddr) voted on the proposal. (May be null)
+`Vote {proposal_id、voter}`-指定されたものを返します
+有権者(HumanAddr)が提案に投票しました。 (空の場合があります)
 
-`ListVotes{proposal_id, start_after, limit}` - Returns the same info
-as `Vote`, but for all votes along with pagination.
-Returns the voters sorted by the voters' address in
-lexographically ascending order.
+`ListVotes {proposal_id、start_after、limit}`-同じ情報を返します
+「投票」として、ただしすべての投票とページ付け。
+投票者の住所でソートされた投票者を返す
+辞書の順序は昇順です。
 
-## Voter Info
+## 投票者情報
 
-Information on who can vote is contract dependent. But
-we will work on a common API to display some of this.
+誰が投票できるかについての情報は、契約によって異なります。しかし
+共通のAPIを使用してその一部を表示します。
 
-`Voter { address }` - returns voting power (weight) of this address, if any
+`Voter {address}`-アドレスの議決権(重み)を返します(存在する場合)
 
-`ListVoters { start_after, limit }` - list all eligable voters
-
+`ListVoters {start_after、limit}`-すべての有権者を一覧表示します

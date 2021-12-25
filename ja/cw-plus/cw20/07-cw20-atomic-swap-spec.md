@@ -1,30 +1,30 @@
-# Atomic Swaps
+# アトミックスワップ
 
-cw20-atomic-swap source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-atomic-swap](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-atomic-swap)
+cw20-atomic-swapソースコード:[https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-atomic-swap](https://github.com/CosmWasm/cosmwasm-plus/ツリー/マスター/コントラクト/cw20-アトムスワップ)
 
-This is a contract that allows users to execute atomic swaps.
-It implements one side of an atomic swap. The other side can be realized
-by an equivalent contract in the same blockchain or, typically, on a different blockchain.
+これは、ユーザーがアトミックスワップを実行できるようにする契約です。
+アトミックスワップの片側を実装します。反対側を達成することができます
+同じブロックチェーンまたは通常は異なるブロックチェーンでの同等の契約を通じて。
 
-Each side of an atomic swap has a sender, a recipient, a hash,
-and a timeout. It also has a unique id (for future calls to reference it).
-The hash is a sha256-encoded 32-bytes long phrase.
-The timeout can be either time-based (seconds since midnight, January 1, 1970),
-or block height based.
+アトミックスワップの各パーティには、送信者、受信者、ハッシュ、
+そしてタイムアウト。また、一意のIDもあります(今後の呼び出しでそれを参照するため)。
+ハッシュは、sha256によってエンコードされた32バイトの長さのフレーズです。
+タイムアウトは時間ベース(1970年1月1日の午前0時からの秒数)にすることができます。
+またはブロックの高さに基づいています。
 
-The basic function is, the sender chooses a 32-bytes long phrase as preimage, hashes it,
-and then uses the hash to create a swap with funds.
-Before the timeout, anybody that knows the preimage may decide to release the funds
-to the original recipient.
-After the timeout (and if no release has been executed), anyone can refund
-the locked tokens to the original sender.
-On the other side of the swap the process is similar, with sender and recipient exchanged.
-The hash must be the same, so the first sender can claim the funds, revealing the preimage
-and triggering the swap.
+基本的な機能は、送信者が元の画像として32バイトのフレーズを選択し、それをハッシュすることです。
+次に、ハッシュを使用してファンドスワップを作成します。
+タイムアウトの前に、プレイメージを知っている人は誰でも資金を解放することを決定できます
+元の受信者へ。
+タイムアウト後(リリースが実行されていない場合)、誰でも返金できます
+ロックされたトークンは元の送信者に渡されます。
+交換のもう一方の端では、プロセスは同様であり、送信者と受信者が交換します。
+ハッシュ値は同じである必要があるため、最初の送信者は元の画像を表示するための資金を請求できます
+そして、交換をトリガーします。
 
-See the [IOV atomic swap spec](https://github.com/iov-one/iov-core/blob/master/docs/atomic-swap-protocol-v1.md)
-for details.
+[IOVアトミックスワップ仕様](https://github.com/iov-one/iov-core/blob/master/docs/atomic-swap-protocol-v1.md)を参照してください。
+詳細。
 
-## Token types
+## トークンタイプ
 
-Currently native tokens are supported; an upcoming version will support CW20 tokens.
+現在ネイティブトークンをサポートしています。次のバージョンはCW20トークンをサポートします。

@@ -1,32 +1,32 @@
-# What are Multi-Chain Contracts?
+# マルチチェーン契約とは何ですか？
 
-CosmWasm is designed and built from the ground-up to be a multi-chain solution for smart contracts.
-As it comes from the Cosmos ecosystem, it is no surprise that this is designed for networks
-of blockchains, rather than the traditional blockchain silos. But what exactly do we mean by multi-chain?
+CosmWasmは、スマートコントラクトのマルチチェーンソリューションを目指して、ゼロから設計および構築されています。
+Cosmosエコシステムに由来するため、Web用に設計されているのも当然です。
+従来のブロックチェーンアイランドではなく、ブロックチェーン。しかし、マルチチェーンとはどういう意味ですか？
 
-## Different Chain, Same Contract
+## 異なるチェーン、同じ契約
 
-Since we make little requirements of the host application, it is easy for any Cosmos SDK app
-to embed the `wasm` module and customize the permissioning or fees as they wish. All code
-is designed to be agnostic to the details of the underlying chain, so just by writing a
-CosmWasm contract, you will soon be able to run on many different chains on the Cosmos ecosystem.
+ホストアプリケーションの要件が非常に少ないため、CosmosSDKアプリケーションは簡単です。
+`wasm`モジュールを埋め込み、必要に応じてライセンスまたは料金をカスタマイズします。すべてのコード
+基になるチェーンの詳細とは関係がないように設計されているため、1つだけ書く必要があります
+CosmWasmコントラクトを使用すると、Cosmosエコシステム内のさまざまなチェーンですぐに実行できるようになります。
 
-[Regen Network](https://regen.network) plans to include CosmWasm support, when they launch. And a number of other chains are looking into adding this support.
+[Regen Network](https://regen.network)は、起動時にCosmWasmサポートを含める予定です。他の多くのチェーンは、このサポートの追加を検討しています。
 
-## Inter Blockchain Contracts
+## ブロックチェーン間契約
 
-If you have heard anything about Cosmos, it is most likely about [Inter-Blockchain Communication](https://cosmos.network/ibc/). The power of [Tendermint BFT consensus](https://tendermint.com) and their [novel bonded proof of stake algorithm](https://blog.cosmos.network/what-does-the-launch-of-cosmos-mean-for-the-blockchain-ecosystem-952e14f67d0d) are just the foundation on which they enable a revolutionary protocol to allow trustless message passing semantics between blockchains. No middleman, no timing issue, full security.
+Cosmosについて聞いたことがあるなら、それはおそらく[ブロックチェーン間通信](https://cosmos.network/ibc/)に関するものです。 [Tendermint BFTコンセンサス](https://tendermint.com)とその[New Bonded Equity Proof Algorithm](https://blog.cosmos.network/what-does-the-launch-of-cosmos- mean -for- the-blockchain-ecosystem-952e14f67d0d)は、ブロックチェーン間の信頼できないメッセージングセマンティクスを可能にする革新的なプロトコルの基盤にすぎません。仲介人も時間の問題もなく、完全に安全です。
 
-The potential means code on one chain can execute a transaction on another chain. But the code must be designed around such a message-passing idiom. CosmWasm fully embraces the [actor model](./actor) and as such naturally lends itself to such IBC. Fire and forget messages, rather than awaiting a promise and worrying about race conditions and reentrancy attacks. As IBC stabilizes, we will be adding first class support for IBC primitives into the [CosmWasm](https://github.com/CosmWasm/cosmwasm) libraries, as well as the [Cosmos SDK module](https://github.com/CosmWasm/wasmd/tree/master/x/wasm) that hosts it.
+潜在的には、あるチェーンのコードが別のチェーンでトランザクションを実行できることを意味します。しかし、コードはそのようなメッセージパッシングイディオムを中心に設計する必要があります。 CosmWasmには[actormodel](./actor)が完全に含まれているため、このタイプのIBCに自然に適しています。約束を待って競合状態やリエントラント攻撃を心配する代わりに、メッセージをトリガーして忘れてください。 IBCの安定性により、[CosmWasm](https://github.com/CosmWasm/cosmwasm)ライブラリと[Cosmos SDKモジュール](https://github.com)にIBCプリミティブのファーストクラスのサポートを追加します。 com/CosmWasm/wasmd/tree/master/x/wasm)をホストします。
 
-## Easy to Integrate
+## 統合が簡単
 
-Another design goal of CosmWasm was to be more of a library than a framework. This means it has a small surface area of required APIs and you can opt-in to most of the code. It is there to make life easy for you, but you can easily build it your own way as well. This has two big benefits:
+CosmWasmのもう1つの設計目標は、フレームワークというよりもライブラリのようになることです。これは、小さなAPI表面積が必要であり、ほとんどのコードを含めることを選択できることを意味します。それはあなたの人生を楽にすることができますが、あなたはそれをあなたのやり方で簡単に構築することもできます。これには2つの大きな利点があります。
 
-The first is that it makes it easier to add support for multiple languages to write contracts in. So we can add support for say, [AssemblyScript](https://docs.assemblyscript.org/) or [Go](https://github.com/tinygo-org/tinygo), for those who prefer not to write in Rust.
+1つ目は、契約を作成するために複数の言語のサポートを追加するのが簡単になることです。そのため、[AssemblyScript](https://docs.assemblyscript.org/)または[Go](https://github.com/tinygo-org/tinygo)のペアを追加して、気に入らない人に適したものにすることができます。 Rustで書く。
 
-The second benefit is that since it makes limited demands of the host system, it can be embedded in other frameworks, not just the Cosmos SDK. The core runtime logic [`cosmwasm-vm`](https://github.com/CosmWasm/cosmwasm/tree/master/lib/vm) is in Rust, and [`go-cosmwasm`](https://github.com/CosmWasm/go-cosmwasm) provides a generic Go binding to it. As Go and Rust are two of the most popular languages to write blockchains, this opens the door for many integrations. Of course, unless your chain is running on top of [Tendermint](https://tendermint.com) or potentially another BFT Instant Finality Consensus algorithm like [Babble](https://babble.io/), the contracts will not be able to participate with IBC.
+2つ目の利点は、ホストシステムの要件が限られているため、Cosmos SDKだけでなく、他のフレームワークに組み込むことができることです。コアランタイムロジック[`cosmwasm-vm`](https://github.com/CosmWasm/cosmwasm/tree/master/lib/vm)Rustでは、[` go-cosmwasm`](https://github。com/CosmWasm/go-cosmwasm)は、一般的なGoバインディングを提供します。 GoとRustはブロックチェーンを作成するための2つの最も人気のある言語であるため、これは多くの統合への扉を開きます。もちろん、チェーンが[Tendermint](https://tendermint.com)または[Babble](https://babble.io/)などの別のBFTインスタントファイナリティコンセンサスアルゴリズムで実行されていない限り、契約は実行されません。 IBCに参加することができます。
 
-## Platform to Build On
+## プラットフォームを構築する
 
-CosmWasm doesn't want to lock you to one blockchain, or even one programming language. It is designed to be adaptable to many environments, and *connect* blockchains. This makes it a solid platform to build on. Even if one chain doesn't pan out well, all your smart contracts and dApps can quickly be transferred to another chain. Or if your app grows quickly, you can launch your own chain to deploy the next version of the contracts, and transfer all existing tokens to your new chain via IBC. The possibilities are only limited by your imagination.
+CosmWasmは、あなたをブロックチェーンやプログラミング言語に縛り付けたくありません。複数の環境に適応し、ブロックチェーンを*接続*するように設計されています。これにより、堅固なプラットフォームになります。 1つのチェーンがうまく機能しない場合でも、すべてのスマートコントラクトとdAppを別のチェーンにすばやく転送できます。または、アプリケーションが急速に成長している場合は、独自のチェーンを開始して次のバージョンのコントラクトをデプロイし、既存のすべてのトークンをIBCを介して新しいチェーンに転送できます。可能性はあなたの想像力によってのみ制限されます。

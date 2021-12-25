@@ -1,13 +1,12 @@
-# Plus Contracts
+# Plus契約
 
-Plus contracts are collection of production-quality CosmWasm contracts collected at [CosmWasm/cosmwasm-plus](https://github.com/CosmWasm/cosmwasm-plus).
+Plus契約は、[CosmWasm/cosmwasm-plus](https://github.com/CosmWasm/cosmwasm-plus)で収集された生産品質のCosmWasm契約のコレクションです。
 
-## Contents
+## コンテンツ
 
-- [CW20](../cw20/01-spec.md) is a specification for fungible tokens.
-- [CW1](../cw1/01-intro.md) is a specification for proxy contracts.
+-[CW20](../cw20/01-spec.md)は、代替可能なトークンの仕様です。
+-[CW1](../cw1/01-intro.md)は代理店契約の仕様です。
 
-## Contribution
+## 助ける
 
-All contributions are welcome. You can open PRs at [CosmWasm/cosmwasm-plus](https://github.com/CosmWasm/cosmwasm-plus).
-
+すべての貢献を歓迎します。 PRは[CosmWasm/cosmwasm-plus](https://github.com/CosmWasm/cosmwasm-plus)で開くことができます。

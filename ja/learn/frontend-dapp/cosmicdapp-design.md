@@ -1,47 +1,47 @@
-# Cosmic dApp design
+# CosmicdAppデザイン
 
-The [`@cosmicdapp/design`](https://github.com/CosmWasm/dApps/tree/master/packages/design) package provides two kinds of resources: theme and components. The theme provides global styles for visual consistency across the dApps, whereas the components will give us layout primitives and reusable React components with internal logic.
+[`@ cosmicdapp/design`](https://github.com/CosmWasm/dApps/tree/master/packages/design)このパッケージは、テーマとコンポーネントの2種類のリソースを提供します。 テーマは、dApp全体で視覚的な一貫性を実現するためのグローバルなスタイルを提供し、コンポーネントは、内部ロジックを備えたレイアウトプリミティブと再利用可能なReactコンポーネントを提供します。
 
-The example balance checker dApp will make use of some resources from this package, so let's take a look at them.
+サンプルのバランスチェッカーdAppは、このパッケージのリソースの一部を使用します。それらを見てみましょう。
 
-## Theme
+## テーマ
 
-We'll use the exported `GlobalStyle` in order to have visual consistency with the rest of the dApps. This React component includes a CSS reset; spacing, colors, and fonts CSS Custom Properties; and an override for some Ant Design classes. This is seen at first glance if you look at the `GlobalStyle` code:
+エクスポートされた「GlobalStyle」を使用して、dAppの他の部分との視覚的な一貫性を維持します。 このReactコンポーネントには、CSSリセット、間隔、色、フォントのCSSカスタムプロパティ、および一部のAntDesignクラスのオーバーライドが含まれています。 `GlobalStyle`コードを見ると、一目でこれがわかります。
 
 ```jsx
 export function GlobalStyle(): JSX.Element {
   return (
     <>
-      <GlobalReset />
-      <GlobalSpacing />
-      <GlobalColors />
-      <GlobalFonts />
-      <GlobalAntOverride />
+      <GlobalReset/>
+      <GlobalSpacing/>
+      <GlobalColors/>
+      <GlobalFonts/>
+      <GlobalAntOverride/>
     </>
   );
 }
 ```
 
-## Components
+## コンポーネント
 
-### Layout primitives
+### レイアウトプリミティブ
 
-This resource offers some primitives based on the [Every Layout](https://every-layout.dev) book.
+このリソースは、本[Every Layout](https://every-layout.dev)に基づいたいくつかのプリミティブを提供します。
 
-#### Stack
+#### ヒープ
 
-This React component displays its children as a stack with a configurable gap between them.
+このReactコンポーネントは、子コンポーネントを、それらの間に構成可能なギャップがあるスタックとして表示します。
 
-#### PageLayout
+#### ページレイアウト
 
-This React component is used as the wrapper for every view. It establishes a max width of page and centers the stacked children inside.
+このReactコンポーネントは、各ビューのラッパーとして機能します。 ページの最大幅を設定し、スタックされた子を中央に配置します。
 
-### Components with logic
+### ロジックを備えたコンポーネント
 
-#### Login
+#### ログイン
 
-The first view of the balance checker application. It offers three options for logging in: localStorage burner wallet, ledger wallet, or Keplr wallet.
+バランスチェッカーアプリケーションの最初のビュー。 これは、localStorageバーナーウォレット、元帳ウォレット、またはKeplrウォレットの3つのログインオプションを提供します。
 
-#### YourAccount
+#### あなたのアカウント
 
-A useful component that lets the user copy their own address to clipboard, and optionally show their current native balance.
+ユーザーが自分のアドレスをクリップボードにコピーし、オプションで現在のローカル残高を表示できるようにする便利なコンポーネント。

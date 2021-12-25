@@ -1,47 +1,47 @@
-# CW3 Fixed Multisig
+# CW3固定マルチシグニチャ
 
-cw3-fixed-multisig source code: [https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw3-fixed-multisig](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw3-fixed-multisig)
+cw3-fixed-multisigソースコード:[https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw3-fixed-multisig](https://github.com/CosmWasm/cosmwasm-plus/ツリー/メイン/コントラクト/cw3-fixed-multisig)
 
-This is a simple implementation of the [cw3 spec](01-spec.md).
-It is a multisig with a fixed set of addresses created upon initialization.
-Each address may have the same weight (K of N), or some may have extra voting
-power. This works much like the native Cosmos SDK multisig, except that rather
-than aggregating the signatures off chain and submitting the final result,
-we aggregate the approvals on-chain.
+これは、[cw3仕様](01-spec.md)の単純な実装です。
+これは、初期化中に作成された一連の固定アドレスを持つマルチシグニチャです。
+各アドレスの重みは同じ(K of N)の場合もあれば、追加の投票がある場合もあります。
+力。これは、ネイティブのCosmos SDKマルチシグニチャと非常に似ていますが、
+アグリゲーションチェーンの下で署名して最終結果を送信する代わりに、
+チェーンの承認を集約しました。
 
-This is usable as is, and probably the most secure implementation of cw3
-(as it is the simplest), but we will be adding more complex cases, such
-as updating the multisig set, different voting rules for the same group
-with different permissions, and even allow token-weighted voting. All through
-the same client interface.
+これはそのまま使用でき、おそらくcw3の最も安全な実装です。
+(最も単純なため)ただし、次のようなより複雑なケースを追加します
+マルチシグニチャセットを更新する場合、同じセットに対して異なる投票ルール
+さまざまな権限があり、トークン加重投票も許可します。旅全体
+同じクライアントインターフェイス。
 
-## Init
+## 中身
 
-To create the multisig, you must pass in a set of `HumanAddr` with a weight
-for each one, as well as a required weight to pass a proposal. To create
-a 2 of 3 multisig, pass 3 voters with weight 1 and a `required_weight` of 2.
+マルチシグニチャを作成するには、重み付けされた `HumanAddr`のセットを渡す必要があります
+皆のために、そして提案を通過するために必要な重み。作成するには
+3つのマルチ署名のうち2つは、重みが1で `required_weight`が2の3人の有権者を通過します。
 
-Note that 0 *is an allowed weight*. This doesn't give any voting rights, but
-it does allow that key to submit proposals that can later be approved by the
-voters. Any address not in the voter set cannot submit a proposal.
+0 *は許容重量*であることに注意してください。これは議決権を与えるものではありませんが、
+キーを後で送信することはできます
+有権者。有権者以外の住所は提案を提出できません。
 
-## Handle Process
+## 処理
 
-First, a registered voter must submit a proposal. This also includes the
-first "Yes" vote on the proposal by the proposer. The proposer can set
-an expiration time for the voting process, or it defaults to the limit
-provided when creating the contract (so proposals can be closed after several
-days).
+まず、登録済みの有権者は提案を提出する必要があります。これには、
+スポンサーは最初に提案に「はい」と投票しました。提案者は設定できます
+投票プロセスの有効期限、またはデフォルトの制限
+契約が作成されたときに提供されます(したがって、プロポーザルは数回後に閉じることができます
+空)。
 
-Before the proposal has expired, any voter with non-zero weight can add their
-vote. Only "Yes" votes are tallied. If enough "Yes" votes were submitted before
-the proposal expiration date, the status is set to "Passed".
+提案の有効期限が切れる前に、重みがゼロ以外の有権者は、
+投票。 「はい」の投票のみがカウントされます。以前に十分な「はい」の投票が提出されている場合
+提案の期日であり、ステータスは「承認済み」に設定されます。
 
-Once a proposal is "Passed", anyone may submit an "Execute" message. This will
-trigger the proposal to send all stored messages from the proposal and update
-it's state to "Executed", so it cannot run again. (Note if the execution fails
-for any reason - out of gas, insufficient funds, etc - the state update will
-be reverted, and it will remain "Passed", so you can try again).
+提案が「合格」すると、誰でも「実行」メッセージを送信できます。この意志
+プロポーザルをトリガーして、プロポーザルに保存されているすべてのメッセージを送信し、更新します
+ステータスは「実行済み」であるため、再度実行することはできません。 (実行が失敗した場合は注意してください
+何らかの理由で-燃料不足、資金不足など-ステータスの更新は
+復元された場合、「合格」のままになるため、再試行できます)。
 
-Once a proposal has expired without passing, anyone can submit a "Close"
-message to mark it closed. This has no effect beyond cleaning up the UI/database.
+提案の有効期限が切れて合格しなかった場合、誰でも「閉じる」ために提案を送信できます
+閉じたメッセージとしてマークします。 UI/データベースのクリーンアップを除けば、これは効果がありません。

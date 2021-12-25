@@ -1,8 +1,8 @@
-# Hints
+# ヒント
 
-**!! SPOILER ALERT !!**
+**！ ！ ネタバレ注意!! **
 
-This sections contains solutions to previous section's questions.
+このセクションには、前のセクションの質問に対する回答が含まれています。
 
 ## ExecuteMsg
 
@@ -11,7 +11,7 @@ This sections contains solutions to previous section's questions.
 #[serde(rename_all = "snake_case")]
 pub enum ExecuteMsg {
     Approve {
-        // release some coins - if quantity is None, release all coins in balance
+       //release some coins - if quantity is None, release all coins in balance
         quantity: Option<Vec<Coin>>,
     },
     Refund {},
@@ -23,8 +23,8 @@ pub enum ExecuteMsg {
 Add a global constant:
 
 ```rust
-// this will be the bech32-encoded address in final code
-// we cannot use Addr in const as that is heap allocated... use `Addr::from() later
+//this will be the bech32-encoded address in final code
+//we cannot use Addr in const as that is heap allocated... use `Addr::from() later
 const THIEF: &str = "changeme";
 ```
 
@@ -76,17 +76,17 @@ fn try_steal(
 fn handle_steal() {
     let mut deps = mock_dependencies(20, &[]);
 
-    // initialize the store
+   //initialize the store
     let init_amount = coins(1000, "earth");
     let init_env = mock_env_height("creator", &init_amount, 876, 0);
     let msg = init_msg_expire_by_height(1000);
     let init_res = init(&mut deps, init_env, msg).unwrap();
     assert_eq!(0, init_res.messages.len());
 
-    // balance changed in init
+   //balance changed in init
     deps.querier.update_balance(MOCK_CONTRACT_ADDR, init_amount);
 
-    // not just "anybody" can steal the funds
+   //not just "anybody" can steal the funds
     let msg = ExecuteMsg::Steal {
         destination: HumanAddr::from("bankvault"),
     };
@@ -94,7 +94,7 @@ fn handle_steal() {
     let execute_res = execute(&mut deps, env, msg.clone());
     assert!(execute_res.is_err());
 
-    // only the master thief
+   //only the master thief
     let msg = ExecuteMsg::Steal {
         destination: HumanAddr::from("hideout"),
     };
@@ -113,7 +113,7 @@ fn handle_steal() {
 }
 ```
 
-You will also have to add `MOCK_CONTRACT_ADDR` to the test imports, like:
+また、テストインポートに「MOCK_CONTRACT_ADDR」を追加する必要があります。次に例を示します。
 
 ```rust
 use cosmwasm_std::testing::{mock_dependencies, mock_env, MOCK_CONTRACT_ADDR};

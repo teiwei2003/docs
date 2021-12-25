@@ -1,12 +1,12 @@
-# Develop dApp
+# 开发dApp
 
-To showcase the previously explained utilities, we'll create the balance checker dApp from the template.
+为了展示之前解释的实用程序，我们将从模板创建余额检查器 dApp。
 
-## Customize template
+## 自定义模板
 
-To make the app your own, feel free to modify the `name` field in `package.json` and/or update the `README.md` file.
+要使应用程序成为您自己的应用程序，请随时修改“package.json”中的“name”字段和/或更新“README.md”文件。
 
-Also modify the `routes/Login/index.tsx` file to look like this:
+还要修改 `routes/Login/index.tsx` 文件，如下所示:
 
 ```jsx
 import { Login as LoginDesign } from "@cosmicdapp/design";
@@ -28,19 +28,19 @@ export function Login(): JSX.Element {
 
 ```
 
-## Add balance route
+## 添加平衡路由
 
-### Balance path
+### 平衡路径
 
-Add the following to the `paths.ts` file:
+将以下内容添加到 `paths.ts` 文件中:
 
 ```typescript
-export const pathBalance = "/balance";
+export const pathBalance = "/ balance";
 ```
 
-### React component
+### 反应组件
 
-Inside `routes/`, add a `Balance` directory with the following files:
+在 `routes/` 中，添加一个包含以下文件的 `Balance` 目录:
 
 - `index.tsx`
 
@@ -101,15 +101,15 @@ export const ErrorText = styled(Text)`
 `;
 ```
 
-As you can see, this two files make use of `@cosmicdapp/logic`'s `useError` hook, and of `@cosmicdapp/design`'s `Stack`, `PageLayout`, and `YourAccount` components, so they should be familiar to you.
+如您所见，这两个文件使用了`@cosmicdapp/logic` 的`useError` 钩子，以及`@cosmicdapp/design` 的`Stack`、`PageLayout` 和`YourAccount` 组件，因此它们 你应该很熟悉。
 
-The `index.tsx` component's layout makes use of `MainStack` and `ErrorText`, which are Styled Components defined in `style.ts`, and also of `FormCheckBalance` and `TokenList` components, which are yet to be defined.
+`index.tsx` 组件的布局利用了 `MainStack` 和 `ErrorText`，它们是在 `style.ts` 中定义的样式化组件，以及尚未定义的 `FormCheckBalance` 和 `TokenList` 组件。
 
-The logic will work like this: the `TokenList` component will display the native tokens of the user, unless a contract address is entered in `FormCheckBalance`, which will make `TokenList` show the balance for that CW20 contract, or show an error if that address does not have an associated contract.
+逻辑将这样工作:`TokenList` 组件将显示用户的原生代币，除非在`FormCheckBalance` 中输入合约地址，这将使 `TokenList` 显示该 CW20 合约的余额，或者显示错误 如果该地址没有关联的合同。
 
-### Add to ProtectedSwitch
+### 添加到 ProtectedSwitch
 
-Your `ProtectedSwitch` in `App/index.tsx` should look like this:
+你在“App/index.tsx”中的“ProtectedSwitch”应该是这样的:
 
 ```jsx
 <ProtectedSwitch authPath={pathLogin}>
@@ -117,14 +117,13 @@ Your `ProtectedSwitch` in `App/index.tsx` should look like this:
 </ProtectedSwitch>
 ```
 
-Note that we remove `OperationResult`, both the route and the component, since we won't be making transactions in this dApp.
+请注意，我们删除了“OperationResult”，包括路由和组件，因为我们不会在这个 dApp 中进行交易。
 
-## Add FormCheckBalance component
+## 添加 FormCheckBalance 组件
 
-### Add Search component
+### 添加搜索组件
 
-For entering the address we'll use a custom `Search` component, it may seem hacky but does a good job integrating `formik` and `antd`, and is in fact inspired by `formik-antd` (but it's missing there as of now).
-
+为了输入地址，我们将使用自定义的`Search` 组件，它可能看起来很笨拙，但是很好地集成了 `formik` 和 `antd`，并且实际上受到了 `formik-antd` 的启发(但它在那里缺失，因为 现在)。
 `App/forms/Search.tsx`
 
 ```jsx
@@ -214,9 +213,9 @@ TypedInput.Search = React.forwardRef(
 export default TypedInput.Search;
 ```
 
-### Add contract address validation schema
+### 添加合约地址验证架构
 
-The `formik` package we'll be using for building `FormCheckBalance` has great integration with `yup`, which allows us to use it to build validation schemas like the one we need for the contract address:
+我们将用于构建 `FormCheckBalance` 的 `formik` 包与 `yup` 有很好的集成，这允许我们使用它来构建验证模式，就像我们需要的合约地址一样:
 
 `App/forms/validationSchemas.ts`
 
@@ -276,24 +275,23 @@ export function FormCheckBalance({ setContractAddress }: FormCheckBalanceProps):
 }
 ```
 
-It uses the address validation schema defined before, and has a `setContractAddress` param to update the state of the `Balance` route.
+它使用之前定义的地址验证模式，并有一个 `setContractAddress` 参数来更新 `Balance` 路由的状态。
 
-## Add TokenList component
+## 添加TokenList组件
 
-With `FormCheckBalance` working, we just need to implement `TokenList`.
+随着 `FormCheckBalance` 工作，我们只需要实现 `TokenList`。
 
-This component will:
+该组件将:
 
-1. Check if there is a contract address:
-- If not, get the native balance from the `useAccount` hook.
-- If yes, load the balance and the number of decimals for the CW20 contract token.
-- If address has no contract, show error.
-2. Display the balance:
-- Use the local `getCoinToDisplay()` utility to get a user friendly format for balance, be it native or CW20.
-- Use the `showTokens` flag for conditional rendering to avoid display issues when waiting for async data to load.
+1.检查是否有合约地址:
+- 如果没有，从 `useAccount` 钩子中获取本机余额。
+- 如果是，加载 CW20 合约代币的余额和小数位数。
+- 如果地址没有合同，显示错误。
+2.显示余额:
+- 使用本地 `getCoinToDisplay()` 实用程序获取用户友好的余额格式，无论是原生格式还是 CW20。
+- 使用`showTokens` 标志进行条件渲染以避免在等待异步数据加载时出现显示问题。
 
-The `TokenList` implementation for achieving this would be:
-
+实现这一点的 `TokenList` 实现将是:
 `routes/Balance/components/TokenList/index.tsx`
 
 ```jsx
@@ -415,6 +413,6 @@ export const TokenItem = styled.div`
 `;
 ```
 
-## Finished!
+## 完成的！
 
-Now you can check your native balances and your balance for any CW20 contract, and most importantly, you now know how to build a CosmJS based dApp!
+现在您可以检查您的本机余额和任何 CW20 合约的余额，最重要的是，您现在知道如何构建基于 CosmJS 的 dApp！

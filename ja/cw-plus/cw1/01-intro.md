@@ -1,19 +1,19 @@
-# CW1 Spec: Proxy Contracts
+# CW1仕様:代理店契約
 
-[CW1](https://github.com/CosmWasm/cosmwasm-plus/tree/master/packages/cw1) is a specification for proxy contracts based on CosmWasm.
-It is a very simple, but flexible interface designed for the case
-where one contract is meant to hold assets (or rights) on behalf of
-other contracts.
+[CW1](https://github.com/CosmWasm/cosmwasm-plus/tree/master/packages/cw1)は、CosmWasmの代理店契約仕様に基づいています。
+これは、ケース用に設計された非常にシンプルですが柔軟なインターフェイスです
+契約は、他の人に代わって資産(または権利)を保持するように設計されています
+その他の契約。
 
-The simplest example is a contract that will accept messages from
-the creator and resend them from it's address. Simply by making this
-transferable, you can then begin to transfer non-transferable assets
-(eg. staked tokens, voting power, etc).
+最も簡単な例は、受け入れる契約です。
+作成者とそのアドレスからそれらを再送します。 これを作るだけで
+譲渡可能であれば、譲渡不可能な資産の譲渡を開始できます
+(たとえば、住宅ローンのトークン、議決権など)。
 
-You can imagine more complex examples, such as a "1 of N" multisig,
-or conditional approval, where "sub-accounts" have the right to spend
-a limited amount of funds from this account, with a "admin account"
-retaining full control.
+「1ofN」マルチシグニチャなど、より複雑な例を想像できます。
+または条件付きで承認され、「サブアカウント」が使用する権利を持ちます
+この口座からの限られた金額の資金、「管理者口座」があります
+フルコントロールを維持します。
 
-The common denominator is that they allow you to immediately
-execute arbitrary `CosmosMsg` in the same transaction.
+彼らに共通しているのは、すぐにできることです
+同じトランザクションで任意の `CosmosMsg`を実行します。

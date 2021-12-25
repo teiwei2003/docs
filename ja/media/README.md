@@ -1,7 +1,7 @@
-# Brand guidelines
+# ブランドガイドライン
 
-Guideline pdf: [link](/CosmWasm_Brand_Guidelines.pdf)
+ガイドpdf:[リンク](/CosmWasm_Brand_Guidelines.pdf)
 
-# Logos
+# サイン
 
-You can find the logos in PNG and SVG format in this [link](/logos.tar.gz)
+この[リンク](/logos.tar.gz)でPNGおよびSVG形式のロゴを見つけることができます

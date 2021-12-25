@@ -1,6 +1,6 @@
-# Hack the Contract
+# 契約を破る
 
-Now that you can compile and run tests, let's try to make some changes to the code and you can see if they work. If you didn't do this already in the last section, it is time to clone the examples repo and check out the escrow code:
+これで、テストをコンパイルして実行し、コードにいくつかの変更を加えて、それらが機能するかどうかを確認できます。 前のセクションでこれを行っていない場合は、サンプルリポジトリのクローンを作成し、マネージコードを確認します。
 
 ```shell
 git clone https://github.com/CosmWasm/cosmwasm-examples
@@ -10,22 +10,22 @@ git checkout escrow-0.10.0
 cd contracts/escrow
 ```
 
-Note: This guide is compatible with `CosmWasm v0.14.x` and `wasmd v0.16.x`.
+注:このガイドは、 `CosmWasmv0.14.x`および` wasmdv0.16.x`と互換性があります。
 
-## A Walk-Through of the Escrow Contract
+## エスクロー契約のウォークスルー
 
-### Data Structures
+### データ構造
 
-There are three key data structures used in the contract - for encoding the instantiation message, for encoding the execution messages, and for storing the contract data. We define all messages in `src/msg.rs`. The `State` structs are often in `state.rs`, but if only one then just inline in `contracts.rs`.
+コントラクトでは、3つの主要なデータ構造が使用されます。インスタンス化メッセージのエンコードに使用され、実行メッセージのエンコードに使用され、コントラクトデータの保存に使用されます。すべてのメッセージを `src/msg.rs`で定義します。 `State`構造は通常` state.rs`にありますが、1つしかない場合は、 `contracts.rs`にインライン化するだけで済みます。
 
-All of them must be prefixed with a long `derive` line to add various functionality. Otherwise, it should be pretty clear how the `State` defines the current condition of a contract, and `InitMsg` will provide the initial data to configure said contract. Please note that `State` is the *only information* persisted between multiple contract calls. Purpose of these `derive` directives:
+さまざまな機能を追加するには、これらすべての前に長い `derive`行を付ける必要があります。それ以外の場合は、 `State`が契約の現在の条件をどのように定義するかを明確にする必要があり、` InitMsg`は契約を構成するための初期データを提供します。 `State`は、複数のコントラクトコール間で保持される*唯一の情報*であることに注意してください。これらの派生命令の目的は次のとおりです。
 
-* `Serialize`, `Deserialize` generate methods so the [`serde-json`](https://github.com/serde-rs/json) library can de-serialize them (there is no [reflection](https://en.wikipedia.org/wiki/Reflection_(computer_programming)) in rust)
-* `Clone` allows you to make a copy of the object (`msg.clone()`)
-* `Debug` and `PartialEq` are very useful for testing. In particular they allow the use of `assert_eq!(expected, msg);`
-* `JsonSchema` is needed by [`schemars`](https://docs.rs/schemars/0.7.0/schemars), so we can use [`schema_for!`](https://docs.rs/schemars/0.7.0/schemars/macro.schema_for.html) to generate the json schema objects (in `schema/*.json`)
+* `Serialize`、` Deserialize`生成メソッド。したがって、[`serde-json`](https://github.com/serde-rs/json)ライブラリはそれらを逆シリアル化できます([reflection](https://en。 wikipedia.org/wiki/Reflection_(computer_programming))in rust)
+* `Clone`を使用すると、オブジェクトのコピーを作成できます(` msg.clone() `)
+* `Debug`と` PartialEq`はテストに非常に役立ちます。特に、 `assert_eq！(expected、msg);`を使用できます。
+* [`schemars`](https://docs.rs/schemars/0.7.0/schemars)には` JsonSchema`が必要なので、[`schema_for！`](https://docs.rs/schemars/0.7 .0/schemas/macro.schema_for.html)jsonスキーマオブジェクトを生成します( `schema/*。json`内)
 
-From `state.rs`:
+`state.rs`から:
 
 ```rust
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -45,45 +45,45 @@ From `msg.rs`:
 pub struct InstantiateMsg {
     pub arbiter: String,
     pub recipient: String,
-    /// When end height set and block height exceeds this value, the escrow is expired.
-    /// Once an escrow is expired, it can be returned to the original funder (via "refund").
+   ///When end height set and block height exceeds this value, the escrow is expired.
+   ///Once an escrow is expired, it can be returned to the original funder (via "refund").
     pub end_height: Option<u64>,
-    /// When end time (in seconds since epoch 00:00:00 UTC on 1 January 1970) is set and
-    /// block time exceeds this value, the escrow is expired.
-    /// Once an escrow is expired, it can be returned to the original funder (via "refund").
+   ///When end time (in seconds since epoch 00:00:00 UTC on 1 January 1970) is set and
+   ///block time exceeds this value, the escrow is expired.
+   ///Once an escrow is expired, it can be returned to the original funder (via "refund").
     pub end_time: Option<u64>,
 }
 ```
 
-Note that we use `Addr`, which is a validated address wrapper with some helper functions for storage inside `State`, while we use invalidated  `String` address which should be validated by developer, for messages and anything that interacts with the user. There is [more info on addresses here](../../architecture/addresses).
+「State」に保存するためのいくつかのヘルパー関数を備えた検証済みアドレスラッパーである「Addr」を使用し、開発者が検証する必要のある無効な「String」アドレスを使用することに注意してください。メッセージとユーザーインタラクションに使用されるコンテンツ。はい[アドレスに関する詳細情報](../../アーキテクチャ/アドレス)。
 
-`Option<u64>` is a way of telling rust this field may be missing. It may either have a value, like `Some(123456)` or
-be `None`. This means the init message may omit those fields (or pass them as `null`) and we don't need to use some
-special value like `0` to signify disabled.
+`Option <u64>`は、このフィールドが欠落している可能性があることをrustに伝える方法です。 `Some(123456)`や
+「いいえ」です。これは、initメッセージがこれらのフィールドを省略(または `null`として渡す)する可能性があり、一部を使用する必要がないことを意味します
+「0」のような特別な値は、無効になっていることを意味します。
 
-Moving to the `ExecuteMsg` type, which defines the different contract methods, we make use of a slightly more complex rust construction, the [`enum`](https://doc.rust-lang.org/stable/rust-by-example/custom_types/enum.html). This is also known as [a tagged union or sum type](https://en.wikipedia.org/wiki/Tagged_union), and contains a fixed set of defined possible data types, or `variants`, *exactly one of which must be set*. We use each `variant` to encode a different method. For example `Execute::Refund{}` is a serializable request to refund the escrow, which is only valid after a timeout.
+さまざまなコントラクトメソッドを定義する `ExecuteMsg`タイプに目を向けると、もう少し複雑なRust構造[` enum`](https://doc.rust-lang.org/stable/rust-by -example/custom_types/enum。html)。これは[タグ付き共用体または合計型](https://en.wikipedia.org/wiki/Tagged_union)とも呼ばれ、定義された可能なデータ型または「バリアント」の固定セットが含まれています。*そのうちの1つを設定する必要があります* 。それぞれの「バリアント」を使用して、異なるメソッドをエンコードします。たとえば、 `Execute :: Refund {}`はシリアル化可能なリクエストであり、エスクローの払い戻しに使用され、タイムアウト後にのみ有効です。
 
 ```rust
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ExecuteMsg {
     Approve {
-        // release some coins - if quantity is None, release all coins in balance
+       //release some coins - if quantity is None, release all coins in balance
         quantity: Option<Vec<Coin>>,
     },
     Refund {},
 }
 ```
 
-You can see another directive here (`#[serde(rename_all = "snake_case")]`). This ensure the json looks like: `{"approve": {"quantity": ...}}` instead of `{"Approve": {"quantity": ...}}`. This controls the code generated with `Serialize` and `Deserialize`. You see how compile-time codegen (via derive and macros) is a corner-stone of rust, and provides much of the functionality provided by runtime reflection in other, more dynamic, languages.
+ここに別の命令が表示されます( `#[serde(rename_all =" snake_case ")]`)。これにより、jsonは `{" Approve ":{" quantity ":...}}`ではなく `{" approve ":{" quantity ":...}}`のようになります。これは、 `Serialize`と` Deserialize`で生成されたコードを制御します。コンパイル時のコード生成(派生とマクロによる)がRustの基礎になり、他のより動的な言語でのランタイムリフレクションによって提供される機能のほとんどを提供する方法がわかります。
 
-### JSON Format
+### JSON形式
 
-When a `ExecuteMsg` instance is encoded, it will end up looking like `{"approve": {"quantity": [{"amount": "10", "denom": "ATOM"}]}}` or `{"refund": {}}`. This is also the format we should use client side, when submitting a message body to later be processed by `execute`.
+`ExecuteMsg`のインスタンスがエンコードされると、` {"approve":{"quantity":[{"amount": "10"、 "denom": "ATOM"}]}} `または`のようになります。 {"払い戻し":{}} `。これは、後で `execute`によって処理するためにメッセージ本文を送信するときに、クライアント側で使用する必要がある形式でもあります。
 
-### Instantiation Logic
+### インスタンス化ロジック
 
-The `instantiate` function will be called exactly once, before the contract is executed. It is a "privileged" function in that it can set configuration that can never be modified by any other method call. If you look at this example, the first line parses the input from raw bytes into our contract-defined message. We then create the initial state, and check if it is expired already. If expired, we return a generic contract error, otherwise, we store the state and return a success code:
+コントラクトを実行する前に、 `instantiate`関数が1回呼び出されます。他のメソッド呼び出しでは変更できない構成を設定できるため、これは「特権」機能です。この例を見ると、最初の行はrawバイトからの入力を解析してコントラクトで定義されたメッセージに変換します。次に、初期状態を作成し、有効期限が切れているかどうかを確認します。有効期限が切れると、一般契約エラーが返されます。それ以外の場合は、状態が保存され、成功コードが返されます。
 
 ```rust
 pub fn instantiate(
@@ -112,9 +112,9 @@ pub fn instantiate(
 }
 ```
 
-`config` is defined in `state.rs` and is a helper wrapper for interacting with the underlying `Storage`. It handles prefixing and de/serializing
-for you automatically, removing some boilerplate. It is completely optional and you can use `Storage` directly as well. We also encourage
-you to develop other shared libraries for interacting with `Storage` if you want to make certain use cases easier (eg. representing a queue):
+`config`は` state.rs`で定義されており、基盤となる `Storage`と対話するために使用される補助ラッパーです。 プレフィックスとデシリアライズを処理します
+一部のテンプレートは自動的に削除されます。 これは完全にオプションであり、「ストレージ」を直接使用することもできます。 また、
+特定のユースケース(キューの表現など)を簡単にしたい場合は、他の共有ライブラリを開発して `Storage`と対話することができます。
 
 ```rust
 pub fn config(storage: &mut dyn Storage) -> Singleton<State> {
@@ -122,9 +122,9 @@ pub fn config(storage: &mut dyn Storage) -> Singleton<State> {
 }
 ```
 
-### Execution Logic
+### 実行ロジック
 
-Just as `init` is the entry point for instantiating a new contract, `handle` is the entry point for executing the code. Since `handle` takes an `enum` with multiple `variants`, we can't just jump into the business logic, but first start with loading the state, and dispatching the message:
+`init`が新しいコントラクトをインスタンス化するためのエントリポイントであるように、` handle`はコードを実行するためのエントリポイントです。 `handle`は複数の` variants`を持つ `enum`を受け入れるため、ビジネスロジックに直接ジャンプすることはできませんが、最初にロードステータスとメッセージのディスパッチから始めます。
 
 ```rust
 pub fn execute(
@@ -141,14 +141,14 @@ pub fn execute(
 }
 ```
 
-CosmWasm parses the incoming json into a contract-specific `ExecuteMsg` automatically before calling, assuming a JSON-encoding message. We also see the use of `config_read` to load without any boilerplate. Note the trailing `?`. This works on `Result` types and means, "If this is an error, return the underlying error. If this is a success, give me the value". It is a very useful shorthand all over rust and replaces the `if err != nil { return err }` boilerplate in Go.
+CosmWasmは、JSONでエンコードされたメッセージであると想定して、呼び出す前に着信jsonをコントラクト固有の `ExecuteMsg`に自動的に解析します。また、ボイラープレートなしでロードするために `config_read`を使用することも確認しました。末尾の `？`に注意してください。これは `Result`タイプに適用され、「これがエラーの場合は、潜在的なエラーを返します。これが成功した場合は、値を教えてください」という意味です。これは非常に便利な錆の省略形であり、Goの `if err！= nil {returnerr}`ボイラープレートに置き換わるものです。
 
-You will also see the [`match` statement](https://doc.rust-lang.org/1.30.0/book/2018-edition/ch06-02-match.html). This is another nice Rust idiom, and allows you to `switch` over multiple patterns. Here we check the multiple variants of the `ExecuteMsg` enum. Note that if you don't cover all cases, the compiler will refuse to proceed.
+[`match`ステートメント](https://doc.rust-lang.org/1.30.0/book/2018-edition/ch06-02-match.html)も表示されます。これは、複数のモードを「切り替える」ことができるもう1つの優れたRustイディオムです。ここでは、 `ExecuteMsg`列挙の複数のバリアントを調べました。すべての状況をカバーしていない場合、コンパイラーは続行を拒否することに注意してください。
 
-We pass in `deps` to give the handlers access to runtime callbacks, which provide blockchain-specific logic. In particular, we currently use `deps.api` to validate `String` to `Addr` in a blockchain-specific manner. Or verify cryptographic signatures with `secp256k1_verify,ed25519_verify`. And we also use
-`deps.querier` to query the current balance of the contract.
+`deps`を渡して、ハンドラーがブロックチェーン固有のロジックを提供するランタイムコールバックにアクセスできるようにします。特に、現在、ブロックチェーン固有の方法で `String`を` Addr`として検証するために `deps.api`を使用しています。または、 `secp256k1_verify、ed25519_verify`を使用して、暗号化された署名を検証します。私たちも使用します
+`deps.querier`は、契約の現在の残高を照会します。
 
-If we now look into the `try_approve` function, we will see how we can respond to a message. We can return an `unauthorized` error if the `signer` is not what we expect, and `ContractError` if our business logic rejects the message. The `let amount =` line shows how we can use pattern matching to use the number of coins present in the msg if provided, or default to the entire balance of the contract.
+ここで `try_approve`関数を見ると、メッセージに応答する方法がわかります。 `signer`が期待どおりでない場合は、` unauthorized`エラーを返すことができ、ビジネスロジックがメッセージを拒否した場合は、 `ContractError`を返すことができます。行 `let amount =`は、パターンマッチングを使用して、msgに存在するコインの数(提供されている場合)を使用する方法、またはデフォルトで契約の残高全体を使用する方法を示しています。
 
 ```rust
 fn try_approve(
@@ -162,7 +162,7 @@ fn try_approve(
         return Err(ContractError::Unauthorized {});
     }
 
-    // throws error if state is expired
+   //throws error if state is expired
     if state.is_expired(&env) {
         return Err(ContractError::Expired {
             end_height: state.end_height,
@@ -173,10 +173,10 @@ fn try_approve(
     let amount = if let Some(quantity) = quantity {
         quantity
     } else {
-        // release everything
+       //release everything
 
-        // Querier guarantees to returns up-to-date data, including funds sent in this handle message
-        // https://github.com/CosmWasm/wasmd/blob/master/x/wasm/internal/keeper/keeper.go#L185-L192
+       //Querier guarantees to returns up-to-date data, including funds sent in this handle message
+       //https://github.com/CosmWasm/wasmd/blob/master/x/wasm/internal/keeper/keeper.go#L185-L192
         deps.querier.query_all_balances(&env.contract.address)?
     };
 
@@ -184,7 +184,7 @@ fn try_approve(
 }
 ```
 
-At the end, on success, we want to send some tokens. Cosmwasm contracts cannot call other contracts directly, instead, we create a message to represent our request (`CosmosMsg::Bank(BankMsg::Send)`) and return it as our contract ends. This will be parsed by the `wasm` module in go and it will execute and defined actions *in the same transaction*. This means, that while we will not get access to the return value, we can be ensured that if the send fails (user specified more coins than were in the escrow), all state changes in this contract would be reverted... just as if we returned `unauthorized`. This is pulled into a helper to make the code clearer:
+最後に、成功した場合は、いくつかのトークンを送信します。 Cosmwasmコントラクトは、他のコントラクトを直接呼び出すことはできません。代わりに、リクエストを示すメッセージ( `CosmosMsg :: Bank(BankMsg :: Send)`)を作成し、コントラクトが終了したときにそれを返します。 これは、goの `wasm`モジュールによって解決されます。このモジュールは、同じトランザクションで操作を実行および定義します。 つまり、戻り値にアクセスすることはできませんが、送信が失敗した場合(ユーザーがエスクローのコインよりも多くのコインを指定した場合)、契約のすべての状態変化が復元されることを保証できます... 「無許可」を返す場合。 これは、コードを明確にするためにヘルパーに取り込まれます。
 
 ```rust
 fn send_tokens(to_address: Addr, amount: Vec<Coin>, action: &str) -> Response {
@@ -202,34 +202,34 @@ fn send_tokens(to_address: Addr, amount: Vec<Coin>, action: &str) -> Response {
 }
 ```
 
-Note that `Env` encodes a lot of information from the blockchain, essentially providing the `Context` if you are coming from Cosmos SDK. This is validated data and can be trusted to compare any messages against. Refer to [the standard `cosmwasm` types](https://github.com/CosmWasm/cosmwasm/blob/v0.10.0/packages/std/src/types.rs#L7-L41) for references to all the available types in the environment.
+`Env`はブロックチェーンからの多くの情報をエンコードすることに注意してください。CosmosSDKからの場合は、基本的に` Context`を提供します。これは検証済みのデータであり、メッセージを比較するために信頼できます。使用可能なすべてのタイプのリファレンスについては、[標準の `cosmwasm`タイプ](https://github.com/CosmWasm/cosmwasm/blob/v0.10.0/packages/std/src/types.rs#L7-L41)を参照してください。環境で。
 
-## Adding a New Message
+## 新しいメッセージを追加
 
-In this example, we will modify this contract to add some more functionality. In particular, let's make a backdoor to the contract. In the form of a `ExecuteMsg::Steal` variant that must be signed by some hard coded `THIEF` address and will release the entire contract balance to an address included in the message. Simple?
+この例では、このコントラクトを変更して機能を追加します。特に、契約の裏口を作りましょう。 `ExecuteMsg :: Steel`のバリアントの形式では、ハードコードされた` THIEF`アドレスによって署名され、メッセージに含まれているアドレスに契約残高全体を解放する必要があります。単純？
 
-Note that this also demonstrates the need to verify the code behind a contract rather than just rely on raw wasm. Since we have a reproducible compilation step (details below), if I show you code I claim to belong to the contract, you can compile it and compare the hash to the hash stored on the blockchain, to verify that this really is the original rust code. We will be adding tooling to automate this step and make it simpler in the coming months, but for now, this example serves to demonstrate why it is important.
+これは、元のwasmだけに依存するのではなく、コントラクトの背後にあるコードを検証する必要があることも示していることに注意してください。繰り返し可能なコンパイル手順があるため(詳細は以下)、コントラクトに属していると主張するコードを表示した場合、それをコンパイルし、ハッシュをブロックチェーンに格納されているハッシュと比較して、これが実際に元のRustコードであることを確認できます。今後数か月以内に、このステップを自動化して簡単にするためのツールを追加しますが、今のところ、この例を使用して、それが重要である理由を説明します。
 
-### Adding the Handler
+### ハンドラーを追加
 
-Open up `src/msg.rs` in your [editor of choice](./intro#setting-up-your-ide) and let's add another variant to the `ExecuteMsg` enum, called `Steal`. Remember, it must have a destination address:
+[選択したエディター](./intro#setting-up-your-ide)で `src/msg.rs`を開き、` ExecuteMsg`列挙に `Steal`という別のバリアントを追加しましょう。ターゲットアドレスが必要であることを忘れないでください。
 
-[Need a hint?](./edit-escrow-hints#handlemsg)
+[ヒントが必要ですか？ ](./edit-escrow-hints#handlemsg)
 
-Now, you can add the message handler. As a quick check, try running `cargo wasm` or look for the compile error in your IDE. Remember what I told you about `match`? Okay, now, add a function to process the `ExecuteMsg::Steal` variant. For the top level `THIEF`, you can use a placeholder address (we will set this to an address you own before deploying).
+これで、メッセージハンドラーを追加できます。簡単なチェックとして、 `cargo wasm`を実行するか、IDEでコンパイルエラーを探してみてください。 「マッチング」について私があなたに言ったことを覚えていますか？さて、ここで、 `ExecuteMsg :: Steal`バリアントを処理する関数を追加します。トップレベルの `THIEF`には、プレースホルダーアドレスを使用できます(デプロイ前に所有しているアドレスに設定します)。
 
-[Need a hint?](./edit-escrow-hints#adding-handler)
+[ヒントが必要ですか？ ](./edit-escrow-hints#adding-handler)
 
-Once you are done, check that it compiles:
+終了したら、コンパイルされるかどうかを確認します。
 
 ```shell
 cargo wasm
 ```
 
-### Writing a Test
+### テストを書く
 
-We have a number of tests inside of `contracts.rs` that serve as templates, so let's make use of them. You can copy the `handle_refund` test and rename it to `handle_steal`. Remember to include the `#[test]` declaration on top. Now, go in and edit it to test that the THIEF can indeed steal the funds, and no one else can. Make sure our backdoor is working properly before we try to use it.
+`contracts.rs`にはテンプレートとして多くのテストがあるので、それらを使用してみましょう。 `handle_refund`テストをコピーして、名前を` handle_steal`に変更できます。 上部に `#[test]`ステートメントを含めることを忘れないでください。 次に、それを入力して編集し、泥棒が実際に資金を盗むことができるのに対し、他の人はできないことをテストします。 使用する前に、バックドアが正常に機能していることを確認してください。
 
-Now, try running `cargo unit-test` and see if your code works as planned. If it fails, try `RUST_BACKTRACE=1 cargo unit-test` to get a full stack trace. Now, isn't that nicer than trying to test Solidity contracts?
+次に、 `cargo unit-test`を実行して、コードが計画どおりに実行されるかどうかを確認します。 失敗した場合は、「RUST_BACKTRACE = 1カーゴユニットテスト」を試して、完全なスタックトレースを取得してください。 さて、これはSolidityコントラクトをテストするよりも優れているのではないでしょうか。
 
-[See solution here](./edit-escrow-hints#test-steal)
+[ここで解決策を見る](./edit-escrow-hints#test-steal)

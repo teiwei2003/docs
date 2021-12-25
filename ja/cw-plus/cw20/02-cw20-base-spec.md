@@ -1,25 +1,25 @@
-# CW20 Basic
+# CW20ベーシック
 
-This is a basic implementation of a cw20 contract. It implements
-the [CW20 spec](01-spec.md) and is designed to
-be deployed as is, or imported into other contracts to easily build
-cw20-compatible tokens with custom logic.
+これがcw20コントラクトの基本的な実現です。 それは達成します
+【CW20仕様】(01-spec.md)の目的
+そのまま展開するか、他のコントラクトをインポートして簡単に構築できます
+カスタムロジックを備えたCw20互換トークン。
 
-Implements:
+達成:
 
-- [x] CW20 Base
-- [x] Mintable extension
-- [x] Allowances extension
+-[x] CW20ベース
+-[x] Mintable拡張
+-[x]手当の延長
 
-## Importing this contract
+## この契約をインポートする
 
-You can also import much of the logic of this contract to build another
-ERC20-contract, such as a bonding curve, overriding or extending what you
-need.
+このコントラクトのロジックのほとんどをインポートして、別のコントラクトを構築することもできます
+ERC20-曲線の組み合わせ、カバーまたは拡張などの契約
+必要。
 
-Basically, you just need to write your handle function and import
-`cw20_base::contract::handle_transfer`, etc and dispatch to them.
-This allows you to use custom `HandleMsg` and `QueryMsg` with your additional
-calls, but then use the underlying implementation for the standard cw20
-messages you want to support. The same with `QueryMsg`. You *could* reuse `init`
-as it, but it is likely you will want to change it. And it is rather simple.
+基本的には、ハンドル関数を記述してインポートするだけです。
+`cw20_base :: Contract :: handle_transfer`を待って、それらに割り当てます。
+これにより、カスタムの `HandleMsg`と` QueryMsg`を追加で使用できます
+呼び出してから、標準cw20の基礎となる実装を使用します
+サポートしたいメッセージ。 `QueryMsg`と同じです。 `init`を再利用できます*
+同じですが、おそらく変更したいと思うでしょう。 そして、それは非常に簡単です。

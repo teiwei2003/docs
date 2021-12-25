@@ -1,93 +1,93 @@
-# CW4 Spec: Group Members
+# CW4仕様:グループメンバーシップ
 
-cw4 package source code: [https://github.com/CosmWasm/cosmwasm-plus/blob/master/packages/cw4/README.md](https://github.com/CosmWasm/cosmwasm-plus/blob/master/packages/cw4/README.md)
+cw4パッケージのソースコード:[https://github.com/CosmWasm/cosmwasm-plus/blob/master/packages/cw4/README.md](https://github.com/CosmWasm/cosmwasm-plus/blob/master/packages/cw4/README.md)
 
-CW4 is a spec for storing group membership, which can be combined
-with CW3 multisigs. The purpose is to store a set of members/voters
-that can be accessed to determine permissions in another section.
+CW4は、ストレージグループメンバーの仕様であり、組み合わせることができます
+CW3マルチシグニチャを使用します。目的は、メンバー/投票者のセットを保存することです
+別のパーツの権限を判別するためにアクセスできます。
 
-Since this is often deployed as a contract pair, we expect this
-contract to often be queried with `QueryRaw` and the internal
-layout of some of the data structures becomes part of the public API.
-Implementations may add more data structures, but at least
-the ones laid out here should be under the specified keys and in the
-same format.
+これは通常、コントラクトペアとして展開されるため、これを期待します
+`QueryRaw`と内部クエリコントラクトの頻繁な使用
+一部のデータ構造のレイアウトは、パブリックAPIの一部になります。
+実装によりデータ構造が追加される場合がありますが、少なくとも
+ここにリストされているものは、指定されたキーの下にあり、
+同じフォーマット。
 
-In this case, a cw3 contract could *read* an external group contract with
-no significant cost more than reading local storage. However, updating
-that group contract (if allowed), would be an external message and
-charged the instantiation overhead for each contract.
+この場合、cw3コントラクトは外部の組み合わせを
+ローカルストレージを読み取るよりもコストはかかりません。ただし、更新
+グループ契約(許可されている場合)は外部メッセージになり、
+契約ごとにインスタンス化コストを請求します。
 
-## Messages
+## 情報
 
-We define an `InitMsg{admin, members}` to make it easy to set up a group
-as part of another flow. Implementations should work with this setup,
-but may add extra `Option<T>` fields for non-essential extensions to
-configure in the `init` phase.
+グループの設定を容易にするために、 `InitMsg {admin、members}`を定義します
+別のプロセスの一部として。実装はこの設定で機能するはずです、
+ただし、不要な拡張機能のために、追加の `Option <T>`フィールドが追加される場合があります
+構成は `init`フェーズで行われます。
 
-There are three messages supported by a group contract:
+グループ契約は、次の3種類のメッセージをサポートします。
 
-`UpdateAdmin{admin}` - changes (or clears) the admin for the contract
+`UpdateAdmin {admin}`-契約の管理者を変更(またはクリア)します
 
-`AddHook{addr}` - adds a contract address to be called upon every
-`UpdateMembers` call. This can only be called by the admin, and care must
-be taken. A contract returning an error or running out of gas will
-revert the membership change (see more in Hooks section below).
+`AddHook {addr}`-契約アドレスを追加します。各アドレスが呼び出されます
+`UpdateMembers`呼び出し。これは管理者のみが呼び出すことができ、注意する必要があります
+連れ去られた。エラーを返したり、ガスが不足したりする契約は
+メンバーシップの変更を元に戻します(以下の「フック」セクションの詳細を参照してください)。
 
-`RemoveHook{addr}` - unregister a contract address that was previously set
-by `AddHook`.
+`RemoveHook {addr}`-以前に設定された契約アドレスをキャンセルします
+`AddHook`経由。
 
-Only the `admin` may execute any of these function. Thus, by omitting an
-`admin`, we end up with a similar functionality ad `cw3-fixed-multisig`.
-If we include one, it may often be desired to be a `cw3` contract that
-uses this group contract as a group. This leads to a bit of chicken-and-egg
-problem, but we cover how to instantiate that in
+これらの機能を実行できるのは `admin`だけです。したがって、1つを省略することによって
+`admin`、私たちはついに同様の機能広告` cw3-fixed-multisig`を手に入れました。
+これを含めると、通常は「cw3」契約であると予想されます
+このグループ契約をグループとして使用します。これはいくつかの鶏と卵をもたらしました
+質問ですが、その方法を示しました
 [`cw3-flexible-multisig`](../cw3/03-cw3-flex-spec.md)
 
-## Queries
+## お問い合わせ
 
-### Smart
+### 頭がいい
 
-`TotalWeight{}` - Returns the total weight of all current members,
-this is very useful if some conditions are defined on a "percentage of members".
+`TotalWeight {}`-現在のすべてのメンバーの合計の重みを返します。
+これは、特定の条件が「メンバーのパーセンテージ」で定義されている場合に非常に役立ちます。
 
-`Member{addr, height}` - Returns the weight of this voter if they are a member of the
-group (may be 0), or `None` if they are not a member of the group.
-If height is set and the cw4 implementation supports snapshots,
-this will return the weight of that member at
-the beginning of the block with the given height.
+`Member {addr、height}`-投票者のメンバーである場合は、投票者の重みを返します
+グループ(0の場合もあります)。グループのメンバーでない場合は「なし」です。
+高さが設定されていて、cw4実装がスナップショットをサポートしている場合、
+これにより、メンバーの重量が返されます
+指定された高さのブロックの始まり。
 
-`MemberList{start_after, limit}` - Allows us to paginate over the list
-of all members. 0-weight members will be included. Removed members will not.
+`MemberList {start_after、limit}`-リストをページ分割できます
+全員。 0の加重メンバーが含まれます。削除されたメンバーはしません。
 
-`Admin{}` - Returns the `admin` address, or `None` if unset.
+`Admin {}` -`admin`のアドレスを返します。設定されていない場合は `None`を返します。
 
-### Raw
+### 生
 
-In addition to the above "SmartQueries", which make up the public API,
-we define two raw queries that are designed for more efficiency
-in contract-contract calls. These use keys exported by `cw4`
+パブリックAPIを構成する上記の「SmartQueries」に加えて、
+効率を向上させるために設計された2つの元のクエリを定義しました
+契約コールで。これらは `cw4`によって派生したキーを使用します
 
-`TOTAL_KEY` - making a raw query with this key (`b"total"`) will return a
-JSON-encoded `u64`
+`TOTAL_KEY`-元のクエリにこのキー(` b "total" `)を使用すると、
+JSONでエンコードされた `u64`
 
-`members_key()` - takes a `CanonicalAddr` and returns a key that can be
-used for raw query (`"\x00\x07members" || addr`). This will return
-empty bytes if the member is not inside the group, otherwise a
-JSON-encoded `u64`
+`members_key()` -` CanonicalAddr`を受け入れ、
+元のクエリの場合( `" \ x00 \ x07members "|| addr`)。これは戻ります
+メンバーがグループに含まれていない場合はヌルバイトであり、そうでない場合はヌルバイトです。
+JSONでエンコードされた `u64`
 
-## Hooks
+## 針
 
-One special feature of the `cw4` contracts is they allow the admin to
-register multiple hooks. These are special contracts that need to react
-to changes in the group membership, and this allows them stay in sync.
-Again, note this is a powerful ability and you should only set hooks
-to contracts you fully trust, generally some contracts you deployed
-alongside the group.
+`cw4`コントラクトの特徴は、管理者が許可することです
+複数のフックを登録します。これらは、対応する必要のある特別な契約です
+グループメンバーシップが変更され、同期が維持されます。
+これは強力な能力であることに再度注意してください。フックのみを設定する必要があります
+完全に信頼できる契約、通常は展開するいくつかの契約
+グループで。
 
-If a contract is registered as a hook on a cw4 contract, then anytime
-`UpdateMembers` is successfully executed, the hook will receive a `handle`
-call with the following format:
+コントラクトがcw4コントラクトのフックとして登録されている場合は、いつでも
+`UpdateMembers`が正常に実行され、フックは` handle`を受け取ります
+次の形式を使用して呼び出します。
 
 ```json
 {
@@ -103,17 +103,17 @@ call with the following format:
 }
 ```
 
-See [hook.rs](https://github.com/CosmWasm/cosmwasm-plus/blob/master/packages/cw4/src/hook.rs) for full details. Note that this example
-shows an update or an existing member. `old_weight` will
-be missing if the address was added for the first time. And
-`new_weight` will be missing if the address was removed.
+詳細については、[hook.rs](https://github.com/CosmWasm/cosmwasm-plus/blob/master/packages/cw4/src/hook.rs)を参照してください。 この例に注意してください
+更新されたメンバーまたは既存のメンバーを表示します。 `old_weight`は
+初めてアドレスを追加すると、アドレスは失われます。 と
+アドレスを削除すると、 `new_weight`は失われます。
 
-The receiving contract must be able to handle the `MemberChangedHookMsg`
-and should only return an error if it wants to change the functionality
-of the group contract (eg. a multisig that wants to prevent membership
-changes while there is an open proposal). However, such cases are quite
-rare and often point to fragile code.
+受信側のコントラクトは `MemberChangedHookMsg`を処理できる必要があります
+そして、関数を変更したい場合にのみエラーを返します
+グループ契約(例:マルチシグニチャメンバーシップを防止したい
+公の提案がある場合は変更してください)。 しかし、そのような場合はかなりです
+まれで、しばしば壊れやすいコードを指します。
 
-Note that the message sender will be the group contract that was updated.
-Make sure you check this when handling, so external actors cannot
-call this hook, only the trusted group.
+メッセージの送信者は、更新された組み合わせと同じになることに注意してください。
+外部の参加者ができないように、処理するときにこれを必ず確認してください
+このフックを、信頼できるグループのみと呼びます。
