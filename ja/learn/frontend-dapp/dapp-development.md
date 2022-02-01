@@ -1,12 +1,12 @@
 # dAppを開発する
 
-前に説明したユーティリティを紹介するために、テンプレートからバランスチェッカーdAppを作成します。
+前に説明したユーティリティを紹介するために、テンプレートからバランスチェッカーdAppを作成します.
 
 ## テンプレートをカスタマイズする
 
-アプリを独自のものにするには、 `package.json`の` name`フィールドを変更するか、 `README.md`ファイルを更新してください。
+アプリを独自のものにするには、 `package.json`の` name`フィールドを変更するか、 `README.md`ファイルを更新してください.
 
-また、 `routes/Login/index.tsx`ファイルを次のように変更します。
+また、 `routes/Login/index.tsx`ファイルを次のように変更します.
 
 ```jsx
 import { Login as LoginDesign } from "@cosmicdapp/design";
@@ -32,7 +32,7 @@ export function Login(): JSX.Element {
 
 ### バランスパス
 
-`paths.ts`ファイルに以下を追加します。
+`paths.ts`ファイルに以下を追加します.
 
 ```typescript
 export const pathBalance = "/balance";
@@ -40,7 +40,7 @@ export const pathBalance = "/balance";
 
 ### Reactコンポーネント
 
-`routes/`内に、次のファイルを含む `Balance`ディレクトリを追加します。
+`routes/`内に、次のファイルを含む `Balance`ディレクトリを追加します.
 
 - `index.tsx`
 
@@ -101,15 +101,15 @@ export const ErrorText = styled(Text)`
 `;
 ```
 
-ご覧のとおり、この2つのファイルは、 `@ cosmicdapp/logic`の` useError`フックと、 `@ cosmicdapp/design`の` Stack`、 `PageLayout`、および` YourAccount`コンポーネントを使用しているためです。 あなたに精通している必要があります。
+ご覧のとおり、この2つのファイルは、 `@ cosmicdapp/logic`の` useError`フックと、 `@ cosmicdapp/design`の` Stack`、 `PageLayout`、および` YourAccount`コンポーネントを使用しているためです. あなたに精通している必要があります.
 
-`index.tsx`コンポーネントのレイアウトは、` style.ts`で定義されたスタイル付きコンポーネントである `MainStack`と` ErrorText`、およびまだ定義されていない `FormCheckBalance`と` TokenList`コンポーネントを利用します。
+`index.tsx`コンポーネントのレイアウトは、` style.ts`で定義されたスタイル付きコンポーネントである `MainStack`と` ErrorText`、およびまだ定義されていない `FormCheckBalance`と` TokenList`コンポーネントを利用します.
 
-ロジックは次のように機能します。コントラクトアドレスが `FormCheckBalance`に入力されていない限り、` TokenList`コンポーネントはユーザーのネイティブトークンを表示します。これにより、 `TokenList`はそのCW20コントラクトの残高を表示するか、エラーを表示します。 そのアドレスに関連する契約がない場合。
+ロジックは次のように機能します.コントラクトアドレスが `FormCheckBalance`に入力されていない限り、` TokenList`コンポーネントはユーザーのネイティブトークンを表示します.これにより、 `TokenList`はそのCW20コントラクトの残高を表示するか、エラーを表示します. そのアドレスに関連する契約がない場合.
 
 ### ProtectedSwitchに追加
 
-`App/index.tsx`の` ProtectedSwitch`は次のようになります。
+`App/index.tsx`の` ProtectedSwitch`は次のようになります.
 
 ```jsx
 <ProtectedSwitch authPath={pathLogin}>
@@ -117,13 +117,13 @@ export const ErrorText = styled(Text)`
 </ProtectedSwitch>
 ```
 
-このdAppではトランザクションを行わないため、ルートとコンポーネントの両方の `OperationResult`を削除することに注意してください。
+このdAppではトランザクションを行わないため、ルートとコンポーネントの両方の `OperationResult`を削除することに注意してください.
 
 ## FormCheckBalanceコンポーネントを追加します
 
 ### 検索コンポーネントを追加
 
-アドレスを入力するために、カスタムの `Search`コンポーネントを使用します。これはハッキーに見えるかもしれませんが、` formik`と `antd`をうまく統合し、実際には` formik-antd`に触発されています(ただし、 今の)。
+アドレスを入力するために、カスタムの `Search`コンポーネントを使用します.これはハッキーに見えるかもしれませんが、` formik`と `antd`をうまく統合し、実際には` formik-antd`に触発されています(ただし、 今の).
 
 `App/forms/Search.tsx`
 
@@ -216,7 +216,7 @@ export default TypedInput.Search;
 
 ### 契約アドレス検証スキーマを追加する
 
-`FormCheckBalance`の構築に使用する` formik`パッケージは、 `yup`との優れた統合により、契約アドレスに必要なもののような検証スキーマを構築するために使用できます。
+`FormCheckBalance`の構築に使用する` formik`パッケージは、 `yup`との優れた統合により、契約アドレスに必要なもののような検証スキーマを構築するために使用できます.
 
 `App/forms/validationSchemas.ts`
 
@@ -276,23 +276,23 @@ export function FormCheckBalance({ setContractAddress }: FormCheckBalanceProps):
 }
 ```
 
-以前に定義されたアドレス検証スキーマを使用し、 `setContractAddress`パラメータを使用して` Balance`ルートの状態を更新します。
+以前に定義されたアドレス検証スキーマを使用し、 `setContractAddress`パラメータを使用して` Balance`ルートの状態を更新します.
 
 ## TokenListコンポーネントを追加します
 
-`FormCheckBalance`が機能しているので、` TokenList`を実装する必要があります。
+`FormCheckBalance`が機能しているので、` TokenList`を実装する必要があります.
 
-このコンポーネントは次のようになります。
+このコンポーネントは次のようになります.
 
-1.契約アドレスがあるかどうかを確認します。
--そうでない場合は、 `useAccount`フックからネイティブ残高を取得します。
--はいの場合、CW20コントラクトトークンの残高と小数点以下の桁数をロードします。
--住所に契約がない場合は、エラーを表示します。
-2.残高を表示します。
--ローカルの `getCoinToDisplay()`ユーティリティを使用して、ネイティブまたはCW20のバランスのためのユーザーフレンドリーなフォーマットを取得します。
--非同期データのロードを待機する際の表示の問題を回避するために、条件付きレンダリングに `showTokens`フラグを使用します。
+1.契約アドレスがあるかどうかを確認します.
+-そうでない場合は、 `useAccount`フックからネイティブ残高を取得します.
+-はいの場合、CW20コントラクトトークンの残高と小数点以下の桁数をロードします.
+-住所に契約がない場合は、エラーを表示します.
+2.残高を表示します.
+-ローカルの `getCoinToDisplay()`ユーティリティを使用して、ネイティブまたはCW20のバランスのためのユーザーフレンドリーなフォーマットを取得します.
+-非同期データのロードを待機する際の表示の問題を回避するために、条件付きレンダリングに `showTokens`フラグを使用します.
 
-これを実現するための `TokenList`の実装は次のようになります。
+これを実現するための `TokenList`の実装は次のようになります.
 
 `routes/Balance/components/TokenList/index.tsx`
 
@@ -415,6 +415,6 @@ export const TokenItem = styled.div`
 `;
 ```
 
-## 終了した！
+## 終了した!
 
-これで、ネイティブ残高とCW20契約の残高を確認できます。最も重要なことは、CosmJSベースのdAppを構築する方法を理解したことです。
+これで、ネイティブ残高とCW20契約の残高を確認できます.最も重要なことは、CosmJSベースのdAppを構築する方法を理解したことです.

@@ -1,26 +1,26 @@
 # 测试网
 
-在本节中，我们将解释如何加入测试网，在哪里可以找到测试网配置，以及一些使过程更快的脚本。
+在本节中，我们将解释如何加入测试网，在哪里可以找到测试网配置，以及一些使过程更快的脚本.
 
 ## 选择您的网络
 
-您可以在 [CosmWasm/testnets](https://github.com/CosmWasm/testnets) 上找到活动和非活动测试网信息，例如配置和端点。
+您可以在 [CosmWasm/testnets](https://github.com/CosmWasm/testnets) 上找到活动和非活动测试网信息，例如配置和端点.
 
 ## 设置
 
-让我们开始滚动您的节点并开始在 testnet 环境中生成块。
+让我们开始滚动您的节点并开始在 testnet 环境中生成块.
 
 **在开始之前**，您可以使用 [CosmWasm/tesnets/devops](https://github.com/CosmWasm/testnets/tree/master/devops)，其中包含 wasmd 的简单设置脚本
 node, faucet, [block explorer](https://github.com/CosmWasm/big-dipper), lcd, nginx 等脚本
-下面本质上做了一些作为 **devops repo** 的事情，只是更多的手动并且不包括 nginx 和系统主管。随意
-使用它们。我们使用 [cosmovisor](https://github.com/cosmos/cosmos-sdk/tree/master/cosmovisor) 升级管理器来处理网络升级。
+下面本质上做了一些作为 **devops repo** 的事情，只是更多的手动并且不包括 nginx 和系统主管.随意
+使用它们.我们使用 [cosmovisor](https://github.com/cosmos/cosmos-sdk/tree/master/cosmovisor) 升级管理器来处理网络升级.
 我们的安装脚本可以帮助您设置 cosmovisor 和 wasmd:[wasmd w/cosmovisor 设置脚本](https://github.com/CosmWasm/testnets/tree/master/devops/node/cosmovisor)g
 
 ### 手动设置
 
-首先确保您遵循了[构建要求部分](./build-requirements.md) 中的安装步骤。您应该拥有所需的二进制文件。如果您只想复制和执行以下脚本，请确保设置环境变量:
+首先确保您遵循了[构建要求部分](./build-requirements.md) 中的安装步骤.您应该拥有所需的二进制文件.如果您只想复制和执行以下脚本，请确保设置环境变量:
 
-下面是【贻贝网配置】(https://github.com/CosmWasm/testnets/tree/master/musselnet)。
+下面是【贻贝网配置】(https://github.com/CosmWasm/testnets/tree/master/musselnet).
 
 ```shell
 export CHAIN_ID="musselnet-4"
@@ -90,14 +90,14 @@ curl -sSL $APP_CONFIG_URL > ~/.wasmd/config/app.toml
 wasmd start --p2p.seeds $SEED_NODE
 ```
 
-现在您应该看到正在重播的块，并且您的节点正在赶上测试网。 这可能需要一段时间。
+现在您应该看到正在重播的块，并且您的节点正在赶上测试网. 这可能需要一段时间.
 
 ### 成为验证者(可选)
 
-为了作为验证者加入网络，您需要一些 staking 代币。
+为了作为验证者加入网络，您需要一些 staking 代币.
 请在 [discord testnets channel](https://docs.cosmwasm.com/chat) 中提问
 
-如果您想参与活跃的区块构建，您需要将一些硬币抵押到您的验证者地址。
+如果您想参与活跃的区块构建，您需要将一些硬币抵押到您的验证者地址.
 
 对于那些对验证器堆栈感兴趣的人，这里有一个关于验证器架构的很好的阅读资源:[certus one blog](https://kb.certus.one/)
 
@@ -120,13 +120,13 @@ wasmd tx staking create-validator \
 
 ### 运行轻客户端守护进程
 
-与 wasmd 版本 v0.13 lcd 客户端和节点合并。 要启用轻客户端，请将 `app.toml/api` 值更改为 true。
+与 wasmd 版本 v0.13 lcd 客户端和节点合并. 要启用轻客户端，请将 `app.toml/api` 值更改为 true.
 
 ## 加入即将推出的测试网
 
 ::: 小费
-您需要在网络创世文件中定义您的地址和信息才能加入尚未启动的测试网。
-这是您可以运行以自动处理它的脚本。
+您需要在网络创世文件中定义您的地址和信息才能加入尚未启动的测试网.
+这是您可以运行以自动处理它的脚本.
 :::
 
 ```shell
@@ -152,8 +152,8 @@ git push
 # Open PR to CosmWasm/testnets:master (https://github.com/CosmWasm/testnets)
 ```
 
-网络启动后，您可以关注[Joining Live Testnets](#joining-live-testnets)。
+网络启动后，您可以关注[Joining Live Testnets](#joining-live-testnets).
 
 ## 将合约部署到测试网
 
-[入门部分](../getting-started/intro.md) 是最好的阅读资源，教你使用基本的智能合约编译和部署合约的过程。 如果您对开发自己的合同感兴趣，请在阅读入门教程后前往 [Hijacking Escrow](../learn/hijack-escrow/intro.md)，在那里您可以使用示例托管合同。
+[入门部分](../getting-started/intro.md) 是最好的阅读资源，教你使用基本的智能合约编译和部署合约的过程. 如果您对开发自己的合同感兴趣，请在阅读入门教程后前往 [Hijacking Escrow](../learn/hijack-escrow/intro.md)，在那里您可以使用示例托管合同.

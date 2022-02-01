@@ -1,28 +1,28 @@
 # 粗略的路线图
 
-到目前为止，CosmWasm 是由 [ICF Grants](https://interchain.io) 资助的[小团队](http://confio.tech) 的成果。我们一直在构建核心技术来支持 Cosmos 生态系统中的各种区块链。以下是目前计划的路线图，主要基于 ICF 赠款的剩余资金。如果希望将其部署到生产的项目有强烈的兴趣(和资金)，则可以修改路线图的优先级。
+到目前为止，CosmWasm 是由 [ICF Grants](https://interchain.io) 资助的[小团队](http://confio.tech) 的成果.我们一直在构建核心技术来支持 Cosmos 生态系统中的各种区块链.以下是目前计划的路线图，主要基于 ICF 赠款的剩余资金.如果希望将其部署到生产的项目有强烈的兴趣(和资金)，则可以修改路线图的优先级.
 
-您可以在我们的 [Github 项目页面](https://github.com/orgs/CosmWasm/projects/1) 中查看最新状态。
+您可以在我们的 [Github 项目页面](https://github.com/orgs/CosmWasm/projects/1) 中查看最新状态.
 
-##过去的成就
+## 过去的成就
 
 **2019 年 8 月至 10 月**:
 
-* 构建 CosmWasm 环境的核心工作，并构建系统、示例代码和 Cosmos SDK 集成。
+* 构建 CosmWasm 环境的核心工作，并构建系统、示例代码和 Cosmos SDK 集成.
 
 **2019 年 11 月**:
 
-* 测试了整个堆栈集成，编写了教程和文档，打磨了许多粗糙的地方。
+* 测试了整个堆栈集成，编写了教程和文档，打磨了许多粗糙的地方.
 
 **2019 年 12 月**:
 
-* [CosmWasm 文档](https://www.cosmwasm.com) 已上线，包括 [教程](../getting-started/intro)。
-* [CosmWasm v0.5.2](https://github.com/CosmWasm/cosmwasm/tree/v0.5.2)，完全支持`init`和`handle`是第一个稳定版本。
-* [`wasmd`](https://github.com/CosmWasm/wasmd) 示例区块链已发布并经过测试。
+* [CosmWasm 文档](https://www.cosmwasm.com) 已上线，包括 [教程](../getting-started/intro).
+* [CosmWasm v0.5.2](https://github.com/CosmWasm/cosmwasm/tree/v0.5.2)，完全支持`init`和`handle`是第一个稳定版本.
+* [`wasmd`](https://github.com/CosmWasm/wasmd) 示例区块链已发布并经过测试.
 
 **2020 年 1 月**:
 
-* [CosmWasm v0.6.0 发布](https://medium.com/confio/annoucing-wasmd-release-d865abf381b) 支持`query` 和许多增强功能，使合约开发更符合人体工程学。
+* [CosmWasm v0.6.0 发布](https://medium.com/confio/annoucing-wasmd-release-d865abf381b) 支持`query` 和许多增强功能，使合约开发更符合人体工程学.
 * [cosmwasm-examples](https://github.com/CosmWasm/cosmwasm-examples) 使用 `escrow` 和 `erc20` 合约
 * 使用 [cosmwasm-opt] (https://github.com/CosmWasm/cosmwasm-opt) 进行可复制的构建
 * 研究[在 AssemblyScript 中编写合约](https://github.com/CosmWasm/cosmwasm/pull/118) 以及 Rust 的可行性
@@ -31,8 +31,8 @@
 **2020 年 2 月**:
 
 * 第一个 [wasmd 稳定版本](https://medium.com/confio/annoucing-wasmd-release-d865abf381b) 带有标记的 Cosmos SDK 依赖项，以便其他项目轻松导入
-* 第一个 [CosmWasm JS 发布](https://medium.com/confio/introduction-to-cosmwasm-js-548f58d9f6af)。 [`cosmwasm-js`](https://github.com/CosmWasm/cosmwasm-js) 是一个易于使用的 TypeScript SDK，用于与 CosmWasm 合约对话
-* [chrome 扩展签署 CosmWasm 令牌合同](https://medium.com/confio/adding-cosmwasm-to-the-neuma-multichain-wallet-ec657d893268)的演示集成。在这种情况下，允许类似 ERC20 的合约与原生代币一起交易。
+* 第一个 [CosmWasm JS 发布](https://medium.com/confio/introduction-to-cosmwasm-js-548f58d9f6af). [`cosmwasm-js`](https://github.com/CosmWasm/cosmwasm-js) 是一个易于使用的 TypeScript SDK，用于与 CosmWasm 合约对话
+* [chrome 扩展签署 CosmWasm 令牌合同](https://medium.com/confio/adding-cosmwasm-to-the-neuma-multichain-wallet-ec657d893268)的演示集成.在这种情况下，允许类似 ERC20 的合约与原生代币一起交易.
 * [nameservice 合约](https://github.com/CosmWasm/cosmwasm-examples/tree/master/nameservice) 作为示例发布到并行 Cosmos SDK 教程
 
 **2020 年 3 月**:
@@ -90,5 +90,5 @@
 * 支持在 *AssemblyScript* 或 *TinyGo* 中编写 CosmWasm 合约
 *更严格和更可配置的气体计量
 * 支持更多主机平台(在 i686/Amd64 上超越 Linux 和 OSX)
-* 在 CosmWasm 上构建的项目要求的其他功能。
+* 在 CosmWasm 上构建的项目要求的其他功能.
 * 进一步开发“概念链”

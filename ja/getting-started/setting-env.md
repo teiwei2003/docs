@@ -1,38 +1,38 @@
 # 環境の設定
 
-契約を実行するための環境が必要です。ノードをローカルで実行するか、に接続できます
-既存のネットワーク。テストを容易にするために、musclenetネットワークはオンラインです。これを使用して、
-契約する。ローカルブロックチェーンを設定して実行する場合は、[クリックしてください
+契約を実行するための環境が必要です.ノードをローカルで実行するか、に接続できます
+既存のネットワーク.テストを容易にするために、musclenetネットワークはオンラインです.これを使用して、
+契約する.ローカルブロックチェーンを設定して実行する場合は、[クリックしてください
 ここで)(#run-local-node-optional)
 
-テストネットが現在実行されていることを確認するには、次のURLがすべて適切であることを確認してください。
+テストネットが現在実行されていることを確認するには、次のURLがすべて適切であることを確認してください.
 
 -[https://rpc.musselnet.cosmwasm.com/status](https://rpc.musselnet.cosmwasm.com/status)
 -[https://faucet.musselnet.cosmwasm.com/status](https://faucet.musselnet.cosmwasm.com/status)
 -[https://lcd.musselnet.cosmwasm.com/node_info](https://lcd.musselnet.cosmwasm.com/node_info)
 
 バリデーターとなる `FRITES`(` urites`)と、
-料金を支払う。
+料金を支払う.
 利用可能なフロントエンド:
 
 -[ブロックエクスプローラー](https://musselnet.cosmwasm.aneka.io/)
 -[コードブラウザ](https://code-explorer.musselnet.cosmwasm.com/)
 
 これらを使用して、トランザクション、アドレス、バリデーター、および契約を調べることができます
-私たちを指すrpc/lcdサーバーを自由にデプロイしてください。リストします。
+私たちを指すrpc/lcdサーバーを自由にデプロイしてください.リストします.
 
 他のテストネットに関する詳細情報を見つけることができます:
 [CosmWasm/testnets](https://github.com/CosmWasm/testnets)および[Testnet
-パート](./../testnets/testnets.md)。
+パート](./../testnets/testnets.md).
 
-ネットワークと対話するときは、GoクライアントまたはNodeREPLの `wasmd`を使用できます。ノードREPLは
-JSON操作はShell/Goクライアントにとって直感的ではないため、コントラクト操作に推奨されます。
+ネットワークと対話するときは、GoクライアントまたはNodeREPLの `wasmd`を使用できます.ノードREPLは
+JSON操作はShell/Goクライアントにとって直感的ではないため、コントラクト操作に推奨されます.
 
 ## GoCLIを設定する
 
-`wasmd` execを構成し、それをテストネットにポイントし、ウォレットを作成して、蛇口からトークンを要求しましょう。
+`wasmd` execを構成し、それをテストネットにポイントし、ウォレットを作成して、蛇口からトークンを要求しましょう.
 
-まず、musselnetネットワーク構成をシェルに供給します。
+まず、musselnetネットワーク構成をシェルに供給します.
 
 ```shell
 source <(curl -sSL https://raw.githubusercontent.com/CosmWasm/testnets/master/musselnet/defaults.env)
@@ -66,9 +66,9 @@ JSON=$(jq -n --arg addr $(wasmd keys show -a thief) '{"denom":"umayo","address":
 
 ## wasmdパラメータをエクスポートする
 
-wasmdをクライアントとして使用する場合は、これらの変数を設定することをお勧めします。
-それ以外の場合は、実行する各コマンドでノードタイプ、チェーンID、およびガス価格の詳細を定義する必要があります。
-また、このチュートリアルでは、これらの変数を使用します。 したがって、先に進む前に、必ずこれらをエクスポートしてください。
+wasmdをクライアントとして使用する場合は、これらの変数を設定することをお勧めします.
+それ以外の場合は、実行する各コマンドでノードタイプ、チェーンID、およびガス価格の詳細を定義する必要があります.
+また、このチュートリアルでは、これらの変数を使用します. したがって、先に進む前に、必ずこれらをエクスポートしてください.
 
 ```bash
 export NODE=(--node "https://rpc.musselnet.cosmwasm.com:443")
@@ -80,18 +80,18 @@ export TXFLAG=($NODE --chain-id ${CHAIN_ID} --gas-prices 0.01umayo --gas auto --
 
 標準のCLIツールに加えて、柔軟なTypeScriptライブラリも作成しました
 [CosmJS](https://github.com/CosmWasm/cosmjs)、Node.jsと最新のブラウザーで実行されます
-そして、問い合わせを処理し、トランザクションを送信します。 このライブラリと一緒に、
-[@ cosmjs/cli](https://www.npmjs.com/package/@cosmjs/cli)、これはスーパーチャージされたノードコンソールです。 それ
-`await`をサポートし、有用なエラーメッセージの型チェックを実行し、多くのCosmJSユーティリティをプリロードします。
-Nodeコンソールに満足している場合は、よりシンプルで強力なものになっているかもしれません。
-CLIツールより。
+そして、問い合わせを処理し、トランザクションを送信します. このライブラリと一緒に、
+[@ cosmjs/cli](https://www.npmjs.com/package/@cosmjs/cli)、これはスーパーチャージされたノードコンソールです. それ
+`await`をサポートし、有用なエラーメッセージの型チェックを実行し、多くのCosmJSユーティリティをプリロードします.
+Nodeコンソールに満足している場合は、よりシンプルで強力なものになっているかもしれません.
+CLIツールより.
 
 完全な使用とインストール[手順
 README](https://github.com/CosmWasm/cosmjs/tree/master/packages/cli)、これも事前にパッケージ化されたソースコードです
 すぐに使用できるネットワーク構成:
 
 ::: 暖かい
-次のコマンドは廃止され、まもなく更新されます。
+次のコマンドは廃止され、まもなく更新されます.
 :::
 
 ```shell
@@ -119,7 +119,7 @@ client.getAccount()
 RPCエンドポイントとを組み合わせる必要があります
 ## ローカルノードを実行する(オプション)
 
-ローカルネットワークの実行に関心がある場合は、次のスクリプトを使用できます。
+ローカルネットワークの実行に関心がある場合は、次のスクリプトを使用できます.
 
 ```shell
 # default home is ~/.wasmd

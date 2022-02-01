@@ -1,12 +1,12 @@
 # 迁移合约
 
 本指南解释了迁移时升级合同所需的条件
-`cosmwasm` 的主要版本。 请注意，您还可以查看
-[完整的 CHANGELOG](./CHANGELOG.md) 以了解差异。
+`cosmwasm` 的主要版本. 请注意，您还可以查看
+[完整的 CHANGELOG](./CHANGELOG.md) 以了解差异.
 
 ## 0.13 -> 0.14
 
-- 0.14 支持的最低 Rust 版本是 1.51.0。 验证你的 Rust
+- 0.14 支持的最低 Rust 版本是 1.51.0. 验证你的 Rust
    版本 >= 1.51.0 带有:`rustc --version`
 
 - 更新 Cargo.toml 中的 CosmWasm 和 schemars 依赖项(跳过那些
@@ -25,16 +25,16 @@
   # ...
   ```
 
-- 将 `init` 入口点重命名为 `instantiate`。 另外，将`InitMsg`重命名为
-   `实例化消息`。
+- 将 `init` 入口点重命名为 `instantiate`. 另外，将`InitMsg`重命名为
+   `实例化消息`.
 
-- 将 `handle` 入口点重命名为 `execute`。 另外，将`HandleMsg`重命名为
-   `执行消息`。
+- 将 `handle` 入口点重命名为 `execute`. 另外，将`HandleMsg`重命名为
+   `执行消息`.
 
-- 将`InitResponse`、`HandleResponse` 和`MigrateResponse` 重命名为`Response`。
+- 将`InitResponse`、`HandleResponse` 和`MigrateResponse` 重命名为`Response`.
    旧名称仍然受支持(带有弃用警告)，并将被
-   在下一个版本中删除。 此外，您还需要添加 `submessages` 字段
-   到`响应`。
+   在下一个版本中删除. 此外，您还需要添加 `submessages` 字段
+   到`响应`.
 
 - 从`BankMsg::Send`中删除`from_address`，现在会自动填充
    与合同地址:
@@ -54,7 +54,7 @@
   });
   ```
 
-- 使用新的入口点系统。 从`lib.rs` 中删除
+- 使用新的入口点系统. 从`lib.rs` 中删除
 
   ```rust
   #[cfg(target_arch = "wasm32")]
@@ -152,10 +152,10 @@
   ```
 
 `MessageInfo::funds` 始终为空，因为 [MsgMigrateContract] 没有
-   一个资金领域。 身份验证不需要`MessageInfo::sender`
-   因为链在调用 `migrate` 之前会检查权限。 如果发件人的
+   一个资金领域. 身份验证不需要`MessageInfo::sender`
+   因为链在调用 `migrate` 之前会检查权限. 如果发件人的
    其他任何事情都需要地址，这应该表示为
-   迁移消息。
+   迁移消息.
 
    [msgmigrate合同]:
      https://github.com/CosmWasm/wasmd/blob/v0.15.0/x/wasm/internal/types/tx.proto#L86-L96
@@ -223,15 +223,15 @@
   ```
 
 - 如有必要，将通配符臂添加到现在非详尽消息的“匹配”中
-   输入 `BankMsg`、`BankQuery`、`WasmMsg` 和 `WasmQuery`。
+   输入 `BankMsg`、`BankQuery`、`WasmMsg` 和 `WasmQuery`.
 
-- `HumanAddr` 已被弃用，取而代之的是简单的 `String`。 它从未添加
-   任何比 `String` 显着的安全奖励，只是一种标记类型。 新的
-   类型 `Addr` 被创建来保存经过验证的地址。 这些可以通过创建
+- `HumanAddr` 已被弃用，取而代之的是简单的 `String`. 它从未添加
+   任何比 `String` 显着的安全奖励，只是一种标记类型. 新的
+   类型 `Addr` 被创建来保存经过验证的地址. 这些可以通过创建
    `Addr::unchecked`、`Api::addr_validate`、`Api::addr_humanize` 和 JSON
-   反序列化。 为了保持类型安全，反序列化为`Addr`
+   反序列化. 为了保持类型安全，反序列化为`Addr`
    只能从受信任的来源完成，例如合约状态或查询
-   回复。 用户输入必须反序列化为 `String`。 这个新的`Addr`类型
+   回复. 用户输入必须反序列化为 `String`. 这个新的`Addr`类型
    使在 state 中使用人类可读地址变得容易:
 
    使用来自 `MessageInfo` 的预先验证的 `Addr`:
@@ -293,26 +293,26 @@
   ```
 
 现有的 `CanonicalAddr` 保持不变，可用于以下情况
-  需要紧凑的二进制表示。对于 JSON 状态，这不会
+  需要紧凑的二进制表示.对于 JSON 状态，这不会
   保存大量数据(例如 bech32 地址
   cosmos1pfq05em6sfkls66ut4m2257p7qwlk448h8mysz 需要 45 个字节作为直接 ASCII
-  当其规范表示为 base64 编码时为 28 个字节)。对于固定
-  长度数据库键`CanonicalAddr` 仍然很方便。
+  当其规范表示为 base64 编码时为 28 个字节).对于固定
+  长度数据库键`CanonicalAddr` 仍然很方便.
 
 - 将 `StakingMsg::Withdraw` 替换为 `DistributionMsg::SetWithdrawAddress` 和
-  `DistributionMsg::WithdrawDelegatorReward`。 `StakingMsg::Withdraw` 是一个
-  两个分发消息的简写。然而，这是不直观的
+  `DistributionMsg::WithdrawDelegatorReward`. `StakingMsg::Withdraw` 是一个
+  两个分发消息的简写.然而，这是不直观的
   因为它没有为一次取款设置地址，而是为所有后续设置
-  撤回。由于取款是 [由不同的
+  撤回.由于取款是 [由不同的
   事件][分发文档]，例如验证者改变他们的佣金率，
   为一次性提款设置的地址将用于未来
-  合同作者不考虑撤回。
+  合同作者不考虑撤回.
 
   如果合约从未设置合约本身以外的提款地址
   (`env.contract.address`)，你可以简单地将 `StakingMsg::Withdraw` 替换为
-  `DistributionMsg::WithdrawDelegatorReward`。然后它永远不会从
-  默认。否则你需要仔细跟踪当前的提款
-  地址是。一次性更改可以通过发出 3 条消息来实现:
+  `DistributionMsg::WithdrawDelegatorReward`.然后它永远不会从
+  默认.否则你需要仔细跟踪当前的提款
+  地址是.一次性更改可以通过发出 3 条消息来实现:
 
   1.`SetWithdrawAddress { address:收件人}`来临时改变
      接受者
@@ -324,7 +324,7 @@
   [分发文档]:https://docs.cosmos.network/v0.42/modules/distribution/
 
 - `env.block.time` 中的区块时间现在是一个 `Timestamp` 存储
-  纳秒精度。 `env.block.time_nanos` 被移除。如果您需要
+  纳秒精度. `env.block.time_nanos` 被移除.如果您需要
   组件和以前一样，使用
   ```rust
   let seconds = env.block.time.nanos() / 1_000_000_000;
@@ -890,15 +890,15 @@ At this point `cargo wasm` should pass.
 - 将所有从 `cosmwasm::mock::*` 导入到 `cosmwasm_std::testing::*`
 - 在所有查询响应中使用 `from_binary` 而不是 `from_slice`(更新导入)
    - `from_slice(res.as_slice())` -> `from_binary(&res)`
-- 将 `coin("123", "FOO")` 替换为 `coins(123, "FOO")`。 我们将其重命名为硬币
+- 将 `coin("123", "FOO")` 替换为 `coins(123, "FOO")`. 我们将其重命名为硬币
    更明确地说，它返回 `Vec<Coin>`，现在接受一个 `u128` 作为
-   更好的类型安全的第一个参数。 `coin` 现在是一个别名
-   `Coin::new` 并返回一个 `Coin`。
+   更好的类型安全的第一个参数. `coin` 现在是一个别名
+   `Coin::new` 并返回一个 `Coin`.
 - 从所有对 `mock_env` 的调用中删除第四个参数(合约余额)，这个
-   不再存储在环境中。
-- `dependencies` 重命名为 `mock_dependencies`。 `mock_dependencies` 和
+   不再存储在环境中.
+- `dependencies` 重命名为 `mock_dependencies`. `mock_dependencies` 和
    `mock_instance` 采用第二个参数来设置合约余额(可见于
-   查询者)。 如果您需要设置更多余额，请使用 `mock_XX_with_balances`。
+   查询者). 如果您需要设置更多余额，请使用 `mock_XX_with_balances`.
    下面的代码块解释了:
 
   ```rust
@@ -923,9 +923,9 @@ At this point `cargo wasm` should pass.
   - 之后:`match err { Err(StdError::Unauthorized{ .. }) => {}, ... }`
 - 删除所有导入/使用`ContractResult`
 - 调用时必须指定`CosmosMsg::Native` 类型
-  `cosmwasm_vm::testing::{handle, init}`。你会想要
+  `cosmwasm_vm::testing::{handle, init}`.你会想要
   `使用 cosmwasm_std::{HandleResult, InitResult}` 或
-  `使用 cosmwasm_std::{HandleResponse, InitResponse}`。如果你不使用自定义
+  `使用 cosmwasm_std::{HandleResponse, InitResponse}`.如果你不使用自定义
   本机类型，只需按如下方式更新调用:
   - `let res = init(...)` => `let res: InitResult = init(...)`
   - `let res = init(...).unwrap()` =>
@@ -936,19 +936,19 @@ At this point `cargo wasm` should pass.
 
 ### 更新架构代码
 
-所有的辅助函数都被移到了一个新的 `cosmwasm-schema` 包中。
+所有的辅助函数都被移到了一个新的 `cosmwasm-schema` 包中.
 
 - 将 `cosmwasm-schema = "0.8"` 添加到 `Cargo.toml` 中的 `[dev-dependencies]`
 - 删除 `serde_json` `[dev-dependency]` 如果有的话，因为 cosmwasm-schema 会
-  在内部处理 JSON 输出。
+  在内部处理 JSON 输出.
 - 更新 `examples/schema.rs` 以查看
   [更像队列](https://github.com/CosmWasm/cosmwasm/blob/master/contracts/queue/examples/schema.rs)，
-  但是将所有导入和类型名称替换为您当前拥有的名称。
+  但是将所有导入和类型名称替换为您当前拥有的名称.
 - 使用 `cargo schema` 重新生成模式
 
 ### 抛光
 
-经过这么多更改后，请记住让 linters 完成它们的工作。
+经过这么多更改后，请记住让 linters 完成它们的工作.
 
 - `cargo fmt`
 - `cargo clippy`

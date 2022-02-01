@@ -40,13 +40,13 @@ test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 
 ```
 
-都好。
+都好.
 
 ::: 小费
 时间码 [https://vimeo.com/457702442#t=39s](https://vimeo.com/457702442#t=39s)
 :::
 
-[src/lib.rs](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/lib.rs) 文件包含 wasm 绑定。 围绕 Rust 函数包装智能合约 *(handle, init, query)* 函数。 如果您没有进行高级 wasm 调整，请不要碰它。
+[src/lib.rs](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/lib.rs) 文件包含 wasm 绑定. 围绕 Rust 函数包装智能合约 *(handle, init, query)* 函数. 如果您没有进行高级 wasm 调整，请不要碰它.
 
 ## 消息
 
@@ -54,11 +54,11 @@ test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 时间码 [https://vimeo.com/457702442#t=1m46s](https://vimeo.com/457702442#t=1m46s)
 :::
 
-开发开始于 [src/msg.rs](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/msg.rs)，其中包含智能合约的输入数据结构。
+开发开始于 [src/msg.rs](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/msg.rs)，其中包含智能合约的输入数据结构.
 
 ### 初始化消息
 
-我们将从 [`InitMsg`](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/msg.rs) 开始。 此结构具有从代码初始化智能合约的初始值，并提供逻辑设置所需的数据。
+我们将从 [`InitMsg`](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/msg.rs) 开始. 此结构具有从代码初始化智能合约的初始值，并提供逻辑设置所需的数据.
 
 ```rust
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -159,13 +159,13 @@ pub fn config_read(storage: &dyn Storage) -> ReadonlySingleton<State> {
 时间码 [https://vimeo.com/457702442#t=11m12s](https://vimeo.com/457702442#t=11m12s)
 :::
 
-定义了乐高积木 **msgs**、**handler** 和 **state**。 现在我们需要在 [contract.rs](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/contract.rs) 中将它们绑定在一起。
+定义了乐高积木 **msgs**、**handler** 和 **state**. 现在我们需要在 [contract.rs](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/contract.rs) 中将它们绑定在一起.
 
 ### 在里面
 
-在执行合约之前，init 函数将被调用一次。 这是一个“特权”功能，因为
-它可以设置任何其他方法调用永远无法修改的配置。 第一行解析来自 raw 的输入
-字节到我们合约定义的消息中。 然后我们检查选项是否过期，然后创建初始状态。 如果过期，
+在执行合约之前，init 函数将被调用一次. 这是一个“特权”功能，因为
+它可以设置任何其他方法调用永远无法修改的配置. 第一行解析来自 raw 的输入
+字节到我们合约定义的消息中. 然后我们检查选项是否过期，然后创建初始状态. 如果过期，
 我们返回一个通用的合约错误，否则，我们存储状态并返回一个成功代码:
 
 ```rust
@@ -206,9 +206,9 @@ pub fn init(
 ) -> Result<InitResponse, ContractError> {
 ```
 
-您将在 CosmWasm 处理程序函数中看到这个签名。 使用 Deps 传递给 handler 的执行上下文，其中包含 Storage、API 和 Querier 函数； Env，包含区块、消息和合约信息； 和味精，嗯，不需要解释。
+您将在 CosmWasm 处理程序函数中看到这个签名. 使用 Deps 传递给 handler 的执行上下文，其中包含 Storage、API 和 Querier 函数； Env，包含区块、消息和合约信息； 和味精，嗯，不需要解释.
 
-`Result<T, ContractError>` 是一种表示成功([`Ok`])或失败([`Err`])的类型。 如果执行成功返回 `T` 类型，否则返回 `ContractError`。 有用。
+`Result<T, ContractError>` 是一种表示成功([`Ok`])或失败([`Err`])的类型. 如果执行成功返回 `T` 类型，否则返回 `ContractError`. 有用.
 
 ### 处理
 
@@ -216,7 +216,7 @@ pub fn init(
 时间码 [https://vimeo.com/457702442#t=15m55s](https://vimeo.com/457702442#t=15m55s)
 :::
 
-`handle` 方法将消息路由到函数。 它类似于 Cosmos SDK 处理程序设计。
+`handle` 方法将消息路由到函数. 它类似于 Cosmos SDK 处理程序设计.
 
 ```rust
 pub fn handle(
@@ -263,8 +263,8 @@ pub fn handle_transfer(
 
 #### 执行
 
-你会在 plus 和示例智能合约中看到 `handle_execute`，但实际上它只是一个命名，没什么特别的。
-大多数功能与`transfer`相同。 只有两个新东西:消息资金检查和返回上下文中的 sdk 消息。
+你会在 plus 和示例智能合约中看到 `handle_execute`，但实际上它只是一个命名，没什么特别的.
+大多数功能与`transfer`相同. 只有两个新东西:消息资金检查和返回上下文中的 sdk 消息.
 
 ```rust
 pub fn handle_execute(

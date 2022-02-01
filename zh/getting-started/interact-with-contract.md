@@ -1,12 +1,12 @@
 # 上传和交互
 
-我们已经准备好了二进制文件。 现在是时候看到一些 wasm 行动了。 您可以使用 [Go CLI](#go-cli) 或
-[节点控制台](#node-console) 如你所愿。
+我们已经准备好了二进制文件. 现在是时候看到一些 wasm 行动了. 您可以使用 [Go CLI](#go-cli) 或
+[节点控制台](#node-console) 如你所愿.
 
 ## 去 CLI
 
-我们在上一章中生成了一个 wasm 二进制可执行文件。 让我们把它投入使用。 现在，我们将
-将代码上传到区块链。 之后，您可以下载字节码以验证它是否正确:
+我们在上一章中生成了一个 wasm 二进制可执行文件. 让我们把它投入使用. 现在，我们将
+将代码上传到区块链. 之后，您可以下载字节码以验证它是否正确:
 
 ```shell
 # see how many codes we have now
@@ -29,8 +29,8 @@ diff contract.wasm download.wasm
 
 ### 实例化合约
 
-我们现在可以创建这个 wasm 合约的实例。 在这里，验证者将为托管提供资金，即
-将允许 fred 控制支出，并且在发布后，资金将转到 bob。
+我们现在可以创建这个 wasm 合约的实例. 在这里，验证者将为托管提供资金，即
+将允许 fred 控制支出，并且在发布后，资金将转到 bob.
 
 ```shell
 # instantiate contract and verify
@@ -95,13 +95,13 @@ wasmd query account $CONTRACT $NODE
 ## 节点控制台
 
 如果您在[客户端设置部分](./setting-env#setup-node-repl) 中设置了节点控制台/REPL，则可以使用
-部署和执行你的合同。 我想你会发现 JSON 操作和解析
-在 JavaScript 中比在 Shell 脚本中好一点。
+部署和执行你的合同. 我想你会发现 JSON 操作和解析
+在 JavaScript 中比在 Shell 脚本中好一点.
 
 首先，进入 cli 目录并启动你的控制台:
 
 ::: 警告
-下面的命令已过时并很快更新。
+下面的命令已过时并很快更新.
 :::
 
 ```shell

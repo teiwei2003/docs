@@ -1,32 +1,32 @@
 # 介绍
 
-CsomWasm 证明了作为 Cosmos Hub 核心的智能合约容器的潜力。 {概要}
+CsomWasm 证明了作为 Cosmos Hub 核心的智能合约容器的潜力. {概要}
 
-CosmWasm 的承诺之一是在 Cosmos Hub 上实现灵活的智能合约执行。使用集线器上的 CosmWasm，
-网络参与者可以提议部署智能合约，在治理中投票以启用它们。
+CosmWasm 的承诺之一是在 Cosmos Hub 上实现灵活的智能合约执行.使用集线器上的 CosmWasm，
+网络参与者可以提议部署智能合约，在治理中投票以启用它们.
 
-在本节中，您将学习在集线器上体验智能合约所需的所有知识。如果您对智能合约感兴趣
-开发，消化 [Getting Started](/getting-started/intro.md) 文档。
+在本节中，您将学习在集线器上体验智能合约所需的所有知识.如果您对智能合约感兴趣
+开发，消化 [Getting Started](/getting-started/intro.md) 文档.
 
 ## Wasmd 授权设置
 
 CosmWasm 提供了可以通过多种方式配置的链上智能合约部署授权机制:
 
-- 对所有人免费，即完全无需管理员。任何人都可以部署。
-- 完全许可，意味着只有管理员可以部署。
-- 通过链上治理。合约的部署由治理投票决定。
-- 按业主，按合同签订合同。
+- 对所有人免费，即完全无需管理员.任何人都可以部署.
+- 完全许可，意味着只有管理员可以部署.
+- 通过链上治理.合约的部署由治理投票决定.
+- 按业主，按合同签订合同.
 
 ### 在编译时启用治理建议
 
-当 gov 提案绕过现有的授权策略时，它们被禁用并需要在编译时启用。
+当 gov 提案绕过现有的授权策略时，它们被禁用并需要在编译时启用.
 ```
 -X github.com/CosmWasm/wasmd/app.ProposalsEnabled=true - enable all x/wasm governance proposals (default false)
 -X github.com/CosmWasm/wasmd/app.EnableSpecificProposals=MigrateContract,UpdateAdmin,ClearAdmin - enable a subset of the x/wasm governance proposal types (overrides ProposalsEnabled)
 ```
 
 如果您使用的是`gaiaflex` 二进制可执行文件，则不需要使用上面的标志进行构建，因为它已经包含在
-二进制构建。
+二进制构建.
 
 ### 通过 Genesis 初始化参数
 
@@ -43,23 +43,23 @@ CosmWasm 提供了可以通过多种方式配置的链上智能合约部署授�
 }
 ```
 
-gaiaflex 测试网中的这些配置意味着只有治理才能上传和初始化智能合约。
+gaiaflex 测试网中的这些配置意味着只有治理才能上传和初始化智能合约.
 
 ### 可用配置
-- `code_upload_access` - 谁可以上传 wasm 二进制文件:`Nobody`、`Everybody`、`OnlyAddress`。需要在创世中定义。
-以后可以通过治理投票进行更改。
+- `code_upload_access` - 谁可以上传 wasm 二进制文件:`Nobody`、`Everybody`、`OnlyAddress`.需要在创世中定义.
+以后可以通过治理投票进行更改.
 - `instantiate_default_permission` - 平台默认，当代码所有者没有设置它时，谁可以实例化一个 wasm 二进制文件
-在本教程中，我们将向您展示在受管控网络上部署智能合约。
+在本教程中，我们将向您展示在受管控网络上部署智能合约.
 
-CosmWasm 扩展了 Cosmos SDK 治理模块，以支持在提案后部署智能合约。
+CosmWasm 扩展了 Cosmos SDK 治理模块，以支持在提案后部署智能合约.
 
 ## 获取示例 cw-subkeys 合同
 
 获取样本合同有两种选择:
 
-1.下载【源代码】(https://github.com/CosmWasm/cosmwasm-plus/tree/v0.1.1/contracts/cw20-base)，并【编译】(/getting-started/compile-contract.md )它是你的自我。
+1.下载【源代码】(https://github.com/CosmWasm/cosmwasm-plus/tree/v0.1.1/contracts/cw20-base)，并【编译】(/getting-started/compile-contract.md )它是你的自我.
 
-2.下载【预编译二进制文件】(https://github.com/CosmWasm/cosmwasm-plus/releases/download/v0.1.1/cw20_base.wasm)。
+2.下载【预编译二进制文件】(https://github.com/CosmWasm/cosmwasm-plus/releases/download/v0.1.1/cw20_base.wasm).
 
 ## 提交提案
 
@@ -84,15 +84,15 @@ wasmcli tx gov submit-proposal wasm-store cw1-subkeys.wasm \
 --instantiate-only-address string   Only this address can instantiate a contract instance from the code, optional
 ```
 
-默认情况下，启用第一个标志。 如果你只希望一个地址能够发起合约，
-设置“仅实例化地址”标志。
+默认情况下，启用第一个标志. 如果你只希望一个地址能够发起合约，
+设置“仅实例化地址”标志.
 
-如果设置了这些标志中的任何一个，投票委员会应该决定这对于给定的合同是否可以接受。
-实例化每个人可能对多重签名有意义(每个人都有自己的)，但不适用于创建新令牌。
+如果设置了这些标志中的任何一个，投票委员会应该决定这对于给定的合同是否可以接受.
+实例化每个人可能对多重签名有意义(每个人都有自己的)，但不适用于创建新令牌.
 
 ## 投票
 
-提案创建后，需要通过治理投票通过。
+提案创建后，需要通过治理投票通过.
 ```shell
 wasmcli tx gov vote [proposal-id] yes --from account
 ```
