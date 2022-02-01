@@ -1,6 +1,6 @@
 # Hall of Fame
 
-_**Here we present yout the CosmWasm hall of fame! Kudos the contributors for their effort in making these amazing projects!**_
+_ **Here we present yout the CosmWasm hall of fame! Kudos the contributors for their effort in making these amazing projects!** _
 Let's give them the visibility and fame they deserve:
 
 ## NFT Marketplace by BlockScape

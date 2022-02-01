@@ -2,9 +2,9 @@
 
 <iframe src = "https://player.vimeo.com/video/457705991" width = "640" height = "360" frameborder = "0" allow = "autoplay; fullscreen" allowfullscreen> </iframe>
 
-コードはこの時点でコンパイルされているはずですが、機能するかどうかはテストされていません。
-変更を加えるたびに、コードをチェーンにデプロイできます。 しかし、さあ、あなたの時間はそれよりも貴重です。
-さらに、契約を乱さないようにし、将来の変更をテストするのが最善です。
+コードはこの時点でコンパイルされているはずですが、機能するかどうかはテストされていません.
+変更を加えるたびに、コードをチェーンにデプロイできます. しかし、さあ、あなたの時間はそれよりも貴重です.
+さらに、契約を乱さないようにし、将来の変更をテストするのが最善です.
 
 ```rust
 #[cfg(test)]
@@ -14,8 +14,8 @@ mod tests {
     use cosmwasm_std::{attr, coins, CosmosMsg};
 ```
 
-これがRustでのテストの始まりです。 [コードリファレンス](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/contract.rs)。
-テストとコードを同じファイルまたは別々のファイルに保存できます。
+これがRustでのテストの始まりです. [コードリファレンス](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/contract.rs).
+テストとコードを同じファイルまたは別々のファイルに保存できます.
 
 ## Test Initialization
 
@@ -23,7 +23,7 @@ mod tests {
 Timecode [https://vimeo.com/457705991#t=3m34s](https://vimeo.com/457705991#t=3m34s)
 :::
 
-テストごとに、ブロック時間、状態などの特定の変数をモックする必要があります。 簡単に設定できる関数を作成します。
+テストごとに、ブロック時間、状態などの特定の変数をモックする必要があります. 簡単に設定できる関数を作成します.
 
 ```rust
 #[test]
@@ -50,12 +50,12 @@ fn proper_initialization() {
 }
 ```
 
-これで、テスト環境の初期化プログラムができました。 これは非常に単純な方法であり、変数を関数に渡してさまざまな調整を行うことができます。
-詳細については、cosmwasm-plusを参照してください。
+これで、テスト環境の初期化プログラムができました. これは非常に単純な方法であり、変数を関数に渡してさまざまな調整を行うことができます.
+詳細については、cosmwasm-plusを参照してください.
 
 ### 依存関係、環境、メッセージ情報をシミュレートする
 
-2つの3つのシミュレーションツールを改善する必要があります。
+2つの3つのシミュレーションツールを改善する必要があります.
 
 ```rust
 ///All external requirements that can be injected for unit tests.
@@ -72,7 +72,7 @@ pub fn mock_dependencies(
 }
 ```
 
-これにより、ストレージ、API、クエリなどのテストの依存関係が設定されます。
+これにより、ストレージ、API、クエリなどのテストの依存関係が設定されます.
 
 ```rust
 ///Returns a default enviroment with height, time, chain_id, and contract address
@@ -248,4 +248,4 @@ Now run the tests:
 cargo test
 ```
 
-すべてが緑色の場合、コードはチェーン上で機能します。
+すべてが緑色の場合、コードはチェーン上で機能します.

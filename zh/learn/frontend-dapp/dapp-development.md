@@ -1,10 +1,10 @@
 # 开发dApp
 
-为了展示之前解释的实用程序，我们将从模板创建余额检查器 dApp。
+为了展示之前解释的实用程序，我们将从模板创建余额检查器 dApp.
 
 ## 自定义模板
 
-要使应用程序成为您自己的应用程序，请随时修改“package.json”中的“name”字段和/或更新“README.md”文件。
+要使应用程序成为您自己的应用程序，请随时修改“package.json”中的“name”字段和/或更新“README.md”文件.
 
 还要修改 `routes/Login/index.tsx` 文件，如下所示:
 
@@ -101,11 +101,11 @@ export const ErrorText = styled(Text)`
 `;
 ```
 
-如您所见，这两个文件使用了`@cosmicdapp/logic` 的`useError` 钩子，以及`@cosmicdapp/design` 的`Stack`、`PageLayout` 和`YourAccount` 组件，因此它们 你应该很熟悉。
+如您所见，这两个文件使用了`@cosmicdapp/logic` 的`useError` 钩子，以及`@cosmicdapp/design` 的`Stack`、`PageLayout` 和`YourAccount` 组件，因此它们 你应该很熟悉.
 
-`index.tsx` 组件的布局利用了 `MainStack` 和 `ErrorText`，它们是在 `style.ts` 中定义的样式化组件，以及尚未定义的 `FormCheckBalance` 和 `TokenList` 组件。
+`index.tsx` 组件的布局利用了 `MainStack` 和 `ErrorText`，它们是在 `style.ts` 中定义的样式化组件，以及尚未定义的 `FormCheckBalance` 和 `TokenList` 组件.
 
-逻辑将这样工作:`TokenList` 组件将显示用户的原生代币，除非在`FormCheckBalance` 中输入合约地址，这将使 `TokenList` 显示该 CW20 合约的余额，或者显示错误 如果该地址没有关联的合同。
+逻辑将这样工作:`TokenList` 组件将显示用户的原生代币，除非在`FormCheckBalance` 中输入合约地址，这将使 `TokenList` 显示该 CW20 合约的余额，或者显示错误 如果该地址没有关联的合同.
 
 ### 添加到 ProtectedSwitch
 
@@ -117,13 +117,13 @@ export const ErrorText = styled(Text)`
 </ProtectedSwitch>
 ```
 
-请注意，我们删除了“OperationResult”，包括路由和组件，因为我们不会在这个 dApp 中进行交易。
+请注意，我们删除了“OperationResult”，包括路由和组件，因为我们不会在这个 dApp 中进行交易.
 
 ## 添加 FormCheckBalance 组件
 
 ### 添加搜索组件
 
-为了输入地址，我们将使用自定义的`Search` 组件，它可能看起来很笨拙，但是很好地集成了 `formik` 和 `antd`，并且实际上受到了 `formik-antd` 的启发(但它在那里缺失，因为 现在)。
+为了输入地址，我们将使用自定义的`Search` 组件，它可能看起来很笨拙，但是很好地集成了 `formik` 和 `antd`，并且实际上受到了 `formik-antd` 的启发(但它在那里缺失，因为 现在).
 `App/forms/Search.tsx`
 
 ```jsx
@@ -275,21 +275,21 @@ export function FormCheckBalance({ setContractAddress }: FormCheckBalanceProps):
 }
 ```
 
-它使用之前定义的地址验证模式，并有一个 `setContractAddress` 参数来更新 `Balance` 路由的状态。
+它使用之前定义的地址验证模式，并有一个 `setContractAddress` 参数来更新 `Balance` 路由的状态.
 
 ## 添加TokenList组件
 
-随着 `FormCheckBalance` 工作，我们只需要实现 `TokenList`。
+随着 `FormCheckBalance` 工作，我们只需要实现 `TokenList`.
 
 该组件将:
 
 1.检查是否有合约地址:
-- 如果没有，从 `useAccount` 钩子中获取本机余额。
-- 如果是，加载 CW20 合约代币的余额和小数位数。
-- 如果地址没有合同，显示错误。
+- 如果没有，从 `useAccount` 钩子中获取本机余额.
+- 如果是，加载 CW20 合约代币的余额和小数位数.
+- 如果地址没有合同，显示错误.
 2.显示余额:
-- 使用本地 `getCoinToDisplay()` 实用程序获取用户友好的余额格式，无论是原生格式还是 CW20。
-- 使用`showTokens` 标志进行条件渲染以避免在等待异步数据加载时出现显示问题。
+- 使用本地 `getCoinToDisplay()` 实用程序获取用户友好的余额格式，无论是原生格式还是 CW20.
+- 使用`showTokens` 标志进行条件渲染以避免在等待异步数据加载时出现显示问题.
 
 实现这一点的 `TokenList` 实现将是:
 `routes/Balance/components/TokenList/index.tsx`
@@ -413,6 +413,6 @@ export const TokenItem = styled.div`
 `;
 ```
 
-## 完成的！
+## 完成的!
 
-现在您可以检查您的本机余额和任何 CW20 合约的余额，最重要的是，您现在知道如何构建基于 CosmJS 的 dApp！
+现在您可以检查您的本机余额和任何 CW20 合约的余额，最重要的是，您现在知道如何构建基于 CosmJS 的 dApp!

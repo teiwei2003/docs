@@ -1,26 +1,26 @@
 # テストネット
 
-このセクションでは、テストネットに参加する方法、テストネット構成を見つける場所、およびプロセスを高速化するためのいくつかのスクリプトについて説明します。
+このセクションでは、テストネットに参加する方法、テストネット構成を見つける場所、およびプロセスを高速化するためのいくつかのスクリプトについて説明します.
 
 ## ネットワークを選択してください
 
-[CosmWasm/testnets](https://github.com/CosmWasm/testnets)で、構成やエンドポイントなどのアクティブおよび非アクティブなテストネット情報を見つけることができます。
+[CosmWasm/testnets](https://github.com/CosmWasm/testnets)で、構成やエンドポイントなどのアクティブおよび非アクティブなテストネット情報を見つけることができます.
 
 ## 設定
 
-ノードのローリングを開始し、テストネット環境でブロックの生成を開始しましょう。
+ノードのローリングを開始し、テストネット環境でブロックの生成を開始しましょう.
 
-**始める前に** [CosmWasm/tesnets/devops](https://github.com/CosmWasm/testnets/tree/master/devops)を使用できます。これには、wasmdの簡単なセットアップスクリプトが含まれています。
+**始める前に** [CosmWasm/tesnets/devops](https://github.com/CosmWasm/testnets/tree/master/devops)を使用できます.これには、wasmdの簡単なセットアップスクリプトが含まれています.
 ノード、蛇口、[ブロックエクスプローラー](https://github.com/CosmWasm/big-dipper)、lcd、nginx、その他のスクリプト
-以下は基本的に** devopsレポジトリ**として機能しますが、より手動であり、nginxとシステムスーパーバイザーは含まれていません。ランダム
-それらを使用してください。 [cosmovisor](https://github.com/cosmos/cosmos-sdk/tree/master/cosmovisor)アップグレードマネージャーを使用して、ネットワークのアップグレードを処理します。
+以下は基本的に** devopsレポジトリ**として機能しますが、より手動であり、nginxとシステムスーパーバイザーは含まれていません.ランダム
+それらを使用してください. [cosmovisor](https://github.com/cosmos/cosmos-sdk/tree/master/cosmovisor)アップグレードマネージャーを使用して、ネットワークのアップグレードを処理します.
 インストールスクリプトは、cosmovisorとwasmdのセットアップに役立ちます:[wasmd w/cosmovisorセットアップスクリプト](https://github.com/CosmWasm/testnets/tree/master/devops/node/cosmovisor)g
 
 ### 手動設定
 
-まず、[ビルド要件セクション](./build-requirements.md)のインストール手順に従っていることを確認してください。必要なバイナリが必要です。次のスクリプトをコピーして実行するだけの場合は、必ず環境変数を設定してください。
+まず、[ビルド要件セクション](./build-requirements.md)のインストール手順に従っていることを確認してください.必要なバイナリが必要です.次のスクリプトをコピーして実行するだけの場合は、必ず環境変数を設定してください.
 
-以下は[Musselnet構成](https://github.com/CosmWasm/testnets/tree/master/musselnet)です。
+以下は[Musselnet構成](https://github.com/CosmWasm/testnets/tree/master/musselnet)です.
 
 ```shell
 export CHAIN_ID="musselnet-4"
@@ -45,7 +45,7 @@ export COSMOVISOR_NAME=wasmd
 export SEED_NODE="c065c5ac440d1a9ba484a9a8b25c24d264b0a1a6@49.12.67.47:26656"
 ```
 
-これらのスクリプトをシームレスに実行するには、CosmWasmツールのディレクトリを作成することをお勧めします。
+これらのスクリプトをシームレスに実行するには、CosmWasmツールのディレクトリを作成することをお勧めします.
 `mkdir CosmWasm && cd CosmWasm && export CW_DIR = $(pwd)
 
 ```shell
@@ -90,16 +90,16 @@ curl -sSL $APP_CONFIG_URL > ~/.wasmd/config/app.toml
 wasmd start --p2p.seeds $SEED_NODE
 ```
 
-これで、ブロックが再生され、ノードがテストネットに追いついていることがわかります。 これは時間がかかる場合があります。
+これで、ブロックが再生され、ノードがテストネットに追いついていることがわかります. これは時間がかかる場合があります.
 
 ### バリデーターになる(オプション)
 
-バリデーターとしてネットワークに参加するには、ステーキングトークンが必要です。
+バリデーターとしてネットワークに参加するには、ステーキングトークンが必要です.
 [discord testnetschannel](https://docs.cosmwasm.com/chat)で質問してください
 
-アクティブなブロック構築に参加したい場合は、バリデーターのアドレスにいくつかのコインを誓約する必要があります。
+アクティブなブロック構築に参加したい場合は、バリデーターのアドレスにいくつかのコインを誓約する必要があります.
 
-ベリファイアスタックに関心のある方のために、ベリファイアアーキテクチャに関する優れた資料を以下に示します。[certus one blog](https://kb.certus.one/)
+ベリファイアスタックに関心のある方のために、ベリファイアアーキテクチャに関する優れた資料を以下に示します.[certus one blog](https://kb.certus.one/)
 
 **注**:バリデーターにアップグレードする前に、バリデーターが同期されていることを確認してください
 
@@ -120,13 +120,13 @@ wasmd tx staking create-validator \
 
 ### ライトクライアントデーモンを実行する
 
-wasmdバージョンv0.13lcdクライアントおよびノー​​ドとマージされました。 ライトクライアントを有効にするには、 `app.toml/api`の値をtrueに変更します。
+wasmdバージョンv0.13lcdクライアントおよびノー​​ドとマージされました. ライトクライアントを有効にするには、 `app.toml/api`の値をtrueに変更します.
 
 ## 今後のテストネットに参加する
 
 ::: ヒント
-まだ開始されていないテストネットに参加するには、ネットワークジェネシスファイルでアドレスと情報を定義する必要があります。
-これは、自動的に処理するために実行できるスクリプトです。
+まだ開始されていないテストネットに参加するには、ネットワークジェネシスファイルでアドレスと情報を定義する必要があります.
+これは、自動的に処理するために実行できるスクリプトです.
 :::
 
 ```shell
@@ -152,8 +152,8 @@ git push
 # Open PR to CosmWasm/testnets:master (https://github.com/CosmWasm/testnets)
 ```
 
-ネットワークが開始したら、[ライブテストネットへの参加](#joining-live-testnets)をフォローできます。
+ネットワークが開始したら、[ライブテストネットへの参加](#joining-live-testnets)をフォローできます.
 
 ## コントラクトをテストネットにデプロイします
 
-[はじめに](../getting-started/intro.md)は、基本的なスマートコントラクトを使用してコントラクトをコンパイルおよびデプロイするプロセスを説明するための最良の資料です。 独自の契約を作成することに興味がある場合は、サンプルのエスクロー契約を使用できる入門チュートリアルを読んだ後、[Hijacking Escrow](../learn/hijack-escrow/intro.md)にアクセスしてください。
+[はじめに](../getting-started/intro.md)は、基本的なスマートコントラクトを使用してコントラクトをコンパイルおよびデプロイするプロセスを説明するための最良の資料です. 独自の契約を作成することに興味がある場合は、サンプルのエスクロー契約を使用できる入門チュートリアルを読んだ後、[Hijacking Escrow](../learn/hijack-escrow/intro.md)にアクセスしてください.

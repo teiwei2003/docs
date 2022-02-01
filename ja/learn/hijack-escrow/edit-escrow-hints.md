@@ -1,8 +1,8 @@
 # ヒント
 
-**！ ！ ネタバレ注意!! **
+**! ! ネタバレ注意!! **
 
-このセクションには、前のセクションの質問に対する回答が含まれています。
+このセクションには、前のセクションの質問に対する回答が含まれています.
 
 ## ExecuteMsg
 
@@ -113,7 +113,7 @@ fn handle_steal() {
 }
 ```
 
-また、テストインポートに「MOCK_CONTRACT_ADDR」を追加する必要があります。次に例を示します。
+また、テストインポートに「MOCK_CONTRACT_ADDR」を追加する必要があります.次に例を示します.
 
 ```rust
 use cosmwasm_std::testing::{mock_dependencies, mock_env, MOCK_CONTRACT_ADDR};

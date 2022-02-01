@@ -2,7 +2,7 @@
 
 <iframe src = "https://player.vimeo.com/video/457702442" width = "640" height = "360" frameborder = "0" allow = "autoplay; fullscreen" allowfullscreen> </iframe>
 
-まず、スターターが機能するかどうかをテストし、錆テストの結果に目を慣れさせます。
+まず、スターターが機能するかどうかをテストし、錆テストの結果に目を慣れさせます.
 
 ```shell
 cargo unit-test
@@ -40,13 +40,13 @@ test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 
 ```
 
-すべて良い。
+すべて良い.
 
 ::: ヒント
 タイムコード[https://vimeo.com/457702442#t=39s](https://vimeo.com/457702442#t=39s)
 :::
 
-[src/lib.rs](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/lib.rs)ファイルにはwasmバインディングが含まれています。 スマートコントラクト*(handle、init、query)*関数をRust関数の周りにラップします。 高度なwasm調整を行っていない場合は、触れないでください。
+[src/lib.rs](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/lib.rs)ファイルにはwasmバインディングが含まれています. スマートコントラクト*(handle、init、query)*関数をRust関数の周りにラップします. 高度なwasm調整を行っていない場合は、触れないでください.
 
 ## 情報
 
@@ -54,11 +54,11 @@ test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 タイムコード[https://vimeo.com/457702442#t=1m46s](https://vimeo.com/457702442#t=1m46s)
 :::
 
-スマートコントラクトの入力データ構造を含む[src/msg.rs](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/msg.rs)で開発が開始されました。
+スマートコントラクトの入力データ構造を含む[src/msg.rs](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/msg.rs)で開発が開始されました.
 
 ### 初期化メッセージ
 
-[`InitMsg`](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/msg.rs)から始めます。 この構造には、コードからスマートコントラクトを初期化するための初期値があり、ロジック設定に必要なデータを提供します。
+[`InitMsg`](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/msg.rs)から始めます. この構造には、コードからスマートコントラクトを初期化するための初期値があり、ロジック設定に必要なデータを提供します.
 
 ```rust
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -79,7 +79,7 @@ pub struct InitMsg {
 
 ### HandleMsg
 
-コントラクトの実行は、 `HandleMsg`列挙型を使用して分岐されます。各フィールドは、メッセージとそのメッセージのコンテンツを定義します。
+コントラクトの実行は、 `HandleMsg`列挙型を使用して分岐されます.各フィールドは、メッセージとそのメッセージのコンテンツを定義します.
 
 ```rust
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -96,8 +96,8 @@ pub enum HandleMsg {
 
 ::: ヒント
 標準および人間のアドレス
-正規アドレスは、暗号アドレスのバイナリ形式を表します。
-一方、人間の住所はUIに最適です。これらは常にASCIIテキストのサブセットであり、多くの場合、Bech32のチェーンプレフィックス(cosmos1h57760w793q6vh06jsppnqdkc4ejcuyrrjxnkeなど)などのセキュリティチェックが含まれています。
+正規アドレスは、暗号アドレスのバイナリ形式を表します.
+一方、人間の住所はUIに最適です.これらは常にASCIIテキストのサブセットであり、多くの場合、Bech32のチェーンプレフィックス(cosmos1h57760w793q6vh06jsppnqdkc4ejcuyrrjxnkeなど)などのセキュリティチェックが含まれています.
 
 `canonicalize(humanize(canonical_addr)) == canonical_addr`
 
@@ -106,7 +106,7 @@ For more details: [Names and Addresses](/architecture/addresses.md)
 
 ### QueryMsg
 
-スマートコントラクトの状態クエリは、 `QueryMsg`列挙型を使用して分岐します。スマートコントラクトの` Config`クエリは後で実装します。
+スマートコントラクトの状態クエリは、 `QueryMsg`列挙型を使用して分岐します.スマートコントラクトの` Config`クエリは後で実装します.
 
 ```rust
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -122,11 +122,11 @@ pub enum QueryMsg {
 タイムコード[https://vimeo.com/457702442#t=7m36s](https://vimeo.com/457702442#t=7m36s)
 :::
 
-[状態](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/state.rs)は、スマートコントラクトデータが保存およびアクセスされるデータベースの状態を処理します。
+[状態](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/state.rs)は、スマートコントラクトデータが保存およびアクセスされるデータベースの状態を処理します.
 
-状態をモデリングする場合、2つのオプションがあります。
-1. **シングルトン**:コントラクトは、一意のdbキーを使用して構造のインスタンスを1つだけ保存します。このチュートリアルでは、これを使用します。
-2。**構造化ストア**:モデルは動的に構造化および保存できます。インデックス作成およびルックアップ機能を使用して、1対1、1対多、および多対多の関係を形成できます。
+状態をモデリングする場合、2つのオプションがあります.
+1. **シングルトン**:コントラクトは、一意のdbキーを使用して構造のインスタンスを1つだけ保存します.このチュートリアルでは、これを使用します.
+2.**構造化ストア**:モデルは動的に構造化および保存できます.インデックス作成およびルックアップ機能を使用して、1対1、1対多、および多対多の関係を形成できます.
 
 ```rust
 //configuration instance key. config object will be saved under this key.
@@ -159,14 +159,14 @@ pub fn config_read(storage: &dyn Storage) -> ReadonlySingleton<State> {
 タイムコード[https://vimeo.com/457702442#t=11m12s](https://vimeo.com/457702442#t=11m12s)
 :::
 
-レゴブロック** msgs **、** handler **、** state **が定義されています。 次に、[contract.rs](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/contract.rs)でそれらをバインドする必要があります。
+レゴブロック** msgs **、** handler **、** state **が定義されています. 次に、[contract.rs](https://github.com/CosmWasm/cosmwasm-examples/blob/master/simple-option/src/contract.rs)でそれらをバインドする必要があります.
 
 ### 中身
 
-コントラクトを実行する前に、init関数が1回呼び出されます。 これは「特権」機能です。
-他のメソッド呼び出しでは変更できない構成を設定できます。 最初の行は、rawからの入力を解析します
-契約で定義されたメッセージへのバイト。 次に、オプションの有効期限が切れているかどうかを確認してから、初期状態を作成します。 有効期限が切れた場合、
-一般的な契約エラーを返します。それ以外の場合は、状態を保存して成功コードを返します。
+コントラクトを実行する前に、init関数が1回呼び出されます. これは「特権」機能です.
+他のメソッド呼び出しでは変更できない構成を設定できます. 最初の行は、rawからの入力を解析します
+契約で定義されたメッセージへのバイト. 次に、オプションの有効期限が切れているかどうかを確認してから、初期状態を作成します. 有効期限が切れた場合、
+一般的な契約エラーを返します.それ以外の場合は、状態を保存して成功コードを返します.
 
 ```rust
 pub fn init(
@@ -195,7 +195,7 @@ pub fn init(
 }
 ```
 
-機能は見た目はシンプルです。オプションの有効期限を確認し、状態を保存して、応答を返します。
+機能は見た目はシンプルです.オプションの有効期限を確認し、状態を保存して、応答を返します.
 
 ```rust
 pub fn init(
@@ -206,9 +206,9 @@ pub fn init(
 ) -> Result<InitResponse, ContractError> {
 ```
 
-このシグネチャは、CosmWasmハンドラー関数に表示されます。 Depsによってハンドラーに渡された実行コンテキストを使用します。これには、ストレージ、API、およびQuerier関数が含まれます。Envには、ブロック、メッセージ、およびコントラクト情報が含まれます。MSGについては、説明は必要ありません。
+このシグネチャは、CosmWasmハンドラー関数に表示されます. Depsによってハンドラーに渡された実行コンテキストを使用します.これには、ストレージ、API、およびQuerier関数が含まれます.Envには、ブロック、メッセージ、およびコントラクト情報が含まれます.MSGについては、説明は必要ありません.
 
-`Result <T、ContractError>`は、成功([`Ok`])または失敗([` Err`])を示すタイプです。 実行が成功した場合はタイプ `T`を返し、そうでない場合は` ContractError`を返します。 できます。
+`Result <T、ContractError>`は、成功([`Ok`])または失敗([` Err`])を示すタイプです. 実行が成功した場合はタイプ `T`を返し、そうでない場合は` ContractError`を返します. できます.
 
 ### 対処する
 
@@ -216,7 +216,7 @@ pub fn init(
 タイムコード[https://vimeo.com/457702442#t=15m55s](https://vimeo.com/457702442#t=15m55s)
 :::
 
-`handle`メソッドは、メッセージを関数にルーティングします。 これは、CosmosSDKハンドラーの設計に似ています。
+`handle`メソッドは、メッセージを関数にルーティングします. これは、CosmosSDKハンドラーの設計に似ています.
 
 ```rust
 pub fn handle(
@@ -263,8 +263,8 @@ pub fn handle_transfer(
 
 #### 执行
 
-你会在 plus 和示例智能合约中看到 `handle_execute`，但实际上它只是一个命名，没什么特别的。
-大多数功能与`transfer`相同。 只有两个新东西:消息资金检查和返回上下文中的 sdk 消息。
+你会在 plus 和示例智能合约中看到 `handle_execute`，但实际上它只是一个命名，没什么特别的.
+大多数功能与`transfer`相同. 只有两个新东西:消息资金检查和返回上下文中的 sdk 消息.
 
 ```rust
 pub fn handle_execute(
@@ -318,9 +318,9 @@ pub fn handle_execute(
 
 ### Query
 
-このコントラクトクエリメソッドは非常に単純で、構成クエリのみです。
-より複雑なクエリについては、[cosmwasm-plus](https://github.com/CosmWasm/cosmwasm-plus/)コントラクトを確認してください。
-ゼロから学び始めた場合は、20分のcosmwasmの経験があります。スキムと契約を進めて、シンプルさを確認してください。
+このコントラクトクエリメソッドは非常に単純で、構成クエリのみです.
+より複雑なクエリについては、[cosmwasm-plus](https://github.com/CosmWasm/cosmwasm-plus/)コントラクトを確認してください.
+ゼロから学び始めた場合は、20分のcosmwasmの経験があります.スキムと契約を進めて、シンプルさを確認してください.
 
 ```rust
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
@@ -337,7 +337,7 @@ fn query_config(deps: Deps) -> StdResult<ConfigResponse> {
 
 ### Build
 
-単純にコードをビルドして、それが機能するかどうかを確認するには、次のようにします。
+単純にコードをビルドして、それが機能するかどうかを確認するには、次のようにします.
 
 ```shell
 cargo build
@@ -356,8 +356,8 @@ rustup component add clippy rustfmt
 cargo fmt
 ```
 
-通常、Rustコンパイラはその仕事をうまく行い、エラーの解決策に導き、警告などを表示します。
-ただし、コードでlinterを実行することは常に良いことです。
+通常、Rustコンパイラはその仕事をうまく行い、エラーの解決策に導き、警告などを表示します.
+ただし、コードでlinterを実行することは常に良いことです.
 
 ```shell
 cargo clippy -- -D warnings
@@ -365,7 +365,7 @@ cargo clippy -- -D warnings
 
 ### Compile
 
-このセクションでは、[Compiling Contract](/getting-started/compile-contract.md)ドキュメントの主要なコマンドをコンパイルします。詳細については、ドキュメントに進んでください。
+このセクションでは、[Compiling Contract](/getting-started/compile-contract.md)ドキュメントの主要なコマンドをコンパイルします.詳細については、ドキュメントに進んでください.
 
 基本的なコンパイル:
 
@@ -388,17 +388,17 @@ docker run --rm -v "$(pwd)":/code \
   cosmwasm/rust-optimizer:0.10.7
 ```
 
-チェーンにデプロイする前に、上記のコマンドを使用する必要があります。
+チェーンにデプロイする前に、上記のコマンドを使用する必要があります.
 
 ### Schema
 
-コントラクトを使用しようとするすべての人のガイドとして機能するJSONスキーマを生成することもできます。これは主にドキュメント化を目的としていますが、コードエクスプローラーで[TypeScript定義を開く]をクリックすると、それらを使用して生成する方法を確認できます。 TypeScriptバインディング。
+コントラクトを使用しようとするすべての人のガイドとして機能するJSONスキーマを生成することもできます.これは主にドキュメント化を目的としていますが、コードエクスプローラーで[TypeScript定義を開く]をクリックすると、それらを使用して生成する方法を確認できます. TypeScriptバインディング.
 
 ```shell
 cargo schema
 ```
 
-生成されたスキーマは[simple-option/schema](https://github.com/CosmWasm/cosmwasm-examples/tree/master/simple-option/schema)で確認できます。
+生成されたスキーマは[simple-option/schema](https://github.com/CosmWasm/cosmwasm-examples/tree/master/simple-option/schema)で確認できます.
 
 ```
 schema
@@ -408,4 +408,4 @@ schema
 └── query_msg.json
 ```
 
-先に進み、スキーマを調べてください。
+先に進み、スキーマを調べてください.

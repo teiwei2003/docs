@@ -2,9 +2,9 @@
 
 <iframe src="https://player.vimeo.com/video/457705991" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
 
-此时您的代码应该正在编译，尽管我们没有测试它是否有效。
-每次进行更改时，您都可以将代码部署到链中。 但是来吧，你的时间比那更宝贵。
-此外，最好保持合同不受干扰并测试未来的变化。
+此时您的代码应该正在编译，尽管我们没有测试它是否有效.
+每次进行更改时，您都可以将代码部署到链中. 但是来吧，你的时间比那更宝贵.
+此外，最好保持合同不受干扰并测试未来的变化.
 
 ```rust
 #[cfg(test)]
@@ -50,8 +50,8 @@ fn proper_initialization() {
 }
 ```
 
-很好，我们现在有一个测试环境初始化程序。 这是一个非常简单的方法，您可以将变量传递给函数并进行不同的调整。
-查看 cosmwasm-plus 了解更多信息。
+很好，我们现在有一个测试环境初始化程序. 这是一个非常简单的方法，您可以将变量传递给函数并进行不同的调整.
+查看 cosmwasm-plus 了解更多信息.
 
 ### 模拟依赖、环境和消息信息
 
@@ -72,7 +72,7 @@ pub fn mock_dependencies(
 }
 ```
 
-这为测试设置了依赖项，例如存储、api 和查询器。
+这为测试设置了依赖项，例如存储、api 和查询器.
 
 ```rust
 /// Returns a default enviroment with height, time, chain_id, and contract address
